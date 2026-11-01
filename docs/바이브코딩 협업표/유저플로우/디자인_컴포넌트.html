@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>문서 디자인 컴포넌트</title>
+  <meta name="description" content="바이브코딩 협업표 문서를 HTML로 뽑을 때 쓰는 디자인 토큰, 컴포넌트, FlowKit 다이어그램 렌더러, 시작 뼈대">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 공통 CSS: 시작 뼈대에 그대로 복사된다 -->
+  <style id="kitcss">
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    .canvas { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .canvas::-webkit-scrollbar { height: 8px; }
+    .canvas::-webkit-scrollbar-thumb { background: #dcd7cd; border-radius: 99px; }
+    .canvas svg { display: block; height: auto; }
+    .canvas a:hover rect.cardbox { stroke: #1d1c1a; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    .codebox { background: #1d1c1a; color: #ece9e2; border-radius: 16px; font: 13px/1.65 ui-monospace, SFMono-Regular, Consolas, 'D2Coding', monospace; }
+    .codebox pre { margin: 0; padding: 18px 20px; overflow: auto; max-height: 420px; white-space: pre; tab-size: 2; }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .sum-plus { transform: rotate(45deg); }
+    .sum-plus { transition: transform .25s; }
+    .frame { background-image: radial-gradient(#e2ded5 1px, transparent 1px); background-size: 14px 14px; }
+  </style>
+</head>
+<body class="min-h-[100dvh] font-sans antialiased">
+
+  <!-- TopBar -->
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">협업표 <span class="text-mute font-medium">디자인 컴포넌트</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#tokens" class="px-3 py-2 rounded-full hover:bg-white">토큰</a>
+        <a href="#layout" class="px-3 py-2 rounded-full hover:bg-white">뼈대</a>
+        <a href="#cards" class="px-3 py-2 rounded-full hover:bg-white">카드</a>
+        <a href="#content" class="px-3 py-2 rounded-full hover:bg-white">내용</a>
+        <a href="#diagram" class="px-3 py-2 rounded-full hover:bg-white">다이어그램</a>
+        <a href="#starter" class="px-3 py-2 rounded-full hover:bg-white">시작 뼈대</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <!-- PageHeader -->
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">DESIGN KIT · VIBE CODING DOCS · v1</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">문서 디자인<br>컴포넌트</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[34rem]">
+        협업표 문서를 <b class="text-ink">HTML 디자인 자료</b>로 뽑을 때 쓰는 부품 모음입니다.
+        규칙은 <b class="text-ink">디자인_형식서.md</b>에 있고, 여기서는 <b class="text-ink">모양을 보고 코드를 복사</b>합니다.
+      </p>
+    </header>
+
+    <!-- 사용법 -->
+    <section class="pt-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 keep">
+        <div class="border-t-[3px] border-ink pt-5">
+          <p class="eyebrow text-xs font-bold text-mute">STEP 1</p>
+          <h3 class="mt-2 text-xl font-black tracking-tight">시작 뼈대 복사</h3>
+          <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">맨 아래 <a href="#starter" class="underline underline-offset-4">시작 뼈대</a>를 복사해 새 HTML 파일을 만듭니다. 공통 CSS와 FlowKit이 이미 들어 있습니다.</p>
+        </div>
+        <div class="border-t-[3px] border-ink pt-5">
+          <p class="eyebrow text-xs font-bold text-mute">STEP 2</p>
+          <h3 class="mt-2 text-xl font-black tracking-tight">컴포넌트 끼워 넣기</h3>
+          <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">문서 섹션마다 맞는 컴포넌트의 <b class="text-ink">코드 보기</b>를 열어 복사하고, 중괄호 자리만 바꿉니다.</p>
+        </div>
+        <div class="border-t-[3px] border-ink pt-5">
+          <p class="eyebrow text-xs font-bold text-mute">STEP 3</p>
+          <h3 class="mt-2 text-xl font-black tracking-tight">점검</h3>
+          <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">브라우저 콘솔에서 <code class="chip rounded px-1.5">FlowKit.check()</code>가 빈 배열인지, 375px 폭에서 가로로 넘치지 않는지 봅니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 토큰 -->
+    <section id="tokens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">디자인 토큰</span>
+        <span class="text-mute">형식서 2장 · 이 값 밖의 색은 쓰지 않음</span>
+      </h2>
+      <p class="mt-7 text-sm font-bold text-mute keep">기본 색</p>
+      <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3" id="swatch-base"></div>
+      <p class="mt-8 text-sm font-bold text-mute keep">블록 색 · 바탕 / 테두리</p>
+      <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3" id="swatch-block"></div>
+
+      <p class="mt-10 text-sm font-bold text-mute keep">글자</p>
+      <div class="mt-3 card rounded-2xl divide-y divide-line keep">
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">페이지 제목 · text-5xl md:text-7xl font-black</code><p class="text-4xl md:text-5xl font-black tracking-tight leading-[1.08]">쿠션톡 유저 플로우</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">아이브로 · eyebrow text-sm font-bold</code><p class="eyebrow text-sm font-bold text-mute">USER FLOW · CUSHION TALK</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">섹션 제목 · text-2xl md:text-3xl font-black</code><p class="text-2xl md:text-3xl font-black tracking-tight">전체 지도</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">카드 제목 · text-2xl md:text-[28px] font-black</code><p class="text-2xl md:text-[28px] font-black tracking-tight">메시지 보내기</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">본문 · text-[15px] #5a564f</code><p class="text-[15px] text-[#5a564f] leading-relaxed">학부모의 요청이 담임에게 빠짐없이 보내진다. 거친 표현을 썼다면 보내기 전에 한 번 돌아본다.</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-[14rem_1fr] gap-2 md:gap-6 p-5 items-center"><code class="text-xs text-mute">메모 · text-[13.5px] #7c776e</code><p class="text-[13.5px] text-[#7c776e]">보내기 전 검사가 5초 넘으면 검사 없이 보낸다. <span class="text-[#b5651d] font-semibold">(미정) 경고 무시 기록을 보여 주나?</span></p></div>
+      </div>
+    </section>
+
+    <!-- 02 뼈대 -->
+    <section id="layout" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">페이지 뼈대</span>
+        <span class="text-mute">TopBar → PageHeader → 번호 섹션 → Footer</span>
+      </h2>
+      <div class="mt-7 space-y-6">
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="TopBar" data-use="모든 페이지">
+          <p class="comp-desc">위에 고정되는 반투명 바. 왼쪽 서비스 이름, 오른쪽 섹션 바로가기. 플로우 글자(A~F)는 둥근 버튼으로.</p>
+          <div class="demo">
+<nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+  <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+    <a href="#top" class="font-extrabold tracking-tight shrink-0">{서비스 이름} <span class="text-mute font-medium">{문서 종류}</span></a>
+    <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+      <a href="#sec-1" class="px-3 py-2 rounded-full hover:bg-white">{섹션}</a>
+      <a href="#flow-a" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">A</a>
+      <a href="#flow-b" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">B</a>
+    </div>
+  </div>
+</nav>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="PageHeader" data-use="모든 페이지">
+          <p class="comp-desc">영문 아이브로 + 두 줄 큰 제목 + 오른쪽 요약. 요약의 핵심 단어는 검정 굵게. 아래에 굵은 검정 가로줄.</p>
+          <div class="demo">
+<header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+  <div>
+    <p class="eyebrow text-xs md:text-sm font-bold text-mute">{ENGLISH LABEL} · {YY.MM.DD}</p>
+    <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">{서비스 이름}<br>{문서 종류}</h1>
+  </div>
+  <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[34rem]">
+    {한두 문장 요약}. <b class="text-ink">{핵심 단어}</b>는 굵게 표시합니다.
+  </p>
+</header>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="SectionTitle" data-use="모든 섹션">
+          <p class="comp-desc">번호(아이브로) + 굵은 제목 + 회색 보조 설명 한 줄. 섹션은 pt-20, 내용은 mt-7.</p>
+          <div class="demo">
+<h2 class="flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+  <span class="eyebrow text-sm font-bold text-mute">01</span>
+  <span class="text-2xl md:text-3xl font-black tracking-tight">{섹션 제목}</span>
+  <span class="text-mute">{보조 설명 한 줄}</span>
+</h2>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="Footer" data-use="모든 페이지">
+          <p class="comp-desc">가는 줄 위에 근거 문서와 양식 파일 이름. 왼쪽 근거, 오른쪽 양식.</p>
+          <div class="demo">
+<footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+  <p>근거 — {근거 문서 파일 이름}</p>
+  <p>양식 — {양식 파일 이름} · 디자인_형식서.md</p>
+</footer>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 03 카드 -->
+    <section id="cards" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">카드 · 칩 · 배지</span>
+        <span class="text-mute">흰 카드는 테두리만, 그림자 없음</span>
+      </h2>
+      <div class="mt-7 space-y-6">
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="LegendCard" data-use="블록 범례 · 핵심 개념 소개">
+          <p class="comp-desc">왼쪽 연한 색 타일 안에 도형, 오른쪽 이름 · 설명 · 예시 칩. 4칸 그리드(xl)로 늘어놓는다. 타일 색은 블록 색 바탕.</p>
+          <div class="demo">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 keep">
+  <div class="card rounded-2xl p-5 flex gap-4 items-center">
+    <div class="w-24 h-20 rounded-xl bg-[#e8eefb] grid place-items-center shrink-0">
+      <svg width="66" height="40" viewBox="0 0 66 40"><rect x="2" y="2" width="62" height="36" rx="4" fill="#fff" stroke="#2f5fd0" stroke-width="2.2"/></svg>
+    </div>
+    <div>
+      <p class="font-extrabold text-lg">{이름}</p>
+      <p class="text-sm text-mute">{모양 · 한 줄 설명}</p>
+      <p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">{예시}</span><span class="chip rounded-md px-2 py-0.5">{예시}</span></p>
+    </div>
+  </div>
+  <div class="card rounded-2xl p-5 flex gap-4 items-center">
+    <div class="w-24 h-20 rounded-xl bg-[#fbf0dc] grid place-items-center shrink-0">
+      <svg width="70" height="44" viewBox="0 0 70 44"><polygon points="35,2 68,22 35,42 2,22" fill="#fff" stroke="#c58a1d" stroke-width="2.2"/></svg>
+    </div>
+    <div>
+      <p class="font-extrabold text-lg">분기</p>
+      <p class="text-sm text-mute">마름모 · ?로 끝남</p>
+      <p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">위협?</span></p>
+    </div>
+  </div>
+</div>
+          </div>
+          <p class="mt-4 text-sm text-mute keep">블록 8종의 타일 SVG(시작/끝 · 화면 · 사용자 입력 · 시스템 처리 · 분기 · 연결점 · 실선 · 점선)는 <code class="chip rounded px-1.5">../유저플로우_쿠션톡_261015.html</code>의 01 섹션에서 그대로 복사한다.</p>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="Chip · StatusBadge · FlowBadge" data-use="화면 번호 · 분담표 상태 · 플로우 글자">
+          <p class="comp-desc">칩은 회색 태그. 상태 배지는 블록 색을 빌린다(대기=시스템 회색, 진행=화면 파랑, 완료=시작 초록, 보류=점선 빨강, 임시=분기 주황). 플로우 배지는 연결점 분홍 원.</p>
+          <div class="demo">
+<div class="flex flex-wrap items-center gap-2 keep">
+  <span class="chip rounded-md px-2 py-0.5 text-[13px] font-semibold">6-1</span>
+  <span class="chip rounded-md px-2 py-0.5 text-[13px] font-semibold">경고 (시트)</span>
+  <span class="badge st-wait">대기</span>
+  <span class="badge st-doing">진행</span>
+  <span class="badge st-done">완료</span>
+  <span class="badge st-hold">보류</span>
+  <span class="badge st-temp">새 화면 · 번호 임시</span>
+  <span class="fbadge w-9 h-9">A</span>
+  <span class="fbadge w-12 h-12 text-xl">B</span>
+</div>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="PanelCard" data-use="지도 · 다이어그램 · 긴 내용">
+          <p class="comp-desc">큰 흰 카드. 다이어그램이나 표처럼 한 덩어리 내용을 담는다. 카드 안 구분은 border-line 가는 줄.</p>
+          <div class="demo">
+<div class="card rounded-[28px] p-5 md:p-8 keep">
+  <p class="text-sm font-semibold text-mute">{작은 머리말}</p>
+  <h3 class="text-2xl md:text-[28px] font-black tracking-tight leading-tight">{카드 제목}</h3>
+  <p class="mt-3 text-[15px] text-[#4a4741] leading-relaxed">{본문}</p>
+  <div class="mt-6 pt-6 border-t border-line">{다이어그램 · 표 등}</div>
+</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 04 내용 -->
+    <section id="content" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">내용 컴포넌트</span>
+        <span class="text-mute">원칙 · 표 · 메모 · 미정 목록</span>
+      </h2>
+      <div class="mt-7 space-y-6">
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="RuleColumns" data-use="원인 · 해결 방안 · 기대 효과 · 원칙">
+          <p class="comp-desc">위에 굵은 검정 줄이 있는 칸. 아이브로에 번호나 플로우 글자를 넣는다. 3칸씩(xl), 2칸(md), 1칸(모바일).</p>
+          <div class="demo">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep">
+  <div class="border-t-[3px] border-ink pt-5">
+    <p class="eyebrow text-xs font-bold text-mute">RULE 1</p>
+    <h3 class="mt-2 text-xl font-black tracking-tight">{굵은 제목}</h3>
+    <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">{두세 줄 설명}</p>
+  </div>
+  <div class="border-t-[3px] border-ink pt-5">
+    <p class="eyebrow text-xs font-bold text-mute">FLOW B · C</p>
+    <h3 class="mt-2 text-xl font-black tracking-tight">AI 완충</h3>
+    <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">공격 표현 가림 · 요청 요약 만들기 → 교사 메시지 상세에서 요약만 본다.</p>
+  </div>
+  <div class="border-t-[3px] border-ink pt-5">
+    <p class="eyebrow text-xs font-bold text-mute">EFFECT · 교사</p>
+    <h3 class="mt-2 text-xl font-black tracking-tight">요청만 보고 일한다</h3>
+    <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">공격적인 표현에 노출되지 않는다.</p>
+  </div>
+</div>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="DataTable" data-use="대상 사용자 · 화면 번호 · 분담표">
+          <p class="comp-desc">흰 카드 안 표. 머리글 아래 굵은 검정 줄, 줄 사이 가는 줄. 첫 열이 번호면 파랑 굵게. 좁으면 카드 안에서 좌우 스크롤.</p>
+          <div class="demo">
+<div class="card rounded-2xl overflow-x-auto">
+  <table class="w-full min-w-[34rem] text-[15px] keep">
+    <thead>
+      <tr class="border-b-2 border-ink text-left">
+        <th class="px-5 py-3.5 font-extrabold w-24">Todo</th>
+        <th class="px-5 py-3.5 font-extrabold">제목</th>
+        <th class="px-5 py-3.5 font-extrabold">선행</th>
+        <th class="px-5 py-3.5 font-extrabold">상태</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-line">
+      <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">#1</td><td class="px-5 py-3.5 font-semibold">{제목}</td><td class="px-5 py-3.5 text-[#5a564f]">없음</td><td class="px-5 py-3.5"><span class="badge st-done">완료</span></td></tr>
+      <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">#2</td><td class="px-5 py-3.5 font-semibold">{제목}</td><td class="px-5 py-3.5 text-[#5a564f]">#1</td><td class="px-5 py-3.5"><span class="badge st-doing">진행</span></td></tr>
+      <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">#3</td><td class="px-5 py-3.5 font-semibold">{제목}</td><td class="px-5 py-3.5 text-[#5a564f]">#2</td><td class="px-5 py-3.5"><span class="badge st-hold">보류</span> <span class="text-sm text-mute">T2-MJ 기다림</span></td></tr>
+    </tbody>
+  </table>
+</div>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="MemoList" data-use="FlowCard 오른편 · 보충 설명">
+          <p class="comp-desc">회색 작은 점 목록. (미정)은 주황 굵은 글자로, 목록 맨 아래에 둔다.</p>
+          <div class="demo">
+<ul class="text-[13.5px] leading-relaxed space-y-1.5 keep">
+  <li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>{규칙이나 숫자 · 이유}</span></li>
+  <li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>{메모}</span></li>
+  <li class="text-[#b5651d] font-semibold flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b5651d] shrink-0"></span><span>(미정) {아직 정하지 않은 것}</span></li>
+</ul>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="OpenList" data-use="다음 회의에서 정할 것">
+          <p class="comp-desc">위에 굵은 검정 줄, 항목마다 플로우 배지 + 질문. 공통 항목은 배지 대신 회색 글자.</p>
+          <div class="demo">
+<ol class="grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink">
+  <li class="flex gap-4 items-center py-4 border-b border-line">
+    <span class="fbadge w-9 h-9">A</span>
+    <span class="text-[15px] font-semibold">{정할 질문}?</span>
+  </li>
+  <li class="flex gap-4 items-center py-4 border-b border-line">
+    <span class="w-9 h-9 grid place-items-center shrink-0 text-xs font-bold text-mute">공통</span>
+    <span class="text-[15px] font-semibold">{정할 질문}?</span>
+  </li>
+</ol>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 05 다이어그램 -->
+    <section id="diagram" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다이어그램 (FlowKit)</span>
+        <span class="text-mute">형식서 5장 · 좌표 데이터만 쓰면 SVG로 그려짐</span>
+      </h2>
+      <div class="mt-7 space-y-6">
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="FlowCanvas" data-use="유저 플로우 · 서비스 흐름" data-code-from="#demo-flow">
+          <p class="comp-desc">블록 6종 + 실선 · 빨간 점선 + 회색 메모 + (미정) 메모. 아래 코드는 이 그림의 데이터다. 블록 크기와 배치 간격은 형식서 5-1, 5-2.</p>
+          <div class="canvas frame rounded-2xl p-3" id="demo-flow-canvas"></div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="MapCanvas" data-use="전체 지도" data-code-from="#demo-map">
+          <p class="comp-desc">FlowKit의 card 블록(누가 · 무엇을 · 링크)과 연결점 배지가 붙은 화살표. 카드를 누르면 해당 FlowCard로 이동한다.</p>
+          <div class="canvas frame rounded-2xl p-3" id="demo-map-canvas"></div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="FlowCard" data-use="유저 플로우 한 개">
+          <p class="comp-desc">위쪽 왼편: 플로우 배지 · 누가 · 무엇을 · 목표 · 화면 칩. 오른편: MemoList. 아래: FlowCanvas. 플로우마다 하나씩 쌓는다(space-y-8).</p>
+          <div class="demo">
+<article id="flow-a" class="card rounded-[28px] p-5 md:p-8">
+  <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-6 lg:gap-12 keep">
+    <div class="flex gap-4 items-start">
+      <span class="fbadge w-12 h-12 text-xl">A</span>
+      <div>
+        <p class="text-sm font-semibold text-mute">{누가}</p>
+        <h3 class="text-2xl md:text-[28px] font-black tracking-tight leading-tight">{무엇을}</h3>
+        <p class="mt-3 text-[15px] text-[#4a4741] leading-relaxed"><b class="text-ink">목표</b> · {이 플로우가 끝나면 이뤄지는 것}</p>
+        <p class="mt-3 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">{화면 번호}</span></p>
+      </div>
+    </div>
+    <ul class="text-[13.5px] leading-relaxed space-y-1.5 lg:border-l lg:border-line lg:pl-8">
+      <li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>{메모}</span></li>
+      <li class="text-[#b5651d] font-semibold flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b5651d] shrink-0"></span><span>(미정) {정할 것}</span></li>
+    </ul>
+  </div>
+  <div class="canvas mt-6 pt-6 border-t border-line" id="flow-a-canvas"><!-- FlowKit.mount('#flow-a-canvas', 'a', FLOW_A) --></div>
+</article>
+          </div>
+        </article>
+
+        <article class="comp card rounded-[28px] p-5 md:p-8" data-name="FlowKit 소스" data-use="시작 뼈대에 이미 들어 있음" data-code-from="#flowkit">
+          <p class="comp-desc">다이어그램 렌더러 전체 코드. 이 파일의 이 스크립트가 원본이다. 고칠 때는 여기를 고치고 형식서 5장도 함께 고친다.</p>
+          <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm keep">
+            <div class="chip rounded-xl p-4"><dt class="font-extrabold">FlowKit.mount(el, id, data)</dt><dd class="mt-1 text-[#5a564f]">el 안에 SVG를 그린다. id는 페이지 안에서 겹치지 않게.</dd></div>
+            <div class="chip rounded-xl p-4"><dt class="font-extrabold">FlowKit.render(id, data)</dt><dd class="mt-1 text-[#5a564f]">SVG 문자열만 돌려준다. 템플릿 문자열 안에 넣을 때.</dd></div>
+            <div class="chip rounded-xl p-4"><dt class="font-extrabold">FlowKit.check()</dt><dd class="mt-1 text-[#5a564f]">겹침 점검. 빈 배열이면 끝. 문제는 콘솔에 한국어로 나온다.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <!-- 06 시작 뼈대 -->
+    <section id="starter" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">시작 뼈대</span>
+        <span class="text-mute">복사해서 새 파일로 저장 → 중괄호 자리 채우기</span>
+      </h2>
+      <div class="mt-7 card rounded-[28px] p-5 md:p-8">
+        <div class="flex flex-wrap gap-3 items-center justify-between keep">
+          <p class="text-[15px] text-[#5a564f] leading-relaxed max-w-[60ch]">공통 CSS, Tailwind 설정, TopBar · PageHeader · FlowCard · RuleColumns · DataTable · Footer, FlowKit과 예시 데이터가 들어 있는 완성 파일입니다.</p>
+          <div class="flex gap-2">
+            <button id="starter-preview" class="rounded-full px-5 py-3 min-h-[48px] font-bold border-2 border-ink hover:bg-white transition">미리 보기</button>
+            <button id="starter-copy" class="rounded-full px-5 py-3 min-h-[48px] font-bold bg-ink text-paper hover:scale-[1.02] active:scale-[0.98] transition">전체 복사</button>
+          </div>
+        </div>
+        <div class="codebox mt-6"><pre id="starter-code"></pre></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>규칙 — 디자인_형식서.md · 블록 뜻 — 유저플로우_블록정의.md</p>
+    <p>참고 구현 — ../유저플로우_쿠션톡_261015.html</p>
+  </footer>
+
+  <!-- FlowKit (원본) -->
+  <script id="flowkit">
+  /* FlowKit v1 · 유저 플로우 SVG 렌더러
+     기준 문서: 문서/바이브코딩 협업표/디자인_형식서.md (4장)
+     쓰는 법: FlowKit.mount('#el', 'a', data) · 다 그린 뒤 콘솔에서 FlowKit.check() → [] 이면 겹침 없음 */
+  const FlowKit = (() => {
+    const DIM = { start: [116, 48], screen: [160, 58], input: [176, 52], system: [180, 58], decision: [150, 96], conn: [40, 40], card: [300, 84] };
+    const SK = 14; // 평행사변형 기울기
+    const COL = {
+      start: ['#e4f1e9', '#2f7a57'], screen: ['#e8eefb', '#2f5fd0'], input: ['#efe8fb', '#7a4bd1'],
+      system: ['#ecebe6', '#57534e'], decision: ['#fbf0dc', '#c58a1d'], conn: ['#fdebf1', '#c8406b'],
+    };
+    const INK = '#3b3a37', RED = '#cf3b2c', MUTE = '#8b867d', OPEN = '#b5651d';
+
+    const dim = (n) => [n.w || DIM[n.t][0], n.h || DIM[n.t][1]];
+    function anc(n, s) {
+      const [w, h] = dim(n), hw = w / 2, hh = h / 2, dx = n.t === 'input' ? SK / 2 : 0;
+      return s === 'l' ? [n.x - hw + dx, n.y] : s === 'r' ? [n.x + hw - dx, n.y] : s === 't' ? [n.x, n.y - hh] : [n.x, n.y + hh];
+    }
+    function route(a, as, b, bs, via) {
+      if (via) return [a, ...via, b];
+      if (a[0] === b[0] || a[1] === b[1]) return [a, b];
+      const H = (s) => s === 'l' || s === 'r';
+      if (H(as) && H(bs)) { const m = (a[0] + b[0]) / 2; return [a, [m, a[1]], [m, b[1]], b]; }
+      if (!H(as) && !H(bs)) { const m = (a[1] + b[1]) / 2; return [a, [a[0], m], [b[0], m], b]; }
+      return H(as) ? [a, [b[0], a[1]], b] : [a, [a[0], b[1]], b];
+    }
+    function longestMid(p) {
+      let best = 0, m = p[0];
+      for (let i = 1; i < p.length; i++) {
+        const L = Math.abs(p[i][0] - p[i - 1][0]) + Math.abs(p[i][1] - p[i - 1][1]);
+        if (L > best) { best = L; m = [(p[i][0] + p[i - 1][0]) / 2, (p[i][1] + p[i - 1][1]) / 2]; }
+      }
+      return m;
+    }
+    const tw = (s, fs) => [...s].reduce((w, c) => w + (/[ㄱ-힝“”·]/.test(c) ? fs : c === ' ' ? fs * 0.3 : fs * 0.6), 0);
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+    function pill(x, y, t, red) {
+      const w = tw(t, 13.5) + 18;
+      return `<rect class="fk-pill" x="${x - w / 2}" y="${y - 12}" width="${w}" height="24" rx="6" fill="${red ? '#fff' : '#f1efea'}"/>`
+        + `<text class="fk-pill-text" x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="13.5" font-weight="700" fill="${red ? RED : INK}">${esc(t)}</text>`;
+    }
+    function connBadge(x, y, letter) {
+      return `<circle class="fk-shape" data-t="conn" cx="${x}" cy="${y}" r="15" fill="#fff" stroke="${COL.conn[1]}" stroke-width="2"/>`
+        + `<text x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="800" fill="${COL.conn[1]}">${letter}</text>`;
+    }
+
+    function node(n) {
+      const [w, h] = dim(n), hw = w / 2, hh = h / 2, x = n.x, y = n.y;
+      if (n.t === 'card') {
+        const g = `<rect class="fk-shape cardbox" data-t="card" x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="18" fill="#fff" stroke="${n.warn ? '#e9b9c7' : '#dcd7cd'}" stroke-width="1.6"/>`
+          + `<circle cx="${x - hw + 42}" cy="${y}" r="21" fill="${COL.conn[0]}" stroke="${COL.conn[1]}" stroke-width="2"/>`
+          + `<text x="${x - hw + 42}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="800" fill="${COL.conn[1]}">${esc(n.l)}</text>`
+          + `<text x="${x - hw + 78}" y="${y - 9}" font-size="13" font-weight="600" fill="${MUTE}">${esc(n.who)}</text>`
+          + `<text x="${x - hw + 78}" y="${y + 15}" font-size="19" font-weight="800" fill="#1d1c1a">${esc(n.what)}</text>`;
+        return n.href ? `<a href="${n.href}">${g}</a>` : g;
+      }
+      const [f, s] = COL[n.t];
+      const A = `class="fk-shape" data-t="${n.t}" fill="${f}" stroke="${s}" stroke-width="2.2"`;
+      if (n.t === 'conn') {
+        return `<circle ${A} cx="${x}" cy="${y}" r="${hw}"/>`
+          + `<text x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="800" fill="${s}">${esc(n.l)}</text>`;
+      }
+      let g = '';
+      if (n.t === 'start') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="${hh}"/>`;
+      if (n.t === 'screen') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="6"/>`;
+      if (n.t === 'input') g = `<polygon ${A} points="${x - hw + SK},${y - hh} ${x + hw},${y - hh} ${x + hw - SK},${y + hh} ${x - hw},${y + hh}"/>`;
+      if (n.t === 'system') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="3"/>`
+        + `<line x1="${x - hw + 10}" y1="${y - hh}" x2="${x - hw + 10}" y2="${y + hh}" stroke="${s}" stroke-width="1.8"/>`
+        + `<line x1="${x + hw - 10}" y1="${y - hh}" x2="${x + hw - 10}" y2="${y + hh}" stroke="${s}" stroke-width="1.8"/>`;
+      if (n.t === 'decision') g = `<polygon ${A} points="${x},${y - hh} ${x + hw},${y} ${x},${y + hh} ${x - hw},${y}"/>`;
+      const lines = String(n.l).split('\n'), LH = 21, SH = n.s ? 17 : 0, total = lines.length * LH + SH;
+      let ty = y - total / 2 + LH / 2, t = '';
+      lines.forEach((ln) => { t += `<text class="fk-text" x="${x}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="700" fill="#1d1c1a">${esc(ln)}</text>`; ty += LH; });
+      if (n.s) t += `<text x="${x}" y="${ty - 1}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="${n.t === 'system' ? MUTE : s}">${esc(n.s)}</text>`;
+      return g + t;
+    }
+
+    function memo(m) {
+      const a = m.a || 'start';
+      return String(m.t).split('\n').map((ln, i) =>
+        `<text class="fk-memo" x="${m.x}" y="${m.y + i * 20}" text-anchor="${a}" font-size="14" font-weight="${m.o ? 700 : 500}" fill="${m.o ? OPEN : MUTE}">${esc((m.o && i === 0 ? '(미정) ' : '') + ln)}</text>`
+      ).join('');
+    }
+
+    function render(id, d) {
+      const N = Object.fromEntries(d.nodes.map((n) => [n.id, n]));
+      let edges = '', labels = '';
+      d.edges.forEach((e) => {
+        const E = Array.isArray(e) ? { f: e[0], t: e[1], l: e[2] } : e;
+        const [fi, fs] = E.f.split('.'), [ti, ts] = E.t.split('.');
+        if (!N[fi] || !N[ti]) { console.warn('FlowKit: 없는 블록', id, E); return; }
+        const a = anc(N[fi], fs), b = anc(N[ti], ts), pts = route(a, fs, b, ts, E.via);
+        const red = !!E.dash;
+        edges += `<path class="fk-edge" d="M${pts.map((p) => p.join(',')).join(' L')}" fill="none" stroke="${red ? RED : INK}" stroke-width="1.8" stroke-linejoin="round"${red ? ' stroke-dasharray="6 5"' : ''} marker-end="url(#${red ? 'ar' : 'ak'}-${id})"/>`;
+        const [lx, ly] = E.lp || longestMid(pts);
+        if (E.l) labels += pill(lx, ly, E.l, red);
+        if (E.c) labels += connBadge(lx, ly, E.c);
+      });
+      const marker = (mid, c) => `<marker id="${mid}-${id}" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`;
+      const extra = (d.lines || []).map((l) => `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#e5e1d8" stroke-width="1.5"/>`).join('');
+      return `<svg data-flow="${id}" viewBox="0 0 ${d.W} ${d.H}" width="100%" style="min-width:${Math.round(d.W * (d.min || 0.68))}px" font-family="Pretendard, system-ui, sans-serif" role="img" aria-label="${esc(d.title || d.what || id)}">`
+        + `<defs>${marker('ak', INK)}${marker('ar', RED)}</defs>${extra}${edges}${d.nodes.map(node).join('')}${labels}${(d.memos || []).map(memo).join('')}</svg>`;
+    }
+
+    function mount(target, id, d) {
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      el.innerHTML = render(id, d);
+    }
+
+    // 겹침 점검: 메모·라벨·블록·선이 겹치거나 글자가 블록 밖으로 나가면 알려 준다
+    function check(root = document) {
+      const issues = [];
+      const ov = (a, b, p = 0) => a.x < b.x + b.width - p && b.x < a.x + a.width - p && a.y < b.y + b.height - p && b.y < a.y + a.height - p;
+      root.querySelectorAll('svg[data-flow]').forEach((svg) => {
+        const id = svg.dataset.flow, vb = svg.viewBox.baseVal;
+        const shapes = [...svg.querySelectorAll('.fk-shape')].map((el) => ({ el, b: el.getBBox() }));
+        const pills = [...svg.querySelectorAll('.fk-pill')].map((el) => ({ t: el.nextElementSibling.textContent, b: el.getBBox() }));
+        const memos = [...svg.querySelectorAll('.fk-memo')].map((el) => ({ t: el.textContent, b: el.getBBox() }));
+        const texts = [...svg.querySelectorAll('.fk-text')].map((el) => ({ t: el.textContent, b: el.getBBox() }));
+        const segs = [];
+        svg.querySelectorAll('.fk-edge').forEach((p) => {
+          const pts = p.getAttribute('d').slice(1).split(' L').map((s) => s.split(',').map(Number));
+          for (let i = 1; i < pts.length; i++) {
+            const [a, b] = [pts[i - 1], pts[i]];
+            segs.push({ x: Math.min(a[0], b[0]) - 1, y: Math.min(a[1], b[1]) - 1, width: Math.abs(a[0] - b[0]) + 2, height: Math.abs(a[1] - b[1]) + 2 });
+          }
+        });
+        memos.forEach((m, i) => {
+          if (m.b.x < 0 || m.b.y < 0 || m.b.x + m.b.width > vb.width || m.b.y + m.b.height > vb.height) issues.push(`${id} · 캔버스 밖 메모: ${m.t}`);
+          if (shapes.some((s) => ov(m.b, s.b))) issues.push(`${id} · 메모가 블록과 겹침: ${m.t}`);
+          if (segs.some((s) => ov(m.b, s))) issues.push(`${id} · 메모가 선과 겹침: ${m.t}`);
+          if (pills.some((p) => ov(m.b, p.b))) issues.push(`${id} · 메모가 라벨과 겹침: ${m.t}`);
+          memos.slice(i + 1).forEach((n) => { if (ov(m.b, n.b, 1)) issues.push(`${id} · 메모끼리 겹침: ${m.t} / ${n.t}`); });
+        });
+        pills.forEach((p) => { if (shapes.some((s) => ov(p.b, s.b, 1))) issues.push(`${id} · 라벨이 블록에 닿음: ${p.t} (블록 간격을 넓히기)`); });
+        texts.forEach((t) => {
+          const cx = t.b.x + t.b.width / 2, cy = t.b.y + t.b.height / 2;
+          const host = shapes.find((s) => s.b.x <= cx && cx <= s.b.x + s.b.width && s.b.y <= cy && cy <= s.b.y + s.b.height);
+          if (!host) return;
+          const k = host.el.dataset.t;
+          const lim = k === 'decision' ? host.b.width * 0.62 : k === 'input' ? host.b.width - SK * 2 - 6 : host.b.width - 24;
+          if (t.b.width > lim) issues.push(`${id} · 글자가 블록보다 김: ${t.t} (줄을 나누거나 w 키우기)`);
+        });
+      });
+      console[issues.length ? 'warn' : 'log']('FlowKit.check', issues.length ? issues : '겹침 없음');
+      return issues;
+    }
+
+    return { DIM, COL, render, mount, check };
+  })();
+  </script>
+
+  <!-- 예시 데이터 -->
+  <script id="demo-flow">
+const LOGIN = {
+  W: 1240, H: 430,
+  nodes: [
+    { id: 'S', t: 'start', x: 70, y: 110, l: '앱 실행' },
+    { id: 'Q1', t: 'decision', x: 260, y: 110, l: '로그인\n됐나?' },
+    { id: 'Home', t: 'screen', x: 1000, y: 110, l: '홈', s: '1-2' },
+    { id: 'X', t: 'conn', x: 1170, y: 110, l: 'B' },
+    { id: 'L', t: 'screen', x: 260, y: 285, l: '로그인', s: '1-1' },
+    { id: 'In', t: 'input', x: 480, y: 285, l: '아이디·비번\n입력' },
+    { id: 'Sys', t: 'system', x: 770, y: 285, l: '계정 확인' },
+    { id: 'Q2', t: 'decision', x: 1000, y: 285, l: '정보\n맞나?' },
+  ],
+  edges: [
+    ['S.r', 'Q1.l'], ['Q1.r', 'Home.l', '예'], ['Home.r', 'X.l'],
+    ['Q1.b', 'L.t', '아니오'], ['L.r', 'In.l'], ['In.r', 'Sys.l', '로그인 클릭'], ['Sys.r', 'Q2.l'],
+    ['Q2.t', 'Home.b', '예'],
+    { f: 'Q2.b', t: 'L.b', l: '아니오 · 오류 메시지', dash: 1, via: [[1000, 390], [260, 390]] },
+  ],
+  memos: [
+    { x: 300, y: 212, t: '분기엔 예 / 아니오 두 길을 다 그린다' },
+    { x: 1022, y: 196, t: '두 길이 같은 화면으로 모임' },
+    { x: 1170, y: 152, t: '홈 플로우로', a: 'middle' },
+    { x: 770, y: 346, t: '5번 틀리면 잠글까?', a: 'middle', o: 1 },
+  ],
+};
+FlowKit.mount('#demo-flow-canvas', 'demo', LOGIN);
+  </script>
+  <script id="demo-map">
+const MAP = {
+  W: 1180, H: 200, min: 0.62,
+  nodes: [
+    { id: 'A', t: 'card', x: 170, y: 110, l: 'A', who: '학부모', what: '메시지 보내기', href: '#flow-a' },
+    { id: 'B', t: 'card', x: 590, y: 110, l: 'B', who: '서버', what: 'AI 분석', href: '#flow-b' },
+    { id: 'C', t: 'card', x: 1010, y: 110, l: 'C', who: '교사', what: '확인하고 답장', href: '#flow-c' },
+  ],
+  edges: [{ f: 'A.r', t: 'B.l', c: 'B' }, { f: 'B.r', t: 'C.l', c: 'C' }],
+  memos: [{ x: 0, y: 30, t: '메시지 한 통의 길' }],
+};
+FlowKit.mount('#demo-map-canvas', 'demomap', MAP);
+  </script>
+
+  <!-- 시작 뼈대 원문: /*KITCSS*/ 와 /*FLOWKIT*/ 자리는 이 페이지의 원본으로 채워진다 -->
+  <script type="text/plain" id="starter-src"><!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{서비스 이름} {문서 종류}</title>
+  <meta name="description" content="[{YY.MM.DD}] {한 줄 설명}">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  <\/script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>/*KITCSS*/</style>
+</head>
+<body class="min-h-[100dvh] font-sans antialiased">
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">{서비스 이름} <span class="text-mute font-medium">{문서 종류}</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#sec-1" class="px-3 py-2 rounded-full hover:bg-white">{섹션 1}</a>
+        <a href="#flow-a" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">A</a>
+        <a href="#sec-3" class="px-3 py-2 rounded-full hover:bg-white">{섹션 3}</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">{ENGLISH LABEL} · {YY.MM.DD}</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">{서비스 이름}<br>{문서 종류}</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[34rem]">{한두 문장 요약}. <b class="text-ink">{핵심 단어}</b>는 굵게.</p>
+    </header>
+
+    <section id="sec-1" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">{섹션 제목}</span>
+        <span class="text-mute">{보조 설명}</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep">
+        <div class="reveal border-t-[3px] border-ink pt-5">
+          <p class="eyebrow text-xs font-bold text-mute">RULE 1</p>
+          <h3 class="mt-2 text-xl font-black tracking-tight">{굵은 제목}</h3>
+          <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">{설명}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">{플로우}</span>
+        <span class="text-mute">좁은 화면에서는 좌우로 밀어서 보기</span>
+      </h2>
+      <div class="mt-7 space-y-8">
+        <article id="flow-a" class="reveal card rounded-[28px] p-5 md:p-8">
+          <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-6 lg:gap-12 keep">
+            <div class="flex gap-4 items-start">
+              <span class="fbadge w-12 h-12 text-xl">A</span>
+              <div>
+                <p class="text-sm font-semibold text-mute">{누가}</p>
+                <h3 class="text-2xl md:text-[28px] font-black tracking-tight leading-tight">{무엇을}</h3>
+                <p class="mt-3 text-[15px] text-[#4a4741] leading-relaxed"><b class="text-ink">목표</b> · {목표}</p>
+                <p class="mt-3 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">{화면 번호}</span></p>
+              </div>
+            </div>
+            <ul class="text-[13.5px] leading-relaxed space-y-1.5 lg:border-l lg:border-line lg:pl-8">
+              <li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>{메모}</span></li>
+              <li class="text-[#b5651d] font-semibold flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b5651d] shrink-0"></span><span>(미정) {정할 것}</span></li>
+            </ul>
+          </div>
+          <div class="canvas mt-6 pt-6 border-t border-line" id="flow-a-canvas"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="sec-3" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">{표 섹션}</span>
+        <span class="text-mute">{보조 설명}</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[34rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-24">{번호}</th><th class="px-5 py-3.5 font-extrabold">{항목}</th><th class="px-5 py-3.5 font-extrabold">{상태}</th></tr></thead>
+          <tbody class="divide-y divide-line">
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">1</td><td class="px-5 py-3.5 font-semibold">{내용}</td><td class="px-5 py-3.5"><span class="badge st-wait">대기</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — {근거 문서}</p>
+    <p>양식 — {양식 파일} · 디자인_형식서.md</p>
+  </footer>
+
+  <script>
+/*FLOWKIT*/
+
+  // ───────── 데이터 (형식서 5장) ─────────
+  const FLOW_A = {
+    W: 1240, H: 300,
+    nodes: [
+      { id: 'S', t: 'start', x: 70, y: 110, l: '{시작}' },
+      { id: 'A', t: 'screen', x: 250, y: 110, l: '{화면 이름}', s: '{번호}' },
+      { id: 'I', t: 'input', x: 460, y: 110, l: '{사용자 입력}' },
+      { id: 'P', t: 'system', x: 720, y: 110, l: '{시스템 처리}' },
+      { id: 'Q', t: 'decision', x: 940, y: 110, l: '{분기?}' },
+      { id: 'E', t: 'start', x: 1150, y: 110, l: '{끝}' },
+      { id: 'X', t: 'conn', x: 940, y: 250, l: 'B' },
+    ],
+    edges: [
+      ['S.r', 'A.l'], ['A.r', 'I.l'], ['I.r', 'P.l', '{행동}'], ['P.r', 'Q.l'], ['Q.r', 'E.l', '예'],
+      { f: 'Q.b', t: 'X.t', l: '아니오', dash: 1 },
+    ],
+    memos: [
+      { x: 720, y: 170, t: '{숫자 · 제한 · 이유}', a: 'middle' },
+      { x: 966, y: 255, t: '{정할 것}', o: 1 },
+    ],
+  };
+  FlowKit.mount('#flow-a-canvas', 'a', FLOW_A);
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  <\/script>
+</body>
+</html>
+</script>
+
+  <!-- 이 페이지 동작 -->
+  <script>
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function dedent(src) {
+    const lines = src.replace(/\t/g, '  ').split('\n');
+    while (lines.length && !lines[0].trim()) lines.shift();
+    while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+    const min = Math.min(...lines.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
+    return lines.map((l) => l.slice(min)).join('\n');
+  }
+  async function copyText(text, btn) {
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+    }
+    const old = btn.textContent; btn.textContent = '복사됨'; setTimeout(() => (btn.textContent = old), 1400);
+  }
+
+  // 색 견본
+  const BASE = [['paper', '#f4f2ee', '페이지 바탕'], ['ink', '#1d1c1a', '제목 · 굵은 줄'], ['card', '#ffffff', '카드 (테두리 #e8e4dc)'], ['line', '#e5e1d8', '구분선'], ['chip', '#f1efea', '칩 · 라벨'], ['body', '#5a564f', '본문'], ['mute', '#8b867d', '보조 · 메모'], ['open', '#b5651d', '(미정)'], ['red', '#cf3b2c', '점선 · 보류']];
+  const BLOCK = [['시작 / 끝', '#e4f1e9', '#2f7a57', '완료'], ['화면', '#e8eefb', '#2f5fd0', '진행 · 화면 번호'], ['사용자 입력', '#efe8fb', '#7a4bd1', ''], ['시스템 처리', '#ecebe6', '#57534e', '대기'], ['분기', '#fbf0dc', '#c58a1d', '임시 · 새 항목'], ['연결점', '#fdebf1', '#c8406b', '플로우 배지'], ['점선 화살표', '#fbe9e6', '#cf3b2c', '보류']];
+  document.getElementById('swatch-base').innerHTML = BASE.map(([n, c, u]) => `
+    <div class="card rounded-2xl p-3 keep"><div class="h-14 rounded-xl border border-[#e8e4dc]" style="background:${c}"></div>
+    <p class="mt-2 font-extrabold text-sm">${n}</p><p class="text-xs text-mute font-mono">${c}</p><p class="text-xs text-[#5a564f] mt-0.5">${u}</p></div>`).join('');
+  document.getElementById('swatch-block').innerHTML = BLOCK.map(([n, f, s, u]) => `
+    <div class="card rounded-2xl p-3 keep"><div class="h-14 rounded-xl" style="background:${f};border:2.2px solid ${s}"></div>
+    <p class="mt-2 font-extrabold text-sm">${n}</p><p class="text-xs text-mute font-mono">${f} / ${s}</p><p class="text-xs text-[#5a564f] mt-0.5">${u || '—'}</p></div>`).join('');
+
+  // 컴포넌트 머리 + 코드 보기
+  document.querySelectorAll('.comp').forEach((c) => {
+    const desc = c.querySelector('.comp-desc');
+    const head = document.createElement('div');
+    head.className = 'flex flex-wrap items-start justify-between gap-3 mb-5 keep';
+    head.innerHTML = `<div><p class="eyebrow text-xs font-bold text-mute">COMPONENT</p><h3 class="mt-1 text-2xl font-black tracking-tight">${c.dataset.name}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed max-w-[70ch]">${desc.innerHTML}</p></div>
+      <span class="chip rounded-md px-2 py-0.5 text-[13px] font-semibold">${c.dataset.use}</span>`;
+    desc.replaceWith(head);
+    const demo = c.querySelector('.demo');
+    if (demo) demo.className = 'demo frame rounded-2xl p-4 md:p-6 overflow-x-auto';
+    const src = c.dataset.codeFrom ? document.querySelector(c.dataset.codeFrom).textContent : demo.innerHTML;
+    const code = dedent(src);
+    const d = document.createElement('details');
+    d.className = 'mt-5';
+    d.innerHTML = `<summary class="inline-flex items-center gap-2 font-bold text-sm"><span class="sum-plus inline-block text-lg leading-none">+</span>코드 보기</summary>
+      <div class="codebox mt-3 relative"><button class="absolute top-3 right-3 rounded-full px-3 py-1.5 text-xs font-bold bg-paper text-ink">복사</button><pre>${esc(code)}</pre></div>`;
+    d.querySelector('button').addEventListener('click', (e) => copyText(code, e.currentTarget));
+    c.appendChild(d);
+  });
+
+  // 시작 뼈대
+  const starter = document.getElementById('starter-src').textContent
+    .replace(/<\\\/script>/g, '</' + 'script>')
+    .replace('/*KITCSS*/', () => '\n' + dedent(document.getElementById('kitcss').textContent).replace(/^/gm, '    ') + '\n  ')
+    .replace('/*FLOWKIT*/', () => document.getElementById('flowkit').textContent.replace(/^\n+|\s+$/g, ''));
+  document.getElementById('starter-code').textContent = starter;
+  document.getElementById('starter-copy').addEventListener('click', (e) => copyText(starter, e.currentTarget));
+  document.getElementById('starter-preview').addEventListener('click', () => {
+    const url = URL.createObjectURL(new Blob([starter], { type: 'text/html' }));
+    window.open(url, '_blank');
+  });
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

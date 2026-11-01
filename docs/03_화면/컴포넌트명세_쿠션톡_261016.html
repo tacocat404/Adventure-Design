@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 컴포넌트 명세</title>
+  <meta name="description" content="[26.10.16] 디자인 시안 E2(쿠션이) 기준 쿠션톡 공통 컴포넌트 명세 · 토큰, 쿠션이 표정 규칙, 부품 21개의 옵션과 상태, 만드는 순서">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    .canvas { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .canvas::-webkit-scrollbar { height: 8px; }
+    .canvas::-webkit-scrollbar-thumb { background: #dcd7cd; border-radius: 99px; }
+    .canvas svg { display: block; height: auto; }
+    .canvas a:hover rect.cardbox { stroke: #1d1c1a; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    .frame { background-image: radial-gradient(#e2ded5 1px, transparent 1px); background-size: 14px 14px; }
+    .codebox { background: #1d1c1a; color: #ece9e2; border-radius: 16px; font: 12.5px/1.7 ui-monospace, SFMono-Regular, Consolas, 'D2Coding', monospace; }
+    .codebox pre { margin: 0; padding: 16px 18px; overflow: auto; white-space: pre; }
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; }
+
+    /* ── 앱 미리보기: 시안 E2 토큰 (문서 색과 섞지 않도록 .e2 안에서만) ── */
+    .e2 {
+      --bg: #F1F4FC; --surface: #FFFFFF; --ink: #262849; --sub: #6B7096; --faint: #9CA1C2; --edge: #DFE5F7; --edge-deep: #CBD4F0;
+      --sky: #7AB8F5; --sky-deep: #4A92DE; --sky-soft: #E6F1FD;
+      --butter: #FFD872; --butter-deep: #E9B83B; --butter-soft: #FFF6DC;
+      --mint: #6FD0B2; --mint-deep: #3BB08D; --mint-soft: #E1F6EF;
+      --coral: #F2806F; --coral-deep: #D9604E; --coral-soft: #FDEBE8;
+      --slate: #7383A3; --slate-soft: #EBEFF7;
+      background: var(--bg); color: var(--ink); border-radius: 20px; padding: 18px; word-break: keep-all; line-height: 1.5;
+    }
+    .e2 svg.ic { display: inline-block; vertical-align: middle; flex: none; }
+    .e2 .pv-lbl { font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--faint); margin: 14px 0 6px; }
+    .e2 .pv-lbl:first-child { margin-top: 0; }
+    /* 주아체 자리: 앱에서는 Google Fonts 'Jua'. 이 문서는 형식서 규칙(글꼴 하나)에 따라 프리텐다드 900으로 대신 보여 줌 */
+    .z-jua { font-family: 'Jua', 'Pretendard', sans-serif; font-weight: 900; letter-spacing: -.01em; }
+    .z-chunk { background: var(--surface); border: 2px solid var(--edge); border-bottom-width: 5px; border-radius: 22px; }
+    .z-btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 54px; padding: 0 16px; border-radius: 18px; font-size: 16px; font-weight: 800; }
+    .z-btn.md { height: 46px; font-size: 15px; }
+    .z-sky { background: var(--sky); color: #fff; box-shadow: 0 5px 0 var(--sky-deep); }
+    .z-sky.pressed { box-shadow: none; transform: translateY(5px); background: var(--sky-deep); }
+    .z-white { background: #fff; color: var(--ink); border: 2px solid var(--edge); box-shadow: 0 5px 0 var(--edge-deep); }
+    .z-ghost { color: var(--sub); font-weight: 700; }
+    .z-off { background: #E7EAF4; color: #AEB3CF; box-shadow: 0 5px 0 #D8DCEB; }
+    .z-spin { width: 18px; height: 18px; border-radius: 99px; border: 2.5px solid rgba(255,255,255,.45); border-top-color: #fff; }
+    .z-tag { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .z-line { background: var(--bg); color: var(--sub); }
+    .z-coral { background: var(--coral); color: #fff; }
+    .z-due { background: var(--ink); color: #fff; }
+    .z-slate { background: var(--slate-soft); color: var(--slate); }
+    .z-mint { background: var(--mint-soft); color: #23876A; }
+    .z-fail { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px var(--edge); }
+    .z-filt { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 8px; border-radius: 14px; font-size: 13.5px; font-weight: 800; border-bottom: 4px solid rgba(0,0,0,.1); }
+    .z-filt b { font-size: 17px; min-width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; background: rgba(255,255,255,.75); }
+    .z-sticker { display: inline-flex; align-items: center; gap: 3px; height: 26px; padding: 0 9px 0 3px; border-radius: 999px; background: var(--butter); color: var(--ink); font-size: 12px; font-weight: 800; vertical-align: middle; box-shadow: 0 2px 0 var(--butter-deep); transform: rotate(-2deg); }
+    .z-sticker svg { width: 20px; height: 20px; }
+    .z-sticker.plain { background: var(--slate-soft); color: var(--slate); box-shadow: 0 2px 0 #D5DCEB; padding: 0 9px; transform: none; }
+    .z-say { position: relative; background: #fff; border: 2px solid var(--edge); border-bottom-width: 5px; border-radius: 20px; padding: 12px 14px; }
+    .z-say::before { content: ''; position: absolute; left: -9px; top: 22px; width: 14px; height: 14px; background: inherit; border-left: 2px solid var(--edge); border-bottom: 2px solid var(--edge); transform: rotate(45deg); }
+    .z-say.butter { background: var(--butter-soft); border-color: #F2DE9E; }
+    .z-say.butter::before { border-color: #F2DE9E; }
+    .z-mini { border-radius: 14px; background: #fff; padding: 8px 10px; }
+    .z-mini p:first-child { font-size: 11px; font-weight: 800; color: #A9861F; }
+    .z-mini p:last-child { font-size: 14px; font-weight: 800; margin-top: 1px; }
+    .z-radio { width: 22px; height: 22px; border-radius: 999px; border: 2.5px solid var(--edge-deep); flex: none; margin-top: 1px; }
+    .z-radio.on { border: 7px solid var(--sky); }
+    .z-wiggle { text-decoration: underline wavy var(--coral); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+    .z-input { display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 6px 6px 16px; border-radius: 22px; border: 2px solid var(--edge); border-bottom-width: 5px; }
+    .z-input p { flex: 1; min-width: 0; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .z-send { width: 44px; height: 44px; border-radius: 15px; display: grid; place-items: center; background: var(--sky); color: #fff; box-shadow: 0 4px 0 var(--sky-deep); flex: none; }
+    .z-tab { height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 800; color: var(--faint); }
+    .z-tab.on { background: var(--sky-soft); color: var(--sky-deep); }
+    .z-banner { border-radius: 18px; padding: 10px 12px; display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; font-weight: 800; border-bottom: 4px solid rgba(0,0,0,.06); }
+    .z-banner small { display: block; font-size: 12px; font-weight: 600; margin-top: 1px; }
+    .z-field { display: flex; align-items: center; height: 50px; padding: 0 14px; border-radius: 16px; background: #fff; border: 2px solid var(--edge); border-bottom-width: 5px; font-size: 16px; font-weight: 800; }
+    .z-field.err { border-color: var(--coral); }
+    .z-flbl { font-size: 12.5px; font-weight: 800; color: var(--sub); margin-bottom: 6px; }
+    .z-sel { flex: 1; display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 12px; border-radius: 14px; background: #fff; border: 2px solid var(--edge); border-bottom-width: 4px; font-size: 15px; font-weight: 800; }
+    .z-code { text-align: center; font-size: 30px; letter-spacing: .16em; border: 2.5px dashed var(--edge-deep); border-radius: 18px; padding: 10px 0; background: #fff; }
+    .z-toast { border-radius: 16px; background: var(--ink); color: #fff; padding: 12px 14px; font-size: 14px; font-weight: 700; box-shadow: 0 5px 0 #15162E; }
+  </style>
+</head>
+<body class="min-h-[100dvh] font-sans antialiased">
+
+  <!-- 쿠션이 (시안 E2와 같은 그림) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="cb" viewBox="0 0 120 100">
+        <path d="M16 20 Q60 6 104 20 Q116 50 104 80 Q60 94 16 80 Q4 50 16 20Z" fill="#FFD872" stroke="#262849" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M23 27 Q60 15 97 27 Q107 50 97 73 Q60 85 23 73 Q13 50 23 27Z" fill="none" stroke="#E9B83B" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M30 30 Q46 24 62 24" stroke="#FFF4CC" stroke-width="5" stroke-linecap="round" fill="none"/>
+      </symbol>
+      <symbol id="cx-hi" viewBox="0 0 120 100"><use href="#cb"/><ellipse cx="46" cy="50" rx="4.8" ry="6.4" fill="#262849"/><ellipse cx="74" cy="50" rx="4.8" ry="6.4" fill="#262849"/><circle cx="47.6" cy="47.6" r="1.6" fill="#fff"/><circle cx="75.6" cy="47.6" r="1.6" fill="#fff"/><ellipse cx="35" cy="62" rx="7" ry="4" fill="#F7A091" opacity=".75"/><ellipse cx="85" cy="62" rx="7" ry="4" fill="#F7A091" opacity=".75"/><path d="M54 61 Q60 68 66 61" stroke="#262849" stroke-width="3.5" fill="none" stroke-linecap="round"/></symbol>
+      <symbol id="cx-safe" viewBox="0 0 120 100"><use href="#cb"/><path d="M39 52 Q46 44 53 52" stroke="#262849" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M67 52 Q74 44 81 52" stroke="#262849" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse cx="35" cy="62" rx="7.5" ry="4.3" fill="#F7A091" opacity=".85"/><ellipse cx="85" cy="62" rx="7.5" ry="4.3" fill="#F7A091" opacity=".85"/><path d="M51 60 Q60 71 69 60" stroke="#262849" stroke-width="3.5" fill="#F7A091" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="cx-read" viewBox="0 0 120 100"><use href="#cb"/><ellipse cx="49" cy="53" rx="4.4" ry="5.4" fill="#262849"/><ellipse cx="77" cy="53" rx="4.4" ry="5.4" fill="#262849"/><circle cx="50.6" cy="51" r="1.4" fill="#fff"/><circle cx="78.6" cy="51" r="1.4" fill="#fff"/><path d="M40 42 L52 40 M70 40 L82 42" stroke="#262849" stroke-width="3" stroke-linecap="round"/><path d="M56 65 L66 65" stroke="#262849" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="36" cy="63" rx="6" ry="3.5" fill="#F7A091" opacity=".6"/><ellipse cx="86" cy="63" rx="6" ry="3.5" fill="#F7A091" opacity=".6"/></symbol>
+      <symbol id="cx-wait" viewBox="0 0 120 100"><use href="#cb"/><path d="M37 44 L50 39 M83 44 L70 39" stroke="#262849" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="46" cy="53" rx="4.6" ry="6" fill="#262849"/><ellipse cx="74" cy="53" rx="4.6" ry="6" fill="#262849"/><circle cx="47.4" cy="50.6" r="1.5" fill="#fff"/><circle cx="75.4" cy="50.6" r="1.5" fill="#fff"/><path d="M52 66 Q56 62 60 66 Q64 70 68 66" stroke="#262849" stroke-width="3.2" fill="none" stroke-linecap="round"/></symbol>
+      <symbol id="cx-rest" viewBox="0 0 120 100"><use href="#cb"/><path d="M39 51 Q46 57 53 51" stroke="#262849" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M67 51 Q74 57 81 51" stroke="#262849" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="60" cy="65" r="3.6" fill="#262849"/><text x="92" y="16" font-family="Pretendard, sans-serif" font-weight="900" font-size="16" fill="#262849">z</text><text x="103" y="8" font-family="Pretendard, sans-serif" font-weight="900" font-size="11" fill="#262849">z</text></symbol>
+      <symbol id="cx-face" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#FFF4CC" stroke="#262849" stroke-width="2.5"/><path d="M11 19 Q14 15 17 19 M23 19 Q26 15 29 19" stroke="#262849" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M15 25 Q20 29 25 25" stroke="#262849" stroke-width="2.4" fill="none" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">컴포넌트 명세</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#rules" class="px-3 py-2 rounded-full hover:bg-white">원칙</a>
+        <a href="#tokens" class="px-3 py-2 rounded-full hover:bg-white">토큰</a>
+        <a href="#character" class="px-3 py-2 rounded-full hover:bg-white">쿠션이</a>
+        <a href="#list" class="px-3 py-2 rounded-full hover:bg-white">목록</a>
+        <a href="#specs" class="px-3 py-2 rounded-full hover:bg-white">부품</a>
+        <a href="#order" class="px-3 py-2 rounded-full hover:bg-white">순서</a>
+        <a href="#open" class="px-3 py-2 rounded-full hover:bg-white">미정</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">COMPONENT SPEC · CUSHION TALK · 26.10.16</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>컴포넌트 명세</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        확정한 디자인 <b class="text-ink">시안 E2(쿠션이)</b>를 프론트가 바로 만들 수 있게 쪼갠 문서입니다.
+        <b class="text-ink">쿠션이 표정 5가지와 나오는 규칙</b>, 공통 부품 <b class="text-ink">21개</b>의 생김새 · 옵션 · 상태 · 규칙, <b class="text-ink">만드는 순서 6단계</b>를 정리했습니다.
+        와이어프레임 23장에서 나온 부품도 모두 넣었습니다.
+      </p>
+    </header>
+
+    <!-- 01 원칙 -->
+    <section id="rules" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">만들 때 지킬 원칙</span>
+        <span class="text-mute">두 사람이 같은 부품을 따로 만들지 않게</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="rule-list"></div>
+    </section>
+
+    <!-- 02 토큰 -->
+    <section id="tokens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">디자인 토큰</span>
+        <span class="text-mute">E2 화면에 쓴 값 그대로 · 색마다 뜻 하나</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[40rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">토큰</th><th class="px-5 py-3.5 font-extrabold">값</th><th class="px-5 py-3.5 font-extrabold">쓰는 곳</th></tr></thead>
+          <tbody class="divide-y divide-line" id="token-rows"></tbody>
+        </table>
+      </div>
+      <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="reveal card rounded-2xl overflow-x-auto">
+          <table class="w-full min-w-[30rem] text-[15px] keep">
+            <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">글자</th><th class="px-5 py-3.5 font-extrabold">글꼴 · 크기</th><th class="px-5 py-3.5 font-extrabold">쓰는 곳</th></tr></thead>
+            <tbody class="divide-y divide-line">
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">jua-num</td><td class="px-5 py-3">주아 · 17~28</td><td class="px-5 py-3 text-[#5a564f]">필터 숫자 · 가림 개수 · 로고 글자</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">jua-say</td><td class="px-5 py-3">주아 · 19~22</td><td class="px-5 py-3 text-[#5a564f]">쿠션이 팻말 “잠깐만요!” 같은 짧은 말</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">title</td><td class="px-5 py-3">프리텐다드 · 18 · 800</td><td class="px-5 py-3 text-[#5a564f]">요약 한 문장 · 시트 제목</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">body</td><td class="px-5 py-3">프리텐다드 · 15 · 500~700</td><td class="px-5 py-3 text-[#5a564f]">본문 · 말풍선(14.5) · 카드 요약(14)</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">small</td><td class="px-5 py-3">프리텐다드 · 13 · 800</td><td class="px-5 py-3 text-[#5a564f]">섹션 이름 · 필터 이름 · 탭</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">cap</td><td class="px-5 py-3">프리텐다드 · 12 · 600 · sub</td><td class="px-5 py-3 text-[#5a564f]">시간 · 반 · 안내</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="reveal card rounded-2xl overflow-x-auto" style="--i:1">
+          <table class="w-full min-w-[30rem] text-[15px] keep">
+            <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">크기 토큰</th><th class="px-5 py-3.5 font-extrabold">값</th><th class="px-5 py-3.5 font-extrabold">쓰는 곳</th></tr></thead>
+            <tbody class="divide-y divide-line">
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">edge-bottom</td><td class="px-5 py-3">테두리 2 · 아래만 5</td><td class="px-5 py-3 text-[#5a564f]">카드 · 입력창 · 탭 바 · 말풍선(쿠션이)</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">press</td><td class="px-5 py-3">아래 그림자 5 → 누르면 0, 5 내려앉음</td><td class="px-5 py-3 text-[#5a564f]">모든 버튼 · 보내기</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">r-control</td><td class="px-5 py-3">18 (작은 버튼 12~15)</td><td class="px-5 py-3 text-[#5a564f]">버튼 · 입력 칸</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">r-card</td><td class="px-5 py-3">22</td><td class="px-5 py-3 text-[#5a564f]">메시지 카드 · 띠 · 말풍선</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">r-sheet</td><td class="px-5 py-3">34 (위쪽만)</td><td class="px-5 py-3 text-[#5a564f]">시트</td></tr>
+              <tr><td class="px-5 py-3 font-bold text-[#2f5fd0]">touch</td><td class="px-5 py-3">최소 44 × 44</td><td class="px-5 py-3 text-[#5a564f]">누르는 모든 것</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="reveal mt-6 card rounded-[28px] p-5 md:p-8">
+        <p class="text-sm font-semibold text-mute keep">복사해서 쓰는 CSS 변수 · <code class="k">frontend/src/styles/tokens.css</code> (제안)</p>
+        <div class="codebox mt-3"><pre id="token-css"></pre></div>
+      </div>
+    </section>
+
+    <!-- 03 쿠션이 -->
+    <section id="character" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">쿠션이 표정 · 나오는 규칙</span>
+        <span class="text-mute">상황 하나에 표정 하나 · 코드 이름 CushionChar</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 keep" id="face-list"></div>
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 keep">
+        <div class="reveal card rounded-[28px] p-5 md:p-7">
+          <p class="eyebrow text-xs font-bold text-mute">DO</p>
+          <h3 class="mt-1 text-xl font-black tracking-tight">이렇게 써요</h3>
+          <ul class="mt-3 text-[14px] leading-relaxed space-y-1.5" id="do-list"></ul>
+        </div>
+        <div class="reveal card rounded-[28px] p-5 md:p-7" style="--i:1">
+          <p class="eyebrow text-xs font-bold text-mute">DON'T</p>
+          <h3 class="mt-1 text-xl font-black tracking-tight">여기엔 나오지 않아요</h3>
+          <ul class="mt-3 text-[14px] leading-relaxed space-y-1.5" id="dont-list"></ul>
+        </div>
+      </div>
+      <div class="reveal mt-4 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[44rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">화면</th><th class="px-5 py-3.5 font-extrabold">쿠션이</th><th class="px-5 py-3.5 font-extrabold">크기</th><th class="px-5 py-3.5 font-extrabold">하는 말</th></tr></thead>
+          <tbody class="divide-y divide-line" id="where-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 목록 -->
+    <section id="list" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">부품 목록 한눈에</span>
+        <span class="text-mute">만드는 순서대로 · 화면 ID는 와이어프레임 기준</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[54rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-16">번호</th><th class="px-5 py-3.5 font-extrabold">부품</th><th class="px-5 py-3.5 font-extrabold">코드 이름</th><th class="px-5 py-3.5 font-extrabold">쓰이는 화면</th><th class="px-5 py-3.5 font-extrabold">단계</th><th class="px-5 py-3.5 font-extrabold">상태</th></tr></thead>
+          <tbody class="divide-y divide-line" id="list-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 05 부품 상세 -->
+    <section id="specs" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">부품 상세</span>
+        <span class="text-mute">왼쪽 미리보기는 E2 실제 모양 · 오른쪽은 옵션과 규칙</span>
+      </h2>
+      <div class="mt-7 space-y-8" id="spec-list"></div>
+    </section>
+
+    <!-- 06 순서 -->
+    <section id="order" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">만드는 순서</span>
+        <span class="text-mute">아래 단계가 위 단계 부품을 씀 · Todo 분담표에 그대로 옮길 수 있게</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="order-list"></div>
+    </section>
+
+    <!-- 07 미정 -->
+    <section id="open" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">07</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다음 회의에서 정할 것</span>
+        <span class="text-mute">정해지면 이 문서 · 와이어프레임 · 부품을 함께 고침</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — 04_디자인시안/E2_쿠션이_다듬기.html · 와이어프레임_쿠션톡_261016.html · 유저플로우_쿠션톡_261015.md · Adventure-Design/README.md</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+  // ───────── 아이콘 (외부 라이브러리 없이 선 아이콘) ─────────
+  const P = {
+    bell: 'M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16z M10 20.5a2 2 0 0 0 4 0',
+    eye: 'M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+    send: 'M4 12l16-8-6 16-2.5-6.5L4 12z',
+    back: 'M15 5l-7 7 7 7',
+    letter: 'M3.5 6h17v12h-17z M3.5 7l8.5 6 8.5-6',
+    users: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5 M16 11a3 3 0 1 0 0-6 M18 14.8c1.8.7 3 2.5 3.5 5.2',
+    gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19 12c0-.4 0-.8-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6c-.1.4-.1.8-.1 1.2s0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z',
+    school: 'M3 21h18 M5 21V9l7-5 7 5v12 M10 21v-5h4v5 M9 11h.01 M15 11h.01',
+    alert: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 8v5 M12 16h.01',
+    check: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M8.5 12.5l2.5 2.5 4.5-5',
+    cal: 'M4 6h16v14H4z M4 10h16 M8 3v4 M16 3v4',
+    copy: 'M8 8h11v12H8z M5 16V4h11',
+    down: 'M6 9l6 6 6-6',
+  };
+  const ic = (n, s = 18, w = 2) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+  const cx = (id, w = 90) => `<svg width="${w}" height="${Math.round(w * 0.84)}" viewBox="0 0 120 100" class="flex-none" aria-hidden="true"><use href="#${id}"/></svg>`;
+  const face = () => '<svg viewBox="0 0 40 40" aria-hidden="true"><use href="#cx-face"/></svg>';
+
+  // ───────── 원칙 ─────────
+  const RULES = [
+    ['색 · 글꼴은 토큰으로', '<code class="k">var(--sky)</code>처럼 이름으로만. 둥근 주아체는 <b class="text-ink">숫자와 쿠션이의 짧은 말</b>에만 쓰고, 문장은 모두 프리텐다드.'],
+    ['두툼한 아래 테두리 하나', '카드 · 입력창 · 탭 바는 테두리 2에 아래만 5. 버튼은 아래 그림자 5가 있다가 누르면 5만큼 내려앉습니다.'],
+    ['쿠션이는 크게 한 번', '한 화면에 큰 쿠션이는 한 번만, 정해진 표정만. 가린 곳 표시는 얼굴 스티커만 씁니다 (03 참고).'],
+    ['쿠션이가 빠지는 화면', '긴급 · 위협 · 분석 실패 · 오류 · 관리자 화면에는 쿠션이도 얼굴 스티커도 쓰지 않습니다. 가벼워 보이면 안 되는 화면입니다.'],
+    ['가린 말은 화면에 넣지 않기', '스티커 아래에 원문 글자를 숨겨 두지 않습니다. 화면 코드에는 “가린 표현 1” 같은 자리만 두고, 원문은 떼고 볼 때 받아 옵니다.'],
+    ['주인은 프론트 A', 'README 역할대로 <code class="k">components/</code>는 프론트 A가 만듭니다. 쿠션이 그림과 표정도 같은 폴더에서 관리합니다.'],
+  ];
+  document.getElementById('rule-list').innerHTML = RULES.map((r, i) => `
+    <div class="reveal border-t-[3px] border-ink pt-5" style="--i:${i % 3}">
+      <p class="eyebrow text-xs font-bold text-mute">RULE ${i + 1}</p>
+      <h3 class="mt-2 text-xl font-black tracking-tight">${r[0]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${r[1]}</p>
+    </div>`).join('');
+
+  // ───────── 토큰 ─────────
+  const TOKENS = [
+    ['bg', '#F1F4FC', '화면 바탕'], ['surface', '#FFFFFF', '카드 · 시트 · 입력창'], ['ink', '#262849', '제목 · 본문 · 기한 태그 · 쿠션이 선'],
+    ['sub', '#6B7096', '보조 글자'], ['faint', '#9CA1C2', '자리 글자 · 비활성 탭'], ['edge', '#DFE5F7', '두툼한 테두리'], ['edge-deep', '#CBD4F0', '흰 버튼 아래 그림자'],
+    ['sky', '#7AB8F5', '행동 (기본 버튼 · 보내기 · 지금 탭)'], ['sky-deep', '#4A92DE', '눌림 · 기본 버튼 아래 그림자'], ['sky-soft', '#E6F1FD', '지금 탭 바탕 · 이름 동그라미'],
+    ['butter', '#FFD872', '쿠션이 몸 · 얼굴 스티커'], ['butter-deep', '#E9B83B', '쿠션이 박음질 · 스티커 그림자'], ['butter-soft', '#FFF6DC', '쿠션이 요약 말풍선'],
+    ['mint', '#6FD0B2', '그대로 전해짐'], ['mint-soft', '#E1F6EF', '그대로 전해짐 태그 · 알림 필터'],
+    ['coral', '#F2806F', '긴급 · 문제 구절 물결 밑줄'], ['coral-soft', '#FDEBE8', '긴급 카드 · 긴급 띠 바탕'],
+    ['slate', '#7383A3', '학교 처리 · 위협 · 관리자'], ['slate-soft', '#EBEFF7', '학교 처리 카드 · 띠 바탕'],
+  ];
+  const sw = (v) => `<span class="inline-block w-5 h-5 rounded-md align-middle mr-2" style="background:${v};box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)"></span>`;
+  document.getElementById('token-rows').innerHTML = TOKENS.map((t) => `<tr>
+    <td class="px-5 py-3 font-bold"><code class="k">--${t[0]}</code></td>
+    <td class="px-5 py-3 whitespace-nowrap">${sw(t[1])}<span class="text-[13.5px]">${t[1]}</span></td>
+    <td class="px-5 py-3 text-[#5a564f]">${t[2]}</td></tr>`).join('');
+  document.getElementById('token-css').textContent = ':root {\n' + TOKENS.map((t) => `  --${t[0]}: ${t[1]};`).join('\n')
+    + '\n  --r-control: 18px; --r-card: 22px; --r-sheet: 34px;\n  --edge-w: 2px; --edge-bottom: 5px; --press: 5px;\n  --font-body: "Pretendard", system-ui, sans-serif;\n  --font-fun: "Jua", "Pretendard", sans-serif; /* 숫자 · 쿠션이 짧은 말만 */\n}';
+
+  // ───────── 쿠션이 ─────────
+  const FACES = [
+    ['cx-hi', '기본', 'hi', '처음 인사 · 처음 쓰는 사람 안내'],
+    ['cx-safe', '막았어요', 'safe', '메시지함 인사 · 가림 개수'],
+    ['cx-read', '읽는 중', 'read', '요약 말풍선 · 보내기 전 검사 중'],
+    ['cx-wait', '잠깐만요', 'wait', '학부모 보내기 전 경고 시트'],
+    ['cx-rest', '쉬는 중', 'rest', '새 연락 없음 (빈 화면)'],
+  ];
+  document.getElementById('face-list').innerHTML = FACES.map((f, i) => `
+    <div class="reveal card rounded-[24px] p-4 text-center" style="--i:${i}">
+      <div class="e2" style="padding:12px">${cx(f[0], 104).replace('class="flex-none"', 'class="mx-auto"')}</div>
+      <p class="mt-3 font-extrabold text-[17px]">${f[1]}</p>
+      <p class="mt-0.5"><code class="k">face="${f[2]}"</code></p>
+      <p class="mt-1.5 text-[13px] text-mute">${f[3]}</p>
+    </div>`).join('');
+  const DOS = ['큰 쿠션이(md 90 · lg 100)는 한 화면에 한 번: 인사 · 요약 · 경고 · 빈 화면 중 하나.', '작은 쿠션이(sm 58)는 요약 말풍선 옆, 검사 중 안내 옆에만.', '가린 곳은 얼굴 스티커(20)만. 몸 전체는 넣지 않음.', '쿠션이 말은 해요체 한 문장, 느낌표는 한 화면에 하나.', '그림은 SVG 한 벌을 표정만 바꿔 씀 (몸은 같음).'];
+  const DONTS = ['긴급(학교폭력 · 아동학대 · 안전) 카드 · 띠 · 상세 화면.', '위협 메시지 카드 · 상세, 관리자 화면 전체 (가림은 무늬 없는 회색 스티커로).', '분석 실패 · 코드 오류 · 네트워크 오류 같은 실패 화면.', '버튼 안, 탭 바 안, 알림 문구 안.'];
+  const li = (t, ok) => `<li class="flex gap-2 text-[#5a564f]"><span class="mt-[7px] w-2 h-2 rounded-full shrink-0" style="background:${ok ? '#3BB08D' : '#D9604E'}"></span><span>${t}</span></li>`;
+  document.getElementById('do-list').innerHTML = DOS.map((t) => li(t, true)).join('');
+  document.getElementById('dont-list').innerHTML = DONTS.map((t) => li(t, false)).join('');
+  const WHERE = [
+    ['A1 학부모 작성 · 처음', '기본', 'sm 58', '“제가 먼저 읽고 선생님께 전해 드려요.”'],
+    ['A2 학부모 작성 · 검사 중', '읽는 중', 'sm 58', '“표현을 살펴보고 있어요.”'],
+    ['A3 보내기 전 경고 시트', '잠깐만요 + 팻말', 'lg 100', '팻말 “잠깐만요!”'],
+    ['C1 · C2 교사 메시지함', '막았어요', 'md 90', '“밤사이 거친 말 5개를 폭신하게 막아 뒀어요!”'],
+    ['C3 새 연락 없음', '쉬는 중', 'md 90', '“새 연락이 없어요. 쿠션이도 잠깐 쉬고 있어요.”'],
+    ['C4 교사 메시지 상세 · 일반', '읽는 중', 'sm 58', '“쿠션이가 읽어 봤어요” + 요약'],
+    ['F1 학생 톡방 참여', '기본', 'md 90', '“반가워요! 선생님이 알려 준 코드를 넣어 주세요.”'],
+  ];
+  document.getElementById('where-rows').innerHTML = WHERE.map((w) => `<tr><td class="px-5 py-3 font-semibold">${w[0]}</td><td class="px-5 py-3">${w[1]}</td><td class="px-5 py-3 text-[#5a564f]">${w[2]}</td><td class="px-5 py-3 text-[#5a564f]">${w[3]}</td></tr>`).join('');
+
+  // ───────── 미리보기 조각 ─────────
+  const lbl = (t) => `<p class="pv-lbl">${t}</p>`;
+  const RAW_ST = `선생님, <span class="z-sticker" role="img" aria-label="가린 표현 1">${face()}<i class="z-jua" style="font-style:normal;font-size:13px">1</i></span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="z-sticker" style="transform:rotate(2deg)" role="img" aria-label="가린 표현 2">${face()}<i class="z-jua" style="font-style:normal;font-size:13px">2</i></span> 내일까지 자리 바꿔 주세요.`;
+  const AV = (t, bg = 'var(--sky-soft)', c = 'var(--sky-deep)', s = 44) => `<span class="rounded-full grid place-items-center flex-none z-jua" style="width:${s}px;height:${s}px;background:${bg};color:${c};font-size:${s * 0.4}px">${t}</span>`;
+
+  const SPECS = [
+    {
+      id: 'char', name: '쿠션이', code: 'CushionChar', screens: ['A1 · A2 · A3', 'C1 · C3 · C4', 'F1'], step: 1,
+      desc: '베개 캐릭터 한 벌. 몸은 같고 표정(face)만 바꿉니다. 나오는 곳과 크기는 03의 표를 따릅니다.',
+      preview: lbl('size · sm 58 · md 90 · lg 100') + `<div class="flex items-end gap-4">${cx('cx-hi', 58)}${cx('cx-safe', 90)}${cx('cx-wait', 100)}</div>`
+        + lbl('팻말 든 쿠션이 (경고 시트 전용)') + `<div class="flex flex-col items-center"><div class="z-jua text-[19px] px-4 py-1.5 rounded-xl bg-white" style="border:2.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);transform:rotate(-3deg)">잠깐만요!</div><svg width="20" height="12" viewBox="0 0 20 12"><path d="M4 0 L4 12 M16 0 L16 12" stroke="#262849" stroke-width="3" stroke-linecap="round"/></svg>${cx('cx-wait', 96)}</div>`,
+      props: [['face', 'hi · safe · read · wait · rest', 'hi', '표정 (03 참고)'], ['size', 'sm 58 · md 90 · lg 100', 'md', '가로 크기'], ['sign', '글자', '없음', '팻말 문구 (wait일 때만)'], ['label', '글자', '표정 이름', '화면 읽기용 설명']],
+      rules: ['그림은 SVG 한 벌. 표정마다 눈 · 눈썹 · 입만 바뀝니다.', '움직임은 등장할 때 살짝 튀어 오르는 정도만 (움직임 줄이기 설정이면 없음).', '장식용이라 화면 읽기에는 “쿠션이, 막았어요 표정”처럼 짧게만 읽힙니다.'],
+    },
+    {
+      id: 'button', name: '눌리는 버튼', code: 'Button', screens: ['A3 경고 시트', 'E1 · E2 · E4', 'F1 · D2'], step: 2,
+      desc: '하늘색 기본 · 흰 보조 · 글자 세 가지. 아래 그림자가 있다가 누르면 5만큼 내려앉습니다.',
+      preview: lbl('종류') + `<div class="grid gap-3"><div class="z-btn z-sky">바꾼 문장으로 보내기</div><div class="grid grid-cols-2 gap-2.5"><div class="z-btn md z-white">직접 고치기</div><div class="z-btn md z-ghost">그대로 보내기</div></div></div>`
+        + lbl('상태') + `<div class="grid grid-cols-3 gap-2.5"><div class="z-btn md z-sky pressed">눌림</div><div class="z-btn md z-off">비활성</div><div class="z-btn md z-sky"><span class="z-spin"></span>보내는 중</div></div>`,
+      props: [['variant', 'primary · secondary · ghost', 'primary', '종류'], ['size', 'lg 54 · md 46 · sm 36', 'lg', '높이'], ['state', 'default · pressed · disabled · loading', 'default', '상태'], ['icon', '아이콘 이름', '없음', '글자 왼쪽 아이콘']],
+      rules: ['하늘색 기본 버튼은 화면마다 하나.', '“그대로 보내기”는 막지 않되 글자 버튼으로 한 단계 약하게.', '비활성일 때도 아래 그림자는 남겨 모양을 유지합니다.'],
+    },
+    {
+      id: 'tag', name: '태그', code: 'Tag', screens: ['C1 카드', 'C4 머리', 'A3 시트'], step: 2,
+      desc: '둥근 알약 모양 딱지. 색 하나에 뜻 하나.',
+      preview: `<div class="flex flex-wrap gap-2"><span class="z-tag z-coral">${ic('bell', 14)}긴급 · 학교폭력</span><span class="z-tag z-due">D-1</span><span class="z-tag z-line">자리·모둠</span><span class="z-tag z-slate">${ic('school', 13)}학교로 넘겼어요</span><span class="z-tag z-mint">${ic('check', 13)}그대로 전해져요</span><span class="z-tag z-fail">${ic('alert', 13)}분석 실패</span></div>`,
+      props: [['tone', 'coral · due · line · slate · mint · fail', 'line', '색과 뜻'], ['icon', '아이콘 이름', 'tone별 기본', '앞 아이콘'], ['label', '글자', '—', '8자 안쪽']],
+      rules: ['coral은 긴급에만, slate는 학교 · 위협에만.', 'due는 답장 기한 “오늘 · D-1 · D-3”.', '태그는 눌리지 않습니다.'],
+    },
+    {
+      id: 'filter', name: '필터 버튼', code: 'FilterButton', screens: ['C1 · C2 · C3 메시지함', 'D1 · D3 관리자'], step: 2,
+      desc: '메시지함 위의 눌리는 필터 세 개. 숫자는 주아체로 크게, 지금 필터는 하늘색으로 채웁니다.',
+      preview: lbl('교사 · 답장할 것이 선택됨') + `<div class="flex flex-wrap gap-2"><div class="z-filt" style="background:var(--sky);color:#fff"><b class="z-jua" style="color:var(--sky-deep)">3</b>답장할 것</div><div class="z-filt" style="background:var(--mint-soft);color:#23876A"><b class="z-jua">1</b>알림</div><div class="z-filt" style="background:var(--slate-soft);color:var(--slate)"><b class="z-jua">1</b>학교</div></div>`
+        + lbl('관리자 · 2개') + `<div class="flex gap-2"><div class="z-filt" style="background:var(--slate);color:#fff"><b class="z-jua" style="color:var(--slate)">1</b>새 알림</div><div class="z-filt" style="background:#fff;color:var(--sub);border:2px solid var(--edge);border-bottom-width:4px"><b class="z-jua" style="background:var(--bg)">3</b>처리 완료</div></div>`,
+      props: [['items', '[{이름, 숫자, tone}]', '—', '2~3개'], ['value', '번호', '0', '지금 필터'], ['tone', 'sky · mint · slate', '이름별', '안 골랐을 때 색']],
+      rules: ['답장할 것: 요청이 있는 메시지 · 분석 실패. 알림: 답장 필요 없는 연락. 학교: 위협으로 넘긴 것.', '숫자가 0이어도 버튼은 보입니다.', '긴급은 필터와 상관없이 맨 위 카드로 따로.'],
+    },
+    {
+      id: 'sticker', name: '가림 스티커', code: 'MaskSticker', screens: ['C1 카드 (개수)', 'C4 원문 (번호)', 'C7 위협 (무늬 없음)'], step: 2,
+      desc: '거친 표현 자리에 붙는 쿠션이 얼굴 스티커. 번호형은 원문 안에, 개수형은 카드 태그 자리에.',
+      preview: lbl('kind = index (원문 안)') + `<p class="text-[14.5px] leading-[2]">${RAW_ST}</p>`
+        + lbl('kind = count (카드)') + `<span class="z-sticker">${face()}2곳 막음</span>`
+        + lbl('plain (위협 · 관리자)') + `<p class="text-[14.5px]">답장도 없으시네요. <span class="z-sticker plain">가림 1</span></p>`,
+      props: [['kind', 'index · count', 'index', '번호 · 개수'], ['value', '숫자', '—', '번호나 개수'], ['plain', 'true · false', 'false', '얼굴 없는 회색 (위협 · 관리자)']],
+      rules: ['스티커 아래에 원문 글자를 넣지 않습니다 (원칙 5).', '화면 읽기에는 “가린 표현 1”로 읽힙니다.', '긴급 메시지에는 쓰지 않습니다 (원문 그대로).', '스티커는 살짝 기울여 붙인 느낌 (−2° · +2°를 번갈아).'],
+    },
+    {
+      id: 'say', name: '쿠션이 말풍선', code: 'SpeechBubble', screens: ['C1 인사', 'A1 · A2 안내', 'F1 인사'], step: 2,
+      desc: '쿠션이 옆에 붙는 말풍선. 왼쪽에 꼬리가 있고, 아래 테두리가 두툼합니다.',
+      preview: lbl('tone = white') + `<div class="flex items-start gap-2">${cx('cx-safe', 80)}<div class="z-say flex-1 mt-1"><p class="text-[15px] font-bold leading-snug">밤사이 거친 말 <span class="z-jua text-[18px]" style="color:var(--butter-deep)">5</span>개를 폭신하게 막아 뒀어요!</p></div></div>`
+        + lbl('tone = butter') + `<div class="flex items-start gap-2">${cx('cx-hi', 58)}<div class="z-say butter flex-1"><p class="text-[14px] font-bold">제가 먼저 읽고 선생님께 전해 드려요.</p></div></div>`,
+      props: [['tone', 'white · butter', 'white', '바탕 (요약은 butter)'], ['face', 'CushionChar.face', '—', '옆에 붙는 쿠션이 표정'], ['children', '글자 · 내용', '—', '한 문장']],
+      rules: ['말은 해요체 한 문장.', '쿠션이 없이 말풍선만 쓰지 않습니다.'],
+    },
+    {
+      id: 'card', name: '메시지 카드', code: 'MessageCard', screens: ['C1 · C2 메시지함'], step: 3,
+      desc: '메시지함의 한 칸. 두툼한 흰 카드에 요약 한 줄. 긴급 · 위협 · 실패 카드는 색만 다르고 쿠션이가 없습니다.',
+      preview: lbl('kind = normal') + `<div class="z-chunk p-4 flex gap-3">${AV('민')}<div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><p class="font-extrabold text-[15px]">민서 보호자</p><span class="z-tag z-due" style="height:22px;padding:0 7px;font-size:11.5px">D-1</span><span class="ml-auto text-[12px] font-semibold" style="color:var(--sub)">어제 9:42</span></div><p class="mt-0.5 text-[14px]">자리를 <b>내일까지</b> 바꿔 달라는 요청이에요.</p><div class="mt-2 flex gap-1.5"><span class="z-tag z-line">자리·모둠</span><span class="z-sticker">${face()}2곳 막음</span></div></div></div>`
+        + lbl('kind = urgent') + `<div class="rounded-[22px] p-4" style="background:var(--coral-soft);border:2px solid #F6C6BD;border-bottom-width:5px"><div class="flex items-center gap-2"><span class="z-tag z-coral">${ic('bell', 14)}긴급 · 학교폭력</span><span class="ml-auto text-[12.5px] font-semibold" style="color:#B25546">7:50</span></div><p class="mt-2 text-[15px] font-extrabold">하윤 보호자 <span class="text-[12px] ml-1" style="color:#B25546">원문 그대로</span></p><p class="mt-0.5 text-[14px] truncate" style="color:#5A3A36">선생님, 하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고…</p></div>`
+        + lbl('kind = threat · failed') + `<div class="grid gap-2.5"><div class="p-3.5 flex gap-3 items-center rounded-[22px]" style="background:var(--slate-soft);border:2px solid #DAE0EE;border-bottom-width:5px"><span class="w-10 h-10 rounded-xl grid place-items-center bg-white" style="color:var(--slate)">${ic('school', 19)}</span><div class="flex-1 min-w-0"><p class="text-[14px] font-extrabold">민서 보호자 · 공격적 표현</p><p class="text-[13px] truncate" style="color:var(--slate)">교감 선생님이 확인 중이에요</p></div></div><div class="z-chunk p-3.5 flex gap-3 items-center" style="border-style:dashed;border-bottom-style:solid"><span class="w-10 h-10 rounded-xl grid place-items-center" style="background:var(--bg);color:var(--sub)">${ic('alert', 19)}</span><div class="flex-1 min-w-0"><p class="text-[14px] font-extrabold">도윤 보호자 · 분석 실패</p><p class="text-[13px] truncate" style="color:var(--sub)">AI가 읽지 못했어요 · 원문은 접혀 있어요</p></div></div></div>`,
+      props: [['kind', 'normal · urgent · threat · failed', 'normal', '종류'], ['sender · time', '글자', '—', '보낸 사람 · 받은 시간'], ['summary', '글자', '—', 'normal · threat 요약 한 줄'], ['raw', '글자', '—', 'urgent만 원문 앞부분'], ['due', '“D-1” 등', '없음', '이름 옆 기한'], ['maskCount', '숫자', '0', '스티커 “n곳 막음”'], ['compact', 'true · false', 'false', '한 줄짜리 작은 카드']],
+      rules: ['urgent는 필터와 상관없이 맨 위에 하나씩, 요약 없이 원문.', 'threat · failed · urgent에는 쿠션이 얼굴을 쓰지 않습니다.', '카드 전체가 눌리는 영역이고, 누르면 6-3 상세로.', '오래된 요청은 compact로 줄여 한 화면에 더 보이게 (서연 보호자 카드처럼).'],
+    },
+    {
+      id: 'banner', name: '띠', code: 'Banner', screens: ['C6 긴급 · C7 위협', 'E3 반 톡방', 'A5 보낸 뒤'], step: 3,
+      desc: '화면 위쪽에 놓이는 안내 띠. 긴급 · 학교 · 안내 세 가지. 쿠션이는 들어가지 않습니다.',
+      preview: lbl('tone = urgent') + `<div class="z-banner" style="background:var(--coral-soft);color:#B25546">${ic('bell', 18)}<div>긴급 · 학교폭력 신고 — 원문 그대로 보여 드려요<small style="color:#7A4A43">학교폭력 · 아동학대 · 안전 메시지는 AI가 고치거나 가리지 않아요.</small></div></div>`
+        + lbl('tone = school') + `<div class="z-banner" style="background:var(--slate-soft);color:var(--slate)">${ic('school', 18)}<div>학교로 넘겼어요<small>교감 선생님이 확인 중이에요</small></div></div>`
+        + lbl('tone = notice') + `<div class="z-banner" style="background:#fff;color:var(--sub);border:2px solid var(--edge);border-bottom-width:5px">${ic('check', 18)}<div style="font-weight:700">선생님의 개인 메신저 계정은 학생에게 보이지 않아요.</div></div>`,
+      props: [['tone', 'urgent · school · notice', 'notice', '종류'], ['title', '글자', '—', '굵은 한 줄'], ['detail', '글자', '없음', '아래 작은 줄']],
+      rules: ['urgent는 긴급 상세(C6)에만. 기한 안내는 띠가 아니라 머리의 D-1 태그로.', 'notice는 닫기 버튼 없이 항상 보입니다 (반 톡방 개인 메신저 안내).'],
+    },
+    {
+      id: 'empty', name: '빈 화면', code: 'EmptyState', screens: ['C3 새 연락 없음', 'E1 반 톡방 없음'], step: 3,
+      desc: '보여 줄 것이 없을 때. 메시지함은 “쉬는 중” 쿠션이가 함께 나옵니다.',
+      preview: `<div class="text-center py-3">${cx('cx-rest', 96).replace('class="flex-none"', 'class="mx-auto"')}<p class="mt-2 text-[16px] font-extrabold">새 연락이 없어요</p><p class="mt-1 text-[13.5px] font-semibold" style="color:var(--sub)">쿠션이도 잠깐 쉬고 있어요. 연락이 오면 먼저 읽고 알려 드릴게요.</p></div>`,
+      props: [['face', 'rest · 없음', 'rest', '쿠션이 (메시지함만)'], ['title', '글자', '—', '“~가 없어요”'], ['body', '글자', '없음', '다음에 일어날 일'], ['action', 'Button', '없음', '할 수 있는 일']],
+      rules: ['오류로 비었을 때(불러오기 실패)는 쿠션이 없이 안내 + 다시 시도 버튼.'],
+    },
+    {
+      id: 'summary', name: '요약 말풍선', code: 'SummarySay', screens: ['C4 교사 메시지 상세'], step: 4,
+      desc: '“읽는 중” 쿠션이가 전하는 요청 요약. 아래에 기한 · 유형 작은 칸 두 개.',
+      preview: `<div class="flex items-start gap-2">${cx('cx-read', 58)}<div class="z-say butter flex-1"><p class="text-[12.5px] font-extrabold" style="color:#A9861F">쿠션이가 읽어 봤어요</p><p class="mt-1 text-[15.5px] font-extrabold leading-snug">짝과 맞지 않아 매일 우는 아이의 자리를 바꿔 달라는 요청이에요!</p><div class="mt-2.5 grid grid-cols-2 gap-1.5"><div class="z-mini"><p>기한</p><p>내일 · 10월 14일</p></div><div class="z-mini"><p>유형</p><p>자리·모둠</p></div></div></div></div>`,
+      props: [['summary', '글자', '—', '“~달라는 요청이에요!”'], ['due', '날짜', '없음', '기한 칸 (없으면 숨김)'], ['category', '글자', '—', '유형 칸'], ['facts', '글자', '없음', '세 번째 칸 (선택)']],
+      rules: ['일반 메시지에만. 위협 메시지는 쿠션이 없이 흰 카드 “요약”으로 (C7).', '분석 실패면 이 자리에 실패 안내 카드 (C8).', '느낌표는 요약 끝 하나만.'],
+    },
+    {
+      id: 'bubble', name: '대화 말풍선', code: 'Bubble · DateChip', screens: ['A1 · A5 학부모', 'C4 · C6 원문', 'E3 · F3 반 톡방'], step: 4,
+      desc: '대화 한 칸. 상대 말은 두툼한 흰 말풍선, 내 말은 하늘색. 날짜 · “원래 보낸 말”은 알약 모양 칩.',
+      preview: `<div class="grid gap-2.5"><p class="justify-self-center text-[12px] font-bold rounded-full px-3 py-1 bg-white" style="color:var(--sub);border:2px solid var(--edge)">원래 보낸 말</p><div class="z-chunk p-3.5 text-[14.5px] leading-[1.95] max-w-[92%]" style="border-radius:22px 22px 22px 8px">${RAW_ST}</div><div class="ml-auto max-w-[80%] rounded-[22px] rounded-tr-[8px] px-4 py-3 text-[14.5px] font-semibold text-white" style="background:var(--sky);box-shadow:0 4px 0 var(--sky-deep)">오늘 자리 배치를 살펴보고 내일 알려 드릴게요.</div></div>`,
+      props: [['from', 'me · other', 'other', '방향과 색'], ['time', '시간', '—', '말풍선 아래'], ['children', '글자 · MaskSticker', '—', '내용'], ['DateChip.label', '글자', '—', '날짜 · “원래 보낸 말”']],
+      rules: ['가린 표현이 있으면 MaskSticker(index)를 안에 넣습니다.', '반 톡방에서는 상대 말풍선 위에 이름(12 · 800).'],
+    },
+    {
+      id: 'composer', name: '입력창', code: 'Composer', screens: ['A1 ~ A5 학부모', 'C4 ~ C8 답장', 'E3 · F3 반 톡방'], step: 5,
+      desc: '두툼한 입력창과 눌리는 보내기 버튼. 학부모 쪽만 보내기 전 검사 상태가 있습니다.',
+      preview: lbl('state = empty') + `<div class="z-input"><p style="color:var(--faint);font-weight:600">답장을 적어 주세요</p><span class="z-send">${ic('send', 19)}</span></div>`
+        + lbl('state = checking (학부모)') + `<div class="flex items-center gap-2 mb-2">${cx('cx-read', 40)}<p class="text-[12.5px] font-bold" style="color:var(--sub)">쿠션이가 표현을 살펴보고 있어요</p></div><div class="z-input"><p>선생님, 애들 하나 제대로 못 보세요? 우리…</p><span class="z-send" style="background:var(--butter);box-shadow:0 4px 0 var(--butter-deep)"><span class="z-spin" style="border-color:rgba(38,40,73,.2);border-top-color:var(--ink)"></span></span></div>`
+        + lbl('state = warned · editing') + `<div class="z-input" style="border-color:#F6C6BD"><p>선생님, <span class="z-wiggle">애들 하나 제대로 못 보세요?</span> 우리…</p><span class="z-send" style="background:#E7EAF4;color:#AEB3CF;box-shadow:0 4px 0 #D8DCEB">${ic('send', 19)}</span></div>`,
+      props: [['state', 'empty · typing · checking · warned · editing', 'empty', '상태'], ['placeholder', '글자', '—', '빈 칸 안내'], ['precheck', 'true · false', 'false', '보내기 전 검사 (학부모만 true)']],
+      rules: ['checking: 보내기 버튼이 버터색 도는 표시, 위에 작은 “읽는 중” 쿠션이 한 줄.', '거친 표현이 있으면 경고 시트(warned). 5초 넘으면 검사 없이 보냄.', 'editing(직접 고치기): 문제 구절에 산호색 물결 밑줄이 남음.', '교사 답장과 반 톡방(학생 · 교사)은 precheck = false (10.16).'],
+    },
+    {
+      id: 'sheet', name: '시트', code: 'Sheet', screens: ['A3 경고', 'C5 원문', 'D2 위협 상세', 'E2 · E4 참여 코드'], step: 5,
+      desc: '아래에서 올라오는 흰 판, 위쪽 모서리 34. 경고 시트만 팻말 든 쿠션이가 위에 걸칩니다.',
+      preview: `<div class="relative rounded-[18px] overflow-hidden" style="background:var(--bg);height:330px"><div class="absolute inset-0" style="background:rgba(38,40,73,.35)"></div><div class="absolute left-0 right-0 bottom-0 px-5 pt-12 pb-4 bg-white" style="border-radius:34px 34px 0 0;border-top:2px solid var(--edge)"><div class="absolute left-1/2 -translate-x-1/2 -top-[64px] flex flex-col items-center"><div class="z-jua text-[16px] px-3 py-1 rounded-xl bg-white" style="border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);transform:rotate(-3deg)">잠깐만요!</div><svg width="18" height="10" viewBox="0 0 20 12"><path d="M4 0 L4 12 M16 0 L16 12" stroke="#262849" stroke-width="3" stroke-linecap="round"/></svg>${cx('cx-wait', 78)}</div><p class="text-center text-[16px] font-extrabold mt-3">이 표현은 교권 침해로 기록될 수 있어요</p><div class="mt-3 z-btn md z-sky">바꾼 문장으로 보내기</div><div class="mt-3 grid grid-cols-2 gap-2"><div class="z-btn md z-white">직접 고치기</div><div class="z-btn md z-ghost">그대로 보내기</div></div></div></div>`,
+      props: [['variant', 'default · warning', 'default', 'warning은 팻말 쿠션이'], ['title · description', '글자', '—', '제목 · 한 줄'], ['actions', 'Button 묶음', '—', '아래 버튼'], ['dismissible', 'true · false', 'true (warning은 false)', '바깥 누르기 · 아래로 밀기로 닫기']],
+      rules: ['경고 문구 “이 표현은 교권 침해로 기록될 수 있어요”는 그대로.', '경고 시트는 세 버튼 중 하나를 골라야 닫힙니다.', '원문 · 위협 상세의 원문은 시트를 열 때 받아 옵니다.', '위협 상세(관리자)에는 쿠션이 없음.'],
+    },
+    {
+      id: 'option', name: '제안 문장 선택', code: 'SuggestionOption', screens: ['A3 경고 시트'], step: 5,
+      desc: '순한 문장 후보 카드. 첫 번째에 “쿠션이 추천” 딱지, 고르지 않은 것은 한 줄로 접습니다.',
+      preview: `<div class="grid gap-2.5"><div class="relative flex gap-3 rounded-[18px] p-3.5 pt-4 bg-white" style="border:2.5px solid var(--sky);border-bottom-width:5px"><span class="absolute -top-3 left-4 z-tag" style="height:22px;font-size:11.5px;background:var(--butter);box-shadow:0 2px 0 var(--butter-deep)"><svg width="16" height="16" viewBox="0 0 40 40"><use href="#cx-face"/></svg>쿠션이 추천</span><span class="z-radio on"></span><p class="text-[14px] leading-relaxed font-semibold">선생님, 민서가 짝이랑 잘 맞지 않아서 요즘 매일 울면서 집에 와요. 내일까지 자리를 바꿔 주실 수 있을까요?</p></div><div class="flex gap-3 rounded-[18px] p-3.5 bg-white" style="border:2px solid var(--edge);border-bottom-width:5px"><span class="z-radio"></span><p class="text-[14px] truncate" style="color:var(--sub)">민서 자리 문제로 연락드려요. 짝과 맞지 않아…</p></div><div class="flex gap-1.5 items-center"><span class="z-tag z-mint">${ic('check', 13)}자리 바꾸기</span><span class="z-tag z-mint">${ic('check', 13)}내일까지</span><span class="text-[12.5px] font-semibold" style="color:var(--sub)">그대로 전해져요</span></div></div>`,
+      props: [['text', '글자', '—', '제안 문장'], ['selected', 'true · false', '첫 번째 true', '선택됨'], ['recommended', 'true · false', '첫 번째 true', '“쿠션이 추천” 딱지'], ['collapsed', 'true · false', '선택 안 됨이면 true', '한 줄로 접기']],
+      rules: ['제안은 1~2개 (최대 개수는 미정).', '아래에 “그대로 전해지는 내용” 민트 태그를 항상 함께.'],
+    },
+    {
+      id: 'header', name: '상단 머리 · 화면 제목', code: 'AppHeader · ScreenTitle', screens: ['A · C 상세 · E3 · F3', 'C1 · D1 · E1 · F1 제목'], step: 6,
+      desc: '대화 화면은 두툼한 뒤로 버튼 · 이름 동그라미 · 이름 · 부제 · 오른쪽 태그. 목록 화면은 쿠션톡 글자와 반 · 날짜.',
+      preview: lbl('AppHeader') + `<div class="flex items-center gap-3"><span class="w-11 h-11 rounded-2xl grid place-items-center bg-white" style="border:2px solid var(--edge);border-bottom-width:4px">${ic('back', 22)}</span>${AV('민')}<div class="flex-1 min-w-0"><p class="font-extrabold text-[16px] leading-tight">민서 보호자</p><p class="text-[12.5px] font-semibold" style="color:var(--sub)">3학년 2반 · 어제 오후 9:42</p></div><span class="z-tag z-due">D-1</span></div>`
+        + lbl('ScreenTitle') + `<div class="flex items-center justify-between"><p class="z-jua text-[24px]" style="color:var(--sky-deep)">쿠션톡</p><span class="text-[13px] font-bold" style="color:var(--sub)">3학년 2반 · 10월 13일</span></div>`,
+      props: [['title · subtitle', '글자', '—', '이름 · 부제'], ['avatar', '글자 한 자', '없음', '이름 첫 글자 (주아체)'], ['right', 'Tag · Button', '없음', '오른쪽 칸 (D-1 · 참여 코드)'], ['ScreenTitle.title', '글자', '쿠션톡', '목록 화면 제목']],
+      rules: ['학부모 대화 화면 부제는 “학교 공식 창구 · 쿠션이가 먼저 읽어요”.', '반 톡방(6-6) 교사 화면은 오른쪽에 [참여 코드] 작은 흰 버튼.'],
+    },
+    {
+      id: 'tabbar', name: '탭 바', code: 'TabBar', screens: ['C1 ~ C3 · E1 (교사)'], step: 6,
+      desc: '아래 떠 있는 두툼한 탭 바. 지금 탭은 하늘색 알약.',
+      preview: `<div class="h-[66px] rounded-[22px] grid grid-cols-3 items-center px-2 bg-white" style="border:2px solid var(--edge);border-bottom-width:5px"><div class="z-tab on">${ic('letter', 20)}메시지함</div><div class="z-tab">${ic('users', 20)}반 톡방</div><div class="z-tab">${ic('gear', 20)}설정</div></div>`,
+      props: [['items', '메시지함 · 반 톡방 · 설정', '—', '교사 탭 세 개'], ['active', '0 · 1 · 2', '0', '지금 탭']],
+      rules: ['학부모 · 학생 화면에는 탭 바가 없습니다. 관리자 탭 구성은 미정.', '화면 아래 여백은 탭 바 높이 + 20만큼 비워 둡니다.'],
+    },
+    {
+      id: 'field', name: '입력 칸', code: 'TextField', screens: ['F1 · F2 톡방 참여'], step: 6,
+      desc: '이름표가 붙은 두툼한 입력 칸. 오류면 테두리가 산호색, 아래에 이유 한 줄.',
+      preview: `<p class="z-flbl">참여 코드</p><div class="z-field">QK7 M29</div><p class="z-flbl mt-4">참여 코드 · 오류</p><div class="z-field err">QK7 M29</div><p class="mt-1.5 text-[12.5px] font-bold" style="color:var(--coral-deep)">코드가 만료됐어요. 선생님께 새 코드를 받아 주세요.</p>`,
+      props: [['label', '글자', '—', '칸 이름'], ['value', '글자', '—', '입력값'], ['error', '글자', '없음', '오류 문구 (있으면 오류 상태)']],
+      rules: ['오류 문구: “코드가 맞지 않아요” / “코드가 만료됐어요. 선생님께 새 코드를 받아 주세요.”', '오류 상태에는 쿠션이를 쓰지 않습니다.'],
+    },
+    {
+      id: 'select', name: '고르기 · 목록 줄', code: 'Select · ListRow', screens: ['E1 반 톡방 목록'], step: 6,
+      desc: '학년 · 반을 고르는 칸과, 반 톡방 한 줄(네모 반 표시 + 이름 + 학생 수).',
+      preview: lbl('ListRow') + `<div class="z-chunk p-3 flex items-center gap-3"><span class="w-11 h-11 rounded-2xl grid place-items-center z-jua" style="background:var(--sky-soft);color:var(--sky-deep);font-size:15px">3-1</span><div class="flex-1"><p class="font-extrabold text-[15px]">3학년 1반 단체 톡방</p><p class="text-[12.5px] font-semibold" style="color:var(--sub)">학생 24명 · 오늘 오후 1:12</p></div><span style="color:var(--faint)">${ic('back', 18).replace('M15 5l-7 7 7 7', 'M9 5l7 7-7 7')}</span></div>`
+        + lbl('Select') + `<div class="flex gap-2"><div class="z-sel">3학년 ${ic('down', 16)}</div><div class="z-sel">1반 ${ic('down', 16)}</div><div class="z-btn md z-sky" style="height:46px;padding:0 16px">열기</div></div>`,
+      props: [['Select.options', '글자 목록', '—', '고를 것'], ['Select.value', '글자', '첫 번째', '고른 값'], ['ListRow.title · detail', '글자', '—', '이름 · 학생 수와 시간'], ['ListRow.badge', '글자', '—', '“3-1” 같은 반 표시']],
+      rules: ['이미 있는 반을 고르면 그 톡방으로, 없으면 만들고 참여 코드 시트.'],
+    },
+    {
+      id: 'code', name: '참여 코드 표시', code: 'CodeDisplay', screens: ['E2 처음 발급', 'E4 다시 보기 · 재발급'], step: 6,
+      desc: '크게 띄어 쓴 참여 코드와 남은 시간.',
+      preview: `<div class="z-code z-jua">QK7 M29</div><p class="mt-2 text-center text-[13px] font-bold" style="color:var(--sub)">남은 시간 <b style="color:var(--ink)">17시간 42분</b></p><div class="mt-3 z-btn md z-sky">${ic('copy', 17)}코드 복사</div>`,
+      props: [['code', '글자 6자', '—', '참여 코드'], ['expiresAt', '시각', '—', '남은 시간 계산 (발급 후 24시간)']],
+      rules: ['참여 코드는 반마다 하나, 하루(24시간) 동안 유효 (10.16).', '새 코드를 받으면 이전 코드는 바로 막히고, 들어온 학생은 그대로.'],
+    },
+    {
+      id: 'radio', name: '대응 기록 칸', code: 'RadioGroup · TextArea', screens: ['D2 위협 상세 (관리자)'], step: 6,
+      desc: '대응 종류 하나 고르기와 메모 칸. 관리자 화면에서만 써서 쿠션이 · 스티커가 없습니다.',
+      preview: `<p class="z-flbl">대응 기록</p><div class="flex flex-wrap gap-2"><span class="flex items-center gap-2 h-10 px-3 rounded-[14px] bg-white text-[14px] font-bold" style="border:2.5px solid var(--slate);border-bottom-width:4px"><span class="z-radio on" style="border-color:var(--slate)"></span>학부모 면담</span><span class="flex items-center gap-2 h-10 px-3 rounded-[14px] bg-white text-[14px] font-semibold" style="border:2px solid var(--edge);border-bottom-width:4px"><span class="z-radio"></span>교육청 보고</span><span class="flex items-center gap-2 h-10 px-3 rounded-[14px] bg-white text-[14px] font-semibold" style="border:2px solid var(--edge);border-bottom-width:4px"><span class="z-radio"></span>수사기관 신고</span></div><div class="mt-3 rounded-[16px] bg-white p-3 text-[14px] font-medium" style="border:2px solid var(--edge);border-bottom-width:5px;color:var(--faint);min-height:70px">어떤 조치를 했는지 적어 주세요</div>`,
+      props: [['options', '학부모 면담 · 교육청 보고 · 수사기관 신고', '—', '대응 종류'], ['value', '번호', '없음', '고른 것'], ['TextArea.value', '글자', '—', '메모']],
+      rules: ['관리자 화면의 고른 색은 sky 대신 slate.', '저장하면 담임에게 처리 상황 알림 (플로우 D).'],
+    },
+    {
+      id: 'toast', name: '잠깐 안내', code: 'Toast', screens: ['D3 기록 저장 뒤', 'E4 코드 복사 뒤'], step: 6,
+      desc: '아래에 잠깐 떴다 사라지는 안내. 2~3초.',
+      preview: `<div class="z-toast">기록했어요. 담임 선생님께 처리 상황을 알렸어요.</div><div class="mt-3 z-toast">참여 코드를 복사했어요.</div>`,
+      props: [['message', '글자', '—', '한 문장'], ['duration', '초', '2.5', '떠 있는 시간']],
+      rules: ['되돌릴 수 없는 일을 알리는 데만. 오류는 Toast 대신 그 자리에서.'],
+    },
+  ];
+
+  const STEP_NAME = { 1: '1 · 토큰 · 쿠션이', 2: '2 · 기본', 3: '3 · 메시지함', 4: '4 · 상세', 5: '5 · 학부모 작성', 6: '6 · 화면 틀 · 나머지' };
+
+  document.getElementById('list-rows').innerHTML = SPECS.map((s, i) => `<tr>
+    <td class="px-5 py-3.5 font-bold text-[#2f5fd0]">${String(i + 1).padStart(2, '0')}</td>
+    <td class="px-5 py-3.5 font-semibold"><a href="#c-${s.id}" class="underline underline-offset-4 decoration-[#cfc9bd] hover:decoration-ink">${s.name}</a></td>
+    <td class="px-5 py-3.5"><code class="k">${s.code}</code></td>
+    <td class="px-5 py-3.5 text-[#5a564f]">${s.screens.join(' · ')}</td>
+    <td class="px-5 py-3.5 text-[#5a564f] whitespace-nowrap">${STEP_NAME[s.step]}</td>
+    <td class="px-5 py-3.5"><span class="badge st-wait">대기</span></td></tr>`).join('');
+
+  document.getElementById('spec-list').innerHTML = SPECS.map((s, i) => `
+    <article id="c-${s.id}" class="reveal card rounded-[28px] p-5 md:p-8" style="--i:${i % 2}">
+      <div class="flex flex-wrap items-start justify-between gap-3 keep">
+        <div>
+          <p class="eyebrow text-xs font-bold text-mute">COMPONENT ${String(i + 1).padStart(2, '0')} · 단계 ${STEP_NAME[s.step]}</p>
+          <h3 class="mt-1 text-2xl md:text-[28px] font-black tracking-tight leading-tight">${s.name} <code class="k align-middle text-[14px]">${s.code}</code></h3>
+          <p class="mt-2 text-[15px] text-[#4a4741] leading-relaxed max-w-[62ch]">${s.desc}</p>
+        </div>
+        <p class="flex flex-wrap gap-1.5 text-[13px] font-semibold">${s.screens.map((x) => `<span class="chip rounded-md px-2 py-0.5">${x}</span>`).join('')}</p>
+      </div>
+      <div class="mt-6 pt-6 border-t border-line grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-6 lg:gap-10">
+        <div class="frame rounded-2xl p-3"><div class="e2">${s.preview}</div></div>
+        <div class="keep">
+          <div class="rounded-2xl border border-line overflow-x-auto">
+            <table class="w-full min-w-[28rem] text-[14px]">
+              <thead><tr class="border-b-2 border-ink text-left"><th class="px-4 py-2.5 font-extrabold">옵션</th><th class="px-4 py-2.5 font-extrabold">값</th><th class="px-4 py-2.5 font-extrabold">기본</th><th class="px-4 py-2.5 font-extrabold">뜻</th></tr></thead>
+              <tbody class="divide-y divide-line">${s.props.map((p) => `<tr><td class="px-4 py-2.5"><code class="k">${p[0]}</code></td><td class="px-4 py-2.5 text-[#5a564f]">${p[1]}</td><td class="px-4 py-2.5 text-[#5a564f]">${p[2]}</td><td class="px-4 py-2.5 text-[#5a564f]">${p[3]}</td></tr>`).join('')}</tbody>
+            </table>
+          </div>
+          <ul class="mt-5 text-[13.5px] leading-relaxed space-y-1.5">${s.rules.map((r) => `<li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>${r}</span></li>`).join('')}</ul>
+        </div>
+      </div>
+    </article>`).join('');
+
+  // ───────── 순서 ─────────
+  const ORDER = [
+    [1, '토큰 · 쿠션이', 'tokens.css, 프리텐다드 + 주아 글꼴, CushionChar(표정 5 · 크기 3)', '빈 화면에 E2 색 · 글꼴과 쿠션이 다섯 표정이 나온다'],
+    [2, '기본 부품', 'Button · Tag · FilterButton · MaskSticker · SpeechBubble', '버튼이 눌리면 내려앉고, 스티커 번호형 · 개수형 · 무늬 없음이 보인다'],
+    [3, '메시지함 부품', 'MessageCard · Banner · EmptyState', '예시 데이터로 C1 · C2 · C3가 나오고, 긴급 · 위협 · 실패 카드에 쿠션이가 없다'],
+    [4, '상세 부품', 'SummarySay · Bubble · DateChip', 'C4에서 요약 말풍선과 원문 스티커 ①②가 나오고, 떼고 보기가 시트를 연다'],
+    [5, '학부모 작성 부품', 'Composer · Sheet · SuggestionOption', '거친 문장을 보내면 checking → 팻말 쿠션이 경고 시트 → 세 버튼이 동작한다'],
+    [6, '화면 틀 · 나머지', 'AppHeader · ScreenTitle · TabBar · TextField · Select · ListRow · CodeDisplay · RadioGroup · TextArea · Toast', 'E · F · D 화면이 와이어프레임 23장대로 조립된다'],
+  ];
+  document.getElementById('order-list').innerHTML = ORDER.map((o, i) => `
+    <div class="reveal border-t-[3px] border-ink pt-5" style="--i:${i % 3}">
+      <p class="eyebrow text-xs font-bold text-mute">STEP ${o[0]}</p>
+      <h3 class="mt-2 text-xl font-black tracking-tight">${o[1]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${o[2]}</p>
+      <p class="mt-3 text-[13.5px] text-[#7c776e] leading-relaxed"><b class="text-ink">완료 기준</b> · ${o[3]}</p>
+    </div>`).join('');
+
+  // ───────── 미정 ─────────
+  const OPENS = [
+    ['쿠션이', '쿠션이 그림을 누가 다듬을지 · 움직임(등장 효과)을 넣을지'],
+    ['글꼴', '주아체를 앱에 넣는 방식 (웹폰트로 불러오기 · 앱에 포함)'],
+    ['필터', '연락이 필터에서 빠지는 조건 (긴급 카드는 답장하면 내려감 · 11.02 정함)'],
+    ['관리자', '관리자 화면의 아래 탭 구성 (대응 기록은 덧붙이기만 · 11.02 정함)'],
+    ['제안 문장', '경고 시트 제안 문장 최대 개수 (시안은 2개)'],
+  ];
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 items-center py-4 border-b border-line" style="--i:${i % 2}">
+      <span class="min-w-[4.5rem] text-xs font-bold text-mute">${o[0]}</span>
+      <span class="text-[15px] font-semibold">${o[1]}</span>
+    </li>`).join('');
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

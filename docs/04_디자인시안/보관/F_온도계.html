@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 시안 F</title>
+  <meta name="description" content="쿠션톡 디자인 초안 F · 온도계 · 말의 온도를 재고 식혀서 전하는 데이터형 디자인">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] } } } }
+  </script>
+  <style>
+    :root {
+      --bg: #F4F6F7; --card: #FFFFFF; --ink: #0E1116; --sub: #67707A; --faint: #9AA3AB; --line: #E1E5E8;
+      --cool: #2E9BC0; --cool-soft: #E3F3F8; --calm: #6DBFA4;
+      --warm: #F0A23B; --hot: #E5484D; --hot-soft: #FDECEC;
+    }
+    body { background: #E9EDEF; color: var(--ink); }
+    .keep { word-break: keep-all; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    iconify-icon { display: inline-block; vertical-align: middle; }
+
+    .phone { width: 395px; height: 820px; border-radius: 54px; background: #15191E; padding: 10px; box-shadow: 0 30px 60px -24px rgba(14, 17, 22, .4); flex: none; }
+    .screen { width: 375px; height: 800px; border-radius: 44px; overflow: hidden; position: relative; background: var(--card); display: flex; flex-direction: column; font-size: 15px; line-height: 1.5; word-break: keep-all; }
+    .status { height: 50px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 34px; font-size: 15px; font-weight: 600; position: relative; }
+    .island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; }
+
+    /* F 컴포넌트: 온도 눈금 */
+    .scale { position: relative; height: 10px; border-radius: 999px; background: linear-gradient(90deg, #2E9BC0 0%, #6DBFA4 30%, #E9C855 58%, #F0A23B 74%, #E5484D 100%); }
+    .scale.thin { height: 6px; }
+    .mark { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 999px; transform: translate(-50%, -50%); background: #fff; box-shadow: 0 0 0 3px currentColor, 0 2px 6px rgba(0,0,0,.18); }
+    .scale.thin .mark { width: 12px; height: 12px; box-shadow: 0 0 0 2.5px currentColor; }
+    .ghost-mark { position: absolute; top: 50%; width: 3px; height: 20px; border-radius: 2px; transform: translate(-50%, -50%); background: currentColor; }
+    .scale.thin .ghost-mark { height: 14px; }
+    .ticks { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--faint); }
+    .cap { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--sub); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid var(--line); color: var(--sub); }
+    .chip-cool { border-color: transparent; background: var(--cool-soft); color: #1F7896; }
+    .chip-hot { border-color: transparent; background: var(--hot-soft); color: #C2353A; }
+    .chip-ink { border-color: transparent; background: var(--ink); color: #fff; }
+    .row { padding: 14px 20px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+    .cooled { display: inline-flex; align-items: center; gap: 3px; padding: 0 7px; border-radius: 6px; background: var(--cool-soft); color: #1F7896; font-size: 12px; font-weight: 700; line-height: 1.7; vertical-align: 1px; }
+    .tabbar { height: 84px; flex: none; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); padding-top: 10px; background: #fff; }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--faint); }
+    .tab.on { color: var(--ink); }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 52px; border-radius: 12px; font-size: 16px; font-weight: 700; }
+    .btn-ink { background: var(--ink); color: #fff; }
+    .btn-line { border: 1px solid var(--line); color: var(--ink); background: #fff; }
+    .radio { width: 20px; height: 20px; border-radius: 999px; border: 2px solid #C9CFD4; flex: none; margin-top: 2px; }
+    .radio.on { border: 6px solid var(--ink); }
+    .hotline { background: linear-gradient(transparent 60%, rgba(229, 72, 77, .22) 60%); }
+    @media (max-width: 440px) { .phone { zoom: .86; } }
+    @media (max-width: 390px) { .phone { zoom: .8; } }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-[100dvh]">
+
+  <header class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pt-12 md:pt-16 pb-8 keep">
+    <p class="mono text-xs md:text-sm font-semibold tracking-[.2em] text-[#67707A]">CUSHION TALK · DRAFT F · 26.10.16</p>
+    <div class="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-end">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1]">시안 F<br><span class="text-[#2E9BC0]">온도계</span> <span class="mono text-3xl md:text-5xl text-[#E5484D] align-middle">41°</span><span class="mono text-3xl md:text-5xl text-[#9AA3AB] align-middle">→</span><span class="mono text-3xl md:text-5xl text-[#2E9BC0] align-middle">20°</span></h1>
+        <p class="mt-4 text-[15px] md:text-base text-[#4A535C] leading-relaxed max-w-[44rem]">
+          쿠션톡이 하는 일을 <b class="text-[#0E1116]">“말의 온도를 식혀서 전한다”</b>로 보이게 합니다. 메시지마다 받은 온도와 전한 온도를 숫자와 눈금으로 보여 주고,
+          학부모도 보내기 전에 <b class="text-[#0E1116]">지금 문장의 온도</b>를 봅니다. Grammarly 말투 표시처럼 감정을 숫자로 바꿔 거리를 둡니다.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2 lg:justify-end">
+        <span class="chip" style="height:28px;font-size:13px">숫자로 거리 두기</span><span class="chip" style="height:28px;font-size:13px">한눈에 비교</span><span class="chip" style="height:28px;font-size:13px">차분한 계기판</span>
+      </div>
+    </div>
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-3">
+      <div class="rounded-2xl p-4 bg-white">
+        <p class="cap">말 온도 눈금 · 온도 표시에만 씀</p>
+        <div class="scale mt-3"></div>
+        <div class="ticks mt-2 mono"><span>10° 차분</span><span>20° 평온</span><span>30° 날카로움</span><span>40° 공격</span><span>50°</span></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="rounded-2xl p-3 bg-white"><div class="h-10 rounded-lg" style="background:#0E1116"></div><p class="mt-2 text-sm font-bold">먹색 · 행동</p><p class="mono text-xs text-[#9AA3AB]">#0E1116</p></div>
+        <div class="rounded-2xl p-3 bg-white"><div class="h-10 rounded-lg" style="background:#2E9BC0"></div><p class="mt-2 text-sm font-bold">식힘</p><p class="mono text-xs text-[#9AA3AB]">#2E9BC0</p></div>
+        <div class="rounded-2xl p-3 bg-white"><div class="h-10 rounded-lg" style="background:#E5484D"></div><p class="mt-2 text-sm font-bold">뜨거움 · 긴급</p><p class="mono text-xs text-[#9AA3AB]">#E5484D</p></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pb-12">
+    <div class="flex flex-wrap justify-center gap-x-9 gap-y-14">
+
+      <!-- ① 교사 메시지함 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:40</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex-1 overflow-hidden">
+            <div class="px-5 pt-2">
+              <p class="cap mono">10.13 TUE · 3학년 2반</p>
+              <h2 class="mt-1 text-[25px] font-bold tracking-tight">오늘 받은 말의 온도</h2>
+            </div>
+            <div class="mx-5 mt-4 rounded-[16px] p-4" style="background:var(--bg)">
+              <div class="flex items-end gap-4">
+                <div><p class="text-[12px] font-semibold text-[#67707A]">받은 말 평균</p><p class="mono text-[34px] font-bold leading-none mt-1" style="color:var(--warm)">34°</p></div>
+                <iconify-icon icon="solar:arrow-right-linear" width="24" style="color:#9AA3AB;margin-bottom:6px"></iconify-icon>
+                <div><p class="text-[12px] font-semibold text-[#67707A]">선생님께 닿은 말</p><p class="mono text-[34px] font-bold leading-none mt-1" style="color:var(--cool)">21°</p></div>
+              </div>
+              <div class="scale thin mt-4">
+                <span class="ghost-mark" style="left:62%;color:var(--warm)"></span>
+                <span class="mark" style="left:40%;color:var(--cool)"></span>
+              </div>
+              <div class="ticks mt-1.5 mono"><span>10°</span><span>20°</span><span>30°</span><span>40°</span><span>50°</span></div>
+            </div>
+
+            <div class="mt-4">
+              <div class="row" style="background:var(--hot-soft);border-top:0">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5"><span class="chip chip-hot" style="background:#E5484D;color:#fff"><iconify-icon icon="solar:bell-bing-bold" width="13"></iconify-icon>긴급</span><p class="font-bold text-[15px]">하윤 보호자</p></div>
+                  <p class="mt-1 text-[14px] text-[#4A2427] line-clamp-1">하윤이가 쉬는 시간마다 맞는다고 해요…</p>
+                </div>
+                <div class="text-right"><p class="mono text-[12px] text-[#C2353A] font-semibold">07:50</p><p class="text-[11.5px] font-bold text-[#C2353A] mt-1">식히지 않음<br>원문 그대로</p></div>
+              </div>
+              <div class="row">
+                <div class="min-w-0">
+                  <p class="font-bold text-[15px]">민서 보호자</p>
+                  <p class="mt-0.5 text-[14px] text-[#2A3036]">자리를 내일까지 바꿔 달라는 요청이에요.</p>
+                  <div class="scale thin mt-2.5 w-[150px]"><span class="ghost-mark" style="left:78%;color:var(--hot)"></span><span class="mark" style="left:38%;color:var(--cool)"></span></div>
+                </div>
+                <div class="text-right"><p class="mono text-[12px] text-[#9AA3AB]">어제 21:42</p><p class="mono text-[15px] font-bold mt-1"><span style="color:var(--hot)">41°</span><span class="text-[#9AA3AB]">→</span><span style="color:var(--cool)">20°</span></p></div>
+              </div>
+              <div class="row">
+                <div class="min-w-0">
+                  <p class="font-bold text-[15px]">지호 보호자</p>
+                  <p class="mt-0.5 text-[14px] text-[#2A3036]">내일 2교시 후 조퇴한다는 연락이에요.</p>
+                  <div class="scale thin mt-2.5 w-[150px]"><span class="mark" style="left:34%;color:var(--calm)"></span></div>
+                </div>
+                <div class="text-right"><p class="mono text-[12px] text-[#9AA3AB]">07:12</p><p class="mono text-[15px] font-bold mt-1" style="color:var(--calm)">18°</p><p class="text-[11px] text-[#9AA3AB]">그대로</p></div>
+              </div>
+              <div class="row">
+                <div class="min-w-0">
+                  <p class="font-bold text-[15px]">민서 보호자</p>
+                  <p class="mt-0.5 text-[14px] text-[#2A3036]">내일 아침 교실로 찾아오겠다는 내용이에요.</p>
+                  <div class="mt-2"><span class="chip"><iconify-icon icon="solar:buildings-2-linear" width="13"></iconify-icon>학교로 넘김 · 교감</span></div>
+                </div>
+                <div class="text-right"><p class="mono text-[12px] text-[#9AA3AB]">어제 21:58</p><p class="mono text-[15px] font-bold mt-1" style="color:var(--hot)">47°</p><p class="text-[11px] font-semibold text-[#C2353A]">위협</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab on"><iconify-icon icon="solar:temperature-bold" width="24"></iconify-icon>메시지함</div>
+            <div class="tab"><iconify-icon icon="solar:users-group-rounded-linear" width="24"></iconify-icon>반 톡방</div>
+            <div class="tab"><iconify-icon icon="solar:settings-linear" width="24"></iconify-icon>설정</div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="mono text-[12.5px] font-semibold tracking-[.14em] text-[#67707A]">6-2 · 교사 메시지함</p>
+          <p class="mt-1 text-[15px] text-[#4A535C] leading-relaxed">맨 위 계기판이 <b class="text-[#0E1116]">“받은 34° → 닿은 21°”</b>로 오늘 쿠션톡이 한 일을 숫자로 보여 줍니다. 줄마다 작은 눈금으로 얼마나 식혔는지 표시합니다.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ② 교사 메시지 상세 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-2 px-3 pb-3 border-b border-[#E1E5E8]">
+            <span class="w-10 h-10 grid place-items-center"><iconify-icon icon="solar:alt-arrow-left-linear" width="24"></iconify-icon></span>
+            <div class="flex-1 min-w-0"><p class="font-bold text-[17px] leading-tight">민서 보호자</p><p class="mono text-[12px] text-[#9AA3AB]">3학년 2반 · 10.12 21:42</p></div>
+          </div>
+
+          <div class="flex-1 overflow-hidden">
+            <div class="px-5 pt-5">
+              <p class="cap">TEMPERATURE</p>
+              <div class="mt-1 flex items-end gap-3">
+                <p class="mono text-[44px] font-bold leading-none" style="color:var(--hot)">41°</p>
+                <iconify-icon icon="solar:arrow-right-linear" width="26" style="color:#9AA3AB;margin-bottom:8px"></iconify-icon>
+                <p class="mono text-[44px] font-bold leading-none" style="color:var(--cool)">20°</p>
+                <p class="ml-auto text-[12.5px] text-[#67707A] text-right leading-snug mb-1">날카로운 표현<br><b class="text-[#0E1116]">2곳을 식혔어요</b></p>
+              </div>
+              <div class="scale mt-4"><span class="ghost-mark" style="left:78%;color:var(--hot)"></span><span class="mark" style="left:40%;color:var(--cool)"></span></div>
+              <div class="ticks mt-1.5 mono"><span>10°</span><span>20° 평온</span><span>30°</span><span>40° 공격</span><span>50°</span></div>
+            </div>
+
+            <div class="mx-5 mt-5 pt-4 border-t border-[#E1E5E8]">
+              <p class="cap">REQUEST</p>
+              <p class="mt-1.5 text-[19px] font-bold leading-snug tracking-tight">짝과 맞지 않아 매일 우는 아이의 자리를 내일까지 바꿔 달라는 요청이에요.</p>
+              <div class="mt-2.5 flex gap-1.5"><span class="chip"><iconify-icon icon="solar:calendar-linear" width="13"></iconify-icon>내일까지</span><span class="chip">자리·모둠</span></div>
+            </div>
+
+            <div class="mx-5 mt-5 pt-4 border-t border-[#E1E5E8]">
+              <div class="flex items-center"><p class="cap">ORIGINAL · 식혀서 보기</p><span class="ml-auto text-[13px] font-semibold flex items-center gap-1"><iconify-icon icon="solar:eye-linear" width="15"></iconify-icon>원문 보기</span></div>
+              <p class="mt-2 text-[14.5px] leading-[1.85] text-[#2A3036]">선생님, <span class="cooled"><iconify-icon icon="solar:snowflake-linear" width="12"></iconify-icon>식힘 <span class="mono">−14°</span></span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="cooled"><iconify-icon icon="solar:snowflake-linear" width="12"></iconify-icon>식힘 <span class="mono">−18°</span></span> 내일까지 자리 바꿔 주세요.</p>
+            </div>
+          </div>
+
+          <div class="px-3 pt-3 pb-8 border-t border-[#E1E5E8]">
+            <div class="flex items-center gap-2">
+              <p class="flex-1 h-11 rounded-[10px] px-4 flex items-center text-[15px] text-[#9AA3AB] border border-[#E1E5E8]">답장을 적어 주세요</p>
+              <span class="w-11 h-11 rounded-[10px] grid place-items-center text-white" style="background:var(--ink)"><iconify-icon icon="solar:arrow-up-linear" width="22"></iconify-icon></span>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="mono text-[12.5px] font-semibold tracking-[.14em] text-[#67707A]">6-3 · 교사 메시지 상세</p>
+          <p class="mt-1 text-[15px] text-[#4A535C] leading-relaxed">맨 위 큰 숫자 <b class="text-[#0E1116]">41° → 20°</b>, 그 아래 요청 한 문장. 원문에서 거친 부분은 <b class="text-[#0E1116]">“식힘 −14°”</b> 칩으로 바뀌어 얼마나 뜨거웠는지만 남습니다.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ③ 학부모 작성 · 경고 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>9:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-2 px-3 pb-3 border-b border-[#E1E5E8]">
+            <span class="w-10 h-10 grid place-items-center"><iconify-icon icon="solar:alt-arrow-left-linear" width="24"></iconify-icon></span>
+            <div class="flex-1 min-w-0"><p class="font-bold text-[17px] leading-tight">3학년 2반 담임 선생님</p><p class="text-[12.5px] text-[#9AA3AB]">학교 공식 창구 · 말 온도를 재고 전해요</p></div>
+          </div>
+          <div class="flex-1 px-4 pt-4" style="background:var(--bg)">
+            <div class="max-w-[84%] rounded-[16px] rounded-tl-[4px] bg-white px-4 py-3 text-[14.5px]">안녕하세요, 민서 보호자님. 3학년 2반 담임입니다. 궁금한 점은 이 창구로 편하게 남겨 주세요.</div>
+          </div>
+
+          <div class="absolute inset-0" style="background:rgba(14,17,22,.4)"></div>
+          <div class="absolute left-0 right-0 bottom-0 rounded-t-[26px] px-5 pt-3 pb-8 bg-white">
+            <div class="w-10 h-1.5 rounded-full mx-auto bg-[#E1E5E8]"></div>
+            <div class="mt-4 flex items-start justify-between gap-3">
+              <div>
+                <p class="cap">지금 문장의 온도</p>
+                <p class="mt-1 text-[17px] font-bold leading-snug">이 표현은 교권 침해로<br>기록될 수 있어요</p>
+              </div>
+              <p class="mono text-[46px] font-bold leading-none" style="color:var(--hot)">41°</p>
+            </div>
+            <div class="scale mt-3"><span class="mark" style="left:78%;color:var(--hot)"></span></div>
+            <div class="mt-3 text-[13.5px] leading-[1.75] text-[#4A535C]">선생님, <span class="hotline">애들 하나 제대로 못 보세요?</span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="hotline">그러고도 선생님 소리 듣고 싶으세요?</span>…</div>
+
+            <p class="mt-4 cap">식힌 문장</p>
+            <div class="mt-2 grid gap-2">
+              <div class="flex gap-3 rounded-[12px] p-3.5" style="border:2px solid var(--ink)">
+                <span class="radio on"></span>
+                <p class="flex-1 text-[14px] leading-relaxed">선생님, 민서가 짝이랑 잘 맞지 않아서 요즘 매일 울면서 집에 와요. 내일까지 자리를 바꿔 주실 수 있을까요?</p>
+                <span class="mono text-[15px] font-bold flex-none" style="color:var(--cool)">19°</span>
+              </div>
+              <div class="flex gap-3 rounded-[12px] p-3.5 border border-[#E1E5E8]">
+                <span class="radio"></span>
+                <p class="flex-1 text-[14px] leading-relaxed text-[#4A535C]">민서 자리 문제로 연락드려요. 짝과 맞지 않아 많이 힘들어해요. 내일까지 바꿔 주시면 좋겠어요.</p>
+                <span class="mono text-[15px] font-bold flex-none" style="color:var(--calm)">22°</span>
+              </div>
+            </div>
+            <p class="mt-3 text-[12.5px] text-[#4A535C] flex items-center gap-1.5"><iconify-icon icon="solar:check-circle-linear" width="15" style="color:var(--cool)"></iconify-icon>온도만 낮추고 <b class="text-[#0E1116]">자리 바꾸기 · 내일까지</b>는 그대로 전해요</p>
+            <div class="mt-4 btn btn-ink">19°로 보내기</div>
+            <div class="mt-2 grid grid-cols-2 gap-2">
+              <div class="btn btn-line" style="height:46px;font-size:15px">직접 고치기</div>
+              <div class="btn" style="height:46px;font-size:15px;color:#67707A">그대로 보내기</div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="mono text-[12.5px] font-semibold tracking-[.14em] text-[#67707A]">6-1 · 학부모 작성 · 온도 시트</p>
+          <p class="mt-1 text-[15px] text-[#4A535C] leading-relaxed">경고 대신 <b class="text-[#0E1116]">“지금 문장 41°”</b>를 보여 줍니다. 제안 문장마다 온도가 붙어 있어, 학부모가 스스로 더 차분한 쪽을 고르게 합니다.</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <section class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 keep">
+      <div class="rounded-[16px] bg-white p-6">
+        <p class="cap">REFERENCE</p>
+        <h3 class="mt-2 text-xl font-bold">말투 표시</h3>
+        <p class="mt-2 text-[15px] text-[#4A535C] leading-relaxed">Grammarly 말투 감지처럼 “읽는 사람에게 이렇게 들릴 수 있어요”를 눈에 보이는 값으로. 감정을 숫자로 바꾸면 한발 떨어져서 보게 됩니다.</p>
+      </div>
+      <div class="rounded-[16px] bg-white p-6">
+        <p class="cap">STYLE</p>
+        <h3 class="mt-2 text-xl font-bold">계기판 같은 화면</h3>
+        <p class="mt-2 text-[15px] text-[#4A535C] leading-relaxed">흰 바탕, 가는 선, 고정폭 숫자. 색은 온도 눈금에서만 쓰고 버튼은 먹색 하나. 날씨 앱과 건강 앱의 숫자 중심 화면을 참고했습니다.</p>
+      </div>
+      <div class="rounded-[16px] bg-white p-6">
+        <p class="cap">CAUTION</p>
+        <h3 class="mt-2 text-xl font-bold">온도는 설명용 숫자</h3>
+        <p class="mt-2 text-[15px] text-[#4A535C] leading-relaxed">AI가 낸 말투 점수를 온도로 바꿔 보여 주는 것. 정확한 측정처럼 보이지 않게 “예상 온도”라고 쓰고, 긴급은 온도와 상관없이 원문으로 보냅니다.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-[#D5DBDF] text-sm text-[#67707A] flex flex-col md:flex-row gap-2 justify-between keep">
+    <p>정적 초안 · 내용은 유저플로우_쿠션톡_261015 · 앱 정의서 6-7절 예시 문구</p>
+    <p>시안 D · E · F 중 하나</p>
+  </footer>
+</body>
+</html>

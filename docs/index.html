@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 문서 목차</title>
+  <meta name="description" content="[26.10.17] 쿠션톡 문서 모음 · 기획 → 흐름 → 화면 → 디자인 시안 순서로 모든 문서를 여는 목차">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    .doc { transition: border-color .2s, transform .2s; }
+    .doc:hover { border-color: #1d1c1a; transform: translateY(-2px); }
+    .doc:hover .arrow { transform: translateX(3px); }
+    .arrow { transition: transform .2s; }
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; }
+    .tree { font: 13.5px/1.9 ui-monospace, SFMono-Regular, Consolas, 'D2Coding', monospace; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">문서 목차</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#read" class="px-3 py-2 rounded-full hover:bg-white">읽는 순서</a>
+        <a href="#docs" class="px-3 py-2 rounded-full hover:bg-white">문서</a>
+        <a href="#drafts" class="px-3 py-2 rounded-full hover:bg-white">시안</a>
+        <a href="#forms" class="px-3 py-2 rounded-full hover:bg-white">양식</a>
+        <a href="#tree" class="px-3 py-2 rounded-full hover:bg-white">폴더</a>
+        <a href="#log" class="px-3 py-2 rounded-full hover:bg-white">기록</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">DOCS INDEX · CUSHION TALK · 26.11.02</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>문서 목차</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        지금까지 만든 문서를 <b class="text-ink">기획 → 흐름 → 화면 → 디자인 시안 → 데이터 → API</b> 순서로 폴더에 나눠 담았습니다.
+        이 페이지에서 바로 열 수 있습니다. 확정 디자인은 <b class="text-ink">시안 E2(쿠션이)</b>이고,
+        다른 시안 9개는 <b class="text-ink">보관</b> 폴더로 옮겼습니다.
+      </p>
+    </header>
+
+    <!-- 01 읽는 순서 -->
+    <section id="read" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">처음 보는 사람은 이 순서로</span>
+        <span class="text-mute">앞 문서가 뒤 문서의 근거</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 keep">
+        <li class="reveal card rounded-2xl p-5" style="--i:0"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">1</span><span class="font-extrabold">서비스 정의서</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">누가 · 왜 · 무엇을. 기능 범위의 기준.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:1"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">2</span><span class="font-extrabold">유저플로우</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">사람별로 어떤 길을 지나는지. 10.16 · 11.02 결정 반영.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:2"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">3</span><span class="font-extrabold">와이어플로우</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">흐름 위에 화면을 얹어 본 것. 화면 사이 연결.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:3"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">4</span><span class="font-extrabold">와이어프레임</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">화면 26장의 배치와 쓰는 부품.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:4"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">5</span><span class="font-extrabold">컴포넌트 명세</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">부품 21개의 옵션 · 상태 · 만드는 순서.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:5"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">6</span><span class="font-extrabold">DB 설계</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">테이블 13개와 관계 · 원문 보관 규칙.</p></li>
+        <li class="reveal card rounded-2xl p-5" style="--i:6"><div class="flex items-center gap-3"><span class="fbadge w-8 h-8 text-sm">7</span><span class="font-extrabold">API 명세</span></div><p class="mt-3 text-sm text-[#5a564f] leading-relaxed">API 28개의 요청 · 응답과 화면별 API.</p></li>
+      </ol>
+    </section>
+
+    <!-- 02 문서 -->
+    <section id="docs" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">단계별 문서</span>
+        <span class="text-mute">카드를 누르면 열림 · .md는 원문으로 열림</span>
+      </h2>
+
+      <div class="mt-8 grid grid-cols-1 lg:grid-cols-[12rem_1fr] gap-x-8 gap-y-4 keep">
+        <div class="reveal"><p class="eyebrow text-xs font-bold text-mute">01_기획</p><p class="mt-1 font-extrabold text-lg">무엇을 만드나</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a href="01_기획/서비스정의서_쿠션톡_261015.md" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-done">확정</span><span class="text-sm text-mute">26.10.15 · md</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">서비스 정의서</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">학부모 · 교사 · 관리자 · 학생 네 사람과 핵심 기능(말 다듬기, 긴급 분류, 위협 가림)을 정한 문서.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+        </div>
+
+        <div class="reveal mt-6 lg:mt-8"><p class="eyebrow text-xs font-bold text-mute">02_흐름</p><p class="mt-1 font-extrabold text-lg">어떻게 움직이나</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:mt-8">
+          <a href="02_흐름/유저플로우_쿠션톡_261015.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-done">11.02 반영</span><span class="text-sm text-mute">26.11.02 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">유저플로우</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">사람별 흐름도 7개. G 로그인 · 가입 추가, 선생님 목록 · 유형 · 기한 고르기.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+          <a href="02_흐름/유저플로우_쿠션톡_261015.md" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-done">11.02 반영</span><span class="text-sm text-mute">26.11.02 · md</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">유저플로우 원문</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">위 흐름도의 글 버전. 6절에 10.16 결정, 7절에 11.02 결정.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+          <a href="02_흐름/와이어플로우_쿠션톡_261016.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-done">11.02 반영</span><span class="text-sm text-mute">26.11.02 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">와이어플로우</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">흐름 위에 화면 썸네일. 참여 코드 시트(남은 시간 · 새 코드 받기) 포함.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+        </div>
+
+        <div class="reveal mt-6 lg:mt-8"><p class="eyebrow text-xs font-bold text-mute">03_화면</p><p class="mt-1 font-extrabold text-lg">무엇이 보이나</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:mt-8">
+          <a href="03_화면/와이어프레임_쿠션톡_261016.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-doing">E2 기준</span><span class="text-sm text-mute">26.11.02 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">와이어프레임 26장</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">로그인 · 가입 2 · 학부모 6 · 교사 8 · 관리자 3 · 반 톡방 4 · 학생 3. 화면마다 쿠션이 표정과 "쿠션이 지도".</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+          <a href="03_화면/컴포넌트명세_쿠션톡_261016.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-doing">E2 기준</span><span class="text-sm text-mute">26.10.16 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">컴포넌트 명세</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">토큰 19개, 쿠션이 표정 5개와 규칙, 부품 21개, 만드는 순서 6단계.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+        </div>
+        <div class="reveal mt-6 lg:mt-8"><p class="eyebrow text-xs font-bold text-mute">05_데이터</p><p class="mt-1 font-extrabold text-lg">무엇을 저장하나</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:mt-8">
+          <a href="05_데이터/DB설계_쿠션톡_261017.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-done">확정</span><span class="text-sm text-mute">26.11.02 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">DB 설계 · ERD</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">테이블 13개, ERD, 원문 보관 · 열람 규칙, 화면별 테이블, SQLite 생성문.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+        </div>
+        <div class="reveal mt-6 lg:mt-8"><p class="eyebrow text-xs font-bold text-mute">06_API</p><p class="mt-1 font-extrabold text-lg">무엇을 주고받나</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:mt-8">
+          <a href="06_API/API명세_쿠션톡_261102.html" class="reveal doc card rounded-2xl p-6 block">
+            <div class="flex items-center justify-between gap-3"><span class="badge st-doing">초안</span><span class="text-sm text-mute">26.11.02 · html</span></div>
+            <p class="mt-4 text-xl font-black tracking-tight">API 명세</p>
+            <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">FastAPI 28개, 요청 · 응답 JSON, 오류 코드 13개, AI 분석 계약, 화면별 API.</p>
+            <p class="mt-4 text-sm font-bold flex items-center gap-1">열기 <span class="arrow">&rarr;</span></p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 디자인 시안 -->
+    <section id="drafts" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">디자인 시안</span>
+        <span class="text-mute">04_디자인시안 · 채택 1개, 보관 9개</span>
+      </h2>
+
+      <a href="04_디자인시안/E2_쿠션이_다듬기.html" class="reveal doc mt-7 card rounded-2xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center keep">
+        <div>
+          <div class="flex items-center gap-2"><span class="badge st-done">채택</span><span class="text-sm text-mute">26.10.16</span></div>
+          <p class="mt-4 text-2xl md:text-3xl font-black tracking-tight">E2 · 쿠션이 다듬기</p>
+          <p class="mt-3 text-[15px] text-[#5a564f] leading-relaxed max-w-[44rem]">파스텔 색, 두툼한 테두리, 눌리는 버튼, 마스코트 쿠션이. 와이어프레임과 컴포넌트 명세가 이 시안을 기준으로 다시 그려졌습니다.</p>
+        </div>
+        <p class="text-sm font-bold flex items-center gap-1">시안 열기 <span class="arrow">&rarr;</span></p>
+      </a>
+
+      <div class="reveal mt-4 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[40rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">보관 시안</th><th class="px-5 py-3.5 font-extrabold">방향</th><th class="px-5 py-3.5 font-extrabold w-28">상태</th></tr></thead>
+          <tbody class="divide-y divide-line">
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/A_포근한쿠션.html">A 포근한 쿠션</a> · <a class="underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/A2_포근한쿠션_다듬기.html">A2 다듬기</a></td><td class="px-5 py-3 text-[#5a564f]">따뜻한 크림색, 둥근 카드</td><td class="px-5 py-3"><span class="badge st-wait">보관</span></td></tr>
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/B_선명한데스크.html">B 선명한 데스크</a> · <a class="underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/B2_선명한데스크_다듬기.html">B2 다듬기</a></td><td class="px-5 py-3 text-[#5a564f]">업무용 도구처럼 또렷한 표 · 목록</td><td class="px-5 py-3"><span class="badge st-wait">보관</span></td></tr>
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/C_알림장.html">C 알림장</a></td><td class="px-5 py-3 text-[#5a564f]">학교 알림장 종이 느낌</td><td class="px-5 py-3"><span class="badge st-wait">보관</span></td></tr>
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/D_밤의등불.html">D 밤의 등불</a> · <a class="underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/D2_밤의등불_다듬기.html">D2 다듬기</a></td><td class="px-5 py-3 text-[#5a564f]">어두운 바탕, 밤 연락을 차분하게</td><td class="px-5 py-3"><span class="badge st-wait">보관</span></td></tr>
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/E_쿠션이.html">E 쿠션이 (첫 안)</a></td><td class="px-5 py-3 text-[#5a564f]">E2의 첫 버전</td><td class="px-5 py-3"><span class="badge st-temp">E2로 대체</span></td></tr>
+            <tr><td class="px-5 py-3"><a class="font-bold underline underline-offset-4 decoration-line hover:decoration-ink" href="04_디자인시안/보관/F_온도계.html">F 온도계</a></td><td class="px-5 py-3 text-[#5a564f]">말의 온도를 눈금으로 보여 주기</td><td class="px-5 py-3"><span class="badge st-wait">보관</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 양식 -->
+    <section id="forms" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">팀 양식 · 규칙</span>
+        <span class="text-mute">바이브코딩 협업표 · 위치 그대로 둠</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 keep">
+        <a href="바이브코딩 협업표/유저플로우/디자인_형식서.md" class="reveal doc card rounded-2xl p-5 block" style="--i:0"><p class="font-extrabold">디자인 형식서</p><p class="mt-2 text-sm text-[#5a564f]">팀 문서 HTML의 뼈대 · 글꼴 · 색 규칙</p></a>
+        <a href="바이브코딩 협업표/유저플로우/디자인_컴포넌트.html" class="reveal doc card rounded-2xl p-5 block" style="--i:1"><p class="font-extrabold">디자인 컴포넌트</p><p class="mt-2 text-sm text-[#5a564f]">문서용 부품과 FlowKit 흐름도</p></a>
+        <a href="바이브코딩 협업표/유저플로우/유저플로우_블록정의.md" class="reveal doc card rounded-2xl p-5 block" style="--i:2"><p class="font-extrabold">유저플로우 블록 정의</p><p class="mt-2 text-sm text-[#5a564f]">흐름도 블록 모양과 뜻</p></a>
+        <a href="바이브코딩 협업표/유저플로우/유저플로우_양식.md" class="reveal doc card rounded-2xl p-5 block" style="--i:3"><p class="font-extrabold">유저플로우 양식</p><p class="mt-2 text-sm text-[#5a564f]">유저플로우 문서 틀</p></a>
+        <a href="바이브코딩 협업표/서비스정의서_양식.md" class="reveal doc card rounded-2xl p-5 block" style="--i:0"><p class="font-extrabold">서비스 정의서 양식</p><p class="mt-2 text-sm text-[#5a564f]">정의서 문서 틀</p></a>
+        <a href="바이브코딩 협업표/Todo_분담표_양식.md" class="reveal doc card rounded-2xl p-5 block" style="--i:1"><p class="font-extrabold">Todo 분담표 양식</p><p class="mt-2 text-sm text-[#5a564f]">누가 무엇을 맡는지</p></a>
+        <a href="바이브코딩 협업표/Git_GitHub_규칙.md" class="reveal doc card rounded-2xl p-5 block" style="--i:2"><p class="font-extrabold">Git · GitHub 규칙</p><p class="mt-2 text-sm text-[#5a564f]">브랜치 · 커밋 · PR 약속</p></a>
+      </div>
+    </section>
+
+    <!-- 05 폴더 -->
+    <section id="tree" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">폴더 구조</span>
+        <span class="text-mute">새 문서는 단계에 맞는 폴더에 · 이름은 문서명_쿠션톡_YYMMDD</span>
+      </h2>
+      <div class="reveal mt-7 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
+        <pre class="card rounded-2xl p-6 tree overflow-x-auto">문서/
+├─ index.html              이 목차
+├─ 01_기획/
+│  └─ 서비스정의서_쿠션톡_261015.md
+├─ 02_흐름/
+│  ├─ 유저플로우_쿠션톡_261015.md
+│  ├─ 유저플로우_쿠션톡_261015.html
+│  └─ 와이어플로우_쿠션톡_261016.html
+├─ 03_화면/
+│  ├─ 와이어프레임_쿠션톡_261016.html
+│  └─ 컴포넌트명세_쿠션톡_261016.html
+├─ 04_디자인시안/
+│  ├─ E2_쿠션이_다듬기.html     채택
+│  └─ 보관/                    A A2 B B2 C D D2 E F
+├─ 05_데이터/
+│  └─ DB설계_쿠션톡_261017.html
+├─ 06_API/
+│  └─ API명세_쿠션톡_261102.html
+└─ 바이브코딩 협업표/            팀 양식 · 규칙</pre>
+        <div class="card rounded-2xl p-6 keep">
+          <p class="font-extrabold text-lg">새 문서를 넣을 때</p>
+          <ul class="mt-4 space-y-3 text-[15px] text-[#5a564f] leading-relaxed">
+            <li class="flex gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full bg-ink shrink-0"></span><span>단계가 맞는 폴더에 넣고, 이 목차의 02 절에 카드 하나를 추가합니다.</span></li>
+            <li class="flex gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full bg-ink shrink-0"></span><span>파일 이름은 <code class="k">문서명_쿠션톡_YYMMDD</code>. 고친 날짜가 바뀌어도 이름은 처음 만든 날로 둡니다.</span></li>
+            <li class="flex gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full bg-ink shrink-0"></span><span>안 쓰게 된 시안 · 문서는 지우지 말고 <code class="k">보관/</code>으로 옮깁니다.</span></li>
+            <li class="flex gap-3"><span class="mt-2 w-1.5 h-1.5 rounded-full bg-ink shrink-0"></span><span>문서 안의 "근거" 줄에 적힌 이름은 글자일 뿐이라, 파일을 옮겨도 깨지는 링크는 없습니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 기록 -->
+    <section id="log" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">진행 기록</span>
+        <span class="text-mute">무엇을 언제 정했나</span>
+      </h2>
+      <ol class="mt-7 border-t-2 border-ink keep">
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.15</span><span class="text-[#5a564f]">서비스 정의서 · 유저플로우 작성</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.16</span><span class="text-[#5a564f]">와이어플로우 작성. 결정 6개 반영 — 경고 무시 기록 안 보여 줌, 위협 원문 볼 수 있게, 참여 코드 유효 하루 · 재발급은 메뉴에서</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.16</span><span class="text-[#5a564f]">디자인 시안 A ~ F, 다듬기 A2 · B2 · D2 · E2</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.16</span><span class="text-[#5a564f]"><b class="text-ink">E2(쿠션이)로 확정</b>. 와이어프레임 23장 · 컴포넌트 명세 21개를 E2로 다시 그림</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.17</span><span class="text-[#5a564f]">문서를 단계별 폴더로 정리, 이 목차 페이지 추가</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">10.17</span><span class="text-[#5a564f]">DB 설계 초안. 사람은 역할 칸으로 나눔, 원문은 교사는 골라서 · 관리자는 증거로</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">11.02</span><span class="text-[#5a564f]">DB 설계 보완. 제안 문장 표시 칸 추가, 참여 코드 글자는 다시 쓰지 않게</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">11.02</span><span class="text-[#5a564f]">미정 결정, DB 설계 확정 — 어른은 아이디 · 비밀번호(학생은 코드 · 이름), 학부모는 학교 이름 검색 → 선생님 목록, 유형 6개 · 기한은 학부모가 고름, 위협 태그는 "공격적 표현" 하나, 긴급은 답장하면 내려감. 유저플로우 7절에 기록</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">11.02</span><span class="text-[#5a564f]">흐름 · 화면에 반영 — 유저플로우 · 와이어플로우에 G(로그인 · 가입) 추가, 와이어프레임에 G1 로그인 · G2 학부모 가입 · A0 선생님 목록 3장 추가 (26장)</span></li>
+        <li class="reveal grid grid-cols-[6rem_1fr] md:grid-cols-[8rem_1fr] gap-4 py-4 border-b border-line"><span class="font-bold">11.02</span><span class="text-[#5a564f]">API 명세 초안 (28개). 저장소 docs를 11.02 문서로 갱신</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>쿠션톡 · 어드벤쳐 디자인 26-2</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 와이어프레임</title>
+  <meta name="description" content="[26.10.16] 쿠션톡 전체 화면 와이어프레임 23장 · 유저 플로우(10.16 결정 반영)와 시안 E2(쿠션이) 구조 기준, 화면마다 번호 설명과 쓰는 부품">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    .canvas { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .canvas::-webkit-scrollbar { height: 8px; }
+    .canvas::-webkit-scrollbar-thumb { background: #dcd7cd; border-radius: 99px; }
+    .canvas svg { display: block; height: auto; }
+    .canvas a:hover rect.cardbox { stroke: #1d1c1a; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS: 회색 와이어프레임 (E2 구조) -->
+  <style>
+    .frame { background-image: radial-gradient(#e2ded5 1px, transparent 1px); background-size: 14px 14px; }
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; }
+
+    .ph { position: relative; width: 248px; height: 500px; border: 2px solid #3b3a37; border-radius: 30px; background: #f4f2ee; overflow: hidden; display: flex; flex-direction: column; font-size: 11.5px; line-height: 1.45; color: #1d1c1a; word-break: keep-all; margin: 0 auto; }
+    .sb { height: 26px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 10.5px; }
+    .isl { width: 58px; height: 15px; border-radius: 99px; background: #3b3a37; }
+    .sig { width: 22px; height: 8px; border-radius: 2px; border: 1.5px solid #1d1c1a; }
+
+    /* E2 와이어 부품 (회색) */
+    .ck { background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 14px; }
+    .hdr { flex: none; display: flex; align-items: center; gap: 6px; padding: 4px 10px 6px; }
+    .bk { width: 24px; height: 24px; border-radius: 8px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; display: grid; place-items: center; font-size: 13px; color: #57534e; flex: none; }
+    .av { width: 24px; height: 24px; border-radius: 99px; background: #e5e1d8; display: grid; place-items: center; font-weight: 900; font-size: 11px; color: #3b3a37; flex: none; }
+    .hdr b { display: block; font-size: 12px; font-weight: 800; line-height: 1.3; }
+    .hdr small { display: block; font-size: 9px; color: #8b867d; font-weight: 600; line-height: 1.3; }
+    .f1 { flex: 1; min-width: 0; }
+    .ttl { flex: none; padding: 2px 12px 4px; display: flex; align-items: center; justify-content: space-between; }
+    .ttl b { font-size: 15px; font-weight: 900; }
+    .ttl small { font-size: 9px; color: #8b867d; font-weight: 700; }
+    .body { flex: 1; min-height: 0; overflow: hidden; padding: 6px 10px 8px; display: flex; flex-direction: column; gap: 7px; }
+    .cxr { display: flex; align-items: flex-start; gap: 4px; }
+    .cxw { display: flex; flex-direction: column; align-items: center; flex: none; }
+    .cxw em { font-style: normal; font-size: 7.5px; font-weight: 700; color: #8b867d; margin-top: -1px; white-space: nowrap; }
+    .say { position: relative; flex: 1; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 12px; padding: 6px 8px; font-size: 10.5px; font-weight: 700; line-height: 1.4; margin-top: 3px; }
+    .say::before { content: ''; position: absolute; left: -6px; top: 12px; width: 9px; height: 9px; background: inherit; border-left: 1.5px solid #cfc9bd; border-bottom: 1.5px solid #cfc9bd; transform: rotate(45deg); }
+    .say.b { background: #faf8f3; }
+    .say .lb { font-size: 8.5px; font-weight: 800; color: #8b867d; }
+    .filts { display: flex; gap: 5px; flex: none; }
+    .filt { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 7px 0 4px; border-radius: 9px; background: #ecebe6; border-bottom: 3px solid #d8d3c9; font-size: 9.5px; font-weight: 800; color: #57534e; white-space: nowrap; }
+    .filt b { min-width: 17px; height: 17px; border-radius: 6px; background: #fff; display: grid; place-items: center; font-size: 10.5px; font-weight: 900; color: #1d1c1a; }
+    .filt.on { background: #3b3a37; border-bottom-color: #1d1c1a; color: #fff; }
+    .sec { font-size: 10px; font-weight: 800; color: #57534e; margin-bottom: -3px; }
+    .urg { background: #fff; border: 2px solid #1d1c1a; border-bottom-width: 4px; border-radius: 14px; padding: 6px 8px; }
+    .thr { background: #ecebe6; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 14px; padding: 6px 8px; }
+    .fl { background: #fff; border: 1.5px dashed #a7a198; border-bottom: 3.5px solid #cfc9bd; border-radius: 14px; padding: 6px 8px; }
+    .mc { display: flex; gap: 7px; padding: 7px 8px; }
+    .nm { display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 11.5px; }
+    .nm .t { margin-left: auto; font-weight: 600; font-size: 9px; color: #8b867d; }
+    .sum { font-size: 10.5px; color: #3b3a37; line-height: 1.4; }
+    .one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+    .tg { display: inline-flex; align-items: center; height: 16px; padding: 0 6px; border-radius: 99px; background: #ecebe6; font-size: 8.5px; font-weight: 800; color: #57534e; white-space: nowrap; }
+    .tg.k { background: #1d1c1a; color: #fff; }
+    .tg.o { background: #fff; box-shadow: inset 0 0 0 1px #a7a198; }
+    .stk { display: inline-flex; align-items: center; gap: 2px; height: 17px; padding: 0 6px 0 2px; border-radius: 99px; background: #e5e1d8; border-bottom: 2px solid #cfc9bd; font-size: 8.5px; font-weight: 800; vertical-align: middle; transform: rotate(-2deg); }
+    .stk .fc { width: 13px; height: 13px; border-radius: 99px; border: 1.5px solid #57534e; background: #fff; position: relative; }
+    .stk .fc::after { content: ''; position: absolute; left: 2px; right: 2px; bottom: 2.5px; height: 2px; border-bottom: 1.2px solid #57534e; border-radius: 0 0 4px 4px; }
+    .stk.p { padding: 0 6px; transform: none; background: #ecebe6; }
+    .wv { text-decoration: underline wavy #57534e; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .mini { background: #fff; border-radius: 8px; padding: 3px 6px; }
+    .mini p:first-child { font-size: 8px; font-weight: 800; color: #8b867d; }
+    .mini p:last-child { font-size: 10px; font-weight: 800; }
+    .chipc { align-self: center; font-size: 8.5px; font-weight: 800; color: #57534e; background: #fff; border: 1.5px solid #d8d3c9; border-radius: 99px; padding: 1px 8px; }
+    .bub { max-width: 88%; align-self: flex-start; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 12px 12px 12px 4px; padding: 6px 8px; font-size: 10.5px; line-height: 1.75; }
+    .bub.me { align-self: flex-end; background: #57534e; border-color: #57534e; border-bottom-color: #3b3a37; color: #fff; border-radius: 12px 12px 4px 12px; font-weight: 600; }
+    .who { font-size: 8.5px; font-weight: 800; color: #8b867d; margin-bottom: -5px; }
+    .cap { font-size: 9px; color: #8b867d; font-weight: 600; }
+    .ctr { text-align: center; }
+    .btn { display: flex; align-items: center; justify-content: center; height: 30px; border-radius: 10px; font-size: 11px; font-weight: 800; background: #3b3a37; color: #fff; box-shadow: 0 3px 0 #1d1c1a; flex: none; }
+    .btn.s { background: #fff; color: #1d1c1a; border: 1.5px solid #cfc9bd; box-shadow: 0 3px 0 #cfc9bd; }
+    .btn.g { background: transparent; color: #57534e; box-shadow: none; font-weight: 700; }
+    .btn.off { background: #ecebe6; color: #b7b1a6; box-shadow: 0 3px 0 #d8d3c9; }
+    .btn.sm { height: 22px; font-size: 9.5px; padding: 0 8px; border-radius: 7px; align-self: flex-start; }
+    .r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .comp { flex: none; padding: 6px 10px 12px; }
+    .comp .in { display: flex; align-items: flex-end; gap: 6px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 14px; padding: 4px 4px 4px 9px; }
+    .comp .tx { flex: 1; min-width: 0; padding: 3px 0; font-size: 10.5px; color: #8b867d; }
+    .comp .tx.f { color: #1d1c1a; }
+    .send { width: 26px; height: 26px; border-radius: 9px; background: #3b3a37; color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 0 #1d1c1a; flex: none; }
+    .send.off { background: #ecebe6; color: #b7b1a6; box-shadow: 0 2px 0 #d8d3c9; }
+    .send.chk { background: #e5e1d8; box-shadow: 0 2px 0 #cfc9bd; }
+    .spin { width: 12px; height: 12px; border-radius: 99px; border: 2px solid rgba(29,28,26,.2); border-top-color: #1d1c1a; }
+    .tabbar { flex: none; margin: 0 8px 10px; height: 40px; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3.5px; border-radius: 14px; padding: 0 4px; }
+    .tabbar span { height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 9px; font-weight: 800; color: #a7a198; }
+    .tabbar span i { width: 10px; height: 10px; border-radius: 3px; border: 1.5px solid currentColor; }
+    .tabbar .on { background: #ecebe6; color: #1d1c1a; }
+    .dim { position: absolute; inset: 0; background: rgba(29, 28, 26, .38); z-index: 3; }
+    .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 20px 20px 0 0; border-top: 1.5px solid #cfc9bd; padding: 7px 12px 14px; display: flex; flex-direction: column; gap: 6px; z-index: 4; }
+    .sheet.warn { padding-top: 40px; }
+    .handle { width: 32px; height: 4px; border-radius: 99px; background: #d8d3c9; align-self: center; flex: none; }
+    .signw { position: absolute; left: 50%; top: -56px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+    .sign { font-size: 11.5px; font-weight: 900; background: #fff; border: 2px solid #1d1c1a; box-shadow: 0 2px 0 #1d1c1a; border-radius: 7px; padding: 1px 8px; transform: rotate(-3deg); }
+    .sh-t { font-size: 12.5px; font-weight: 900; line-height: 1.35; }
+    .sh-s { font-size: 9.5px; color: #57534e; margin-top: -4px; font-weight: 600; }
+    .quote { background: #f4f2ee; border-radius: 9px; padding: 5px 8px; font-size: 10px; line-height: 1.75; }
+    .opt { position: relative; display: flex; gap: 6px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; border-radius: 11px; padding: 6px 8px; font-size: 10px; line-height: 1.5; }
+    .opt.on { border: 2px solid #1d1c1a; border-bottom-width: 3.5px; padding-top: 9px; }
+    .opt .rd { width: 12px; height: 12px; border-radius: 99px; border: 1.5px solid #a7a198; flex: none; margin-top: 1px; }
+    .opt.on .rd { border: 4px solid #1d1c1a; }
+    .rec { position: absolute; top: -8px; left: 10px; font-size: 8px; font-weight: 800; background: #e5e1d8; border-radius: 99px; padding: 0 6px; line-height: 14px; }
+    .banner { flex: none; border-radius: 12px; padding: 6px 8px; font-size: 10px; font-weight: 800; border-bottom: 3px solid rgba(0,0,0,.08); }
+    .banner small { display: block; font-size: 8.5px; font-weight: 600; color: #57534e; margin-top: 1px; }
+    .banner.u { background: #fff; border: 2px solid #1d1c1a; border-bottom-width: 4px; }
+    .banner.s { background: #ecebe6; }
+    .banner.n { background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; font-weight: 700; }
+    .field { height: 30px; display: flex; align-items: center; padding: 0 9px; border-radius: 10px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; font-size: 11.5px; font-weight: 800; }
+    .field.err { border-color: #1d1c1a; border-width: 2px; border-bottom-width: 3.5px; }
+    .lbl { font-size: 9px; font-weight: 800; color: #57534e; margin-bottom: -4px; }
+    .err-t { font-size: 9.5px; font-weight: 800; margin-top: -3px; }
+    .sel { flex: 1; height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border-radius: 9px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; font-size: 10.5px; font-weight: 800; }
+    .code { text-align: center; font-size: 19px; font-weight: 900; letter-spacing: .16em; border: 2px dashed #a7a198; border-radius: 12px; padding: 5px 0; background: #fff; }
+    .rch { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px; border-radius: 8px; background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 2.5px; font-size: 9.5px; font-weight: 700; }
+    .rch i { width: 10px; height: 10px; border-radius: 99px; border: 1.5px solid #a7a198; }
+    .rch.on { border-color: #1d1c1a; font-weight: 800; }
+    .rch.on i { border: 3.5px solid #1d1c1a; }
+    .ta { background: #fff; border: 1.5px solid #cfc9bd; border-bottom-width: 3px; border-radius: 10px; padding: 5px 8px; font-size: 9.5px; color: #8b867d; min-height: 30px; }
+    .kv { display: grid; grid-template-columns: 54px 1fr; gap: 2px 6px; font-size: 9.5px; }
+    .kv dt { color: #8b867d; font-weight: 800; }
+    .kv dd { margin: 0; font-weight: 600; }
+    .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 18px; gap: 3px; }
+    .empty b { font-size: 12.5px; margin-top: 4px; }
+    .empty p { font-size: 10px; color: #8b867d; font-weight: 600; }
+    .ghost { background: #fff; border: 1.5px solid #e5e1d8; border-bottom-width: 3px; border-radius: 14px; padding: 9px; display: flex; flex-direction: column; gap: 5px; }
+    .bar { height: 6px; border-radius: 3px; background: #ecebe6; }
+    .toast { position: absolute; left: 12px; right: 12px; bottom: 16px; background: #1d1c1a; color: #fff; border-radius: 12px; padding: 8px 10px; font-size: 10.5px; font-weight: 700; z-index: 5; box-shadow: 0 3px 0 #000; }
+    .clamp2, .clamp3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+    .clamp2 { -webkit-line-clamp: 2; } .clamp3 { -webkit-line-clamp: 3; }
+
+    /* 설명 번호 */
+    [data-a]:not(.signw):not(.toast) { position: relative; }
+    [data-a]::after { content: attr(data-a); position: absolute; top: -7px; left: -7px; width: 16px; height: 16px; border-radius: 99px; background: #c8406b; color: #fff; font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; z-index: 6; text-decoration: none; font-style: normal; letter-spacing: 0; }
+    .num { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 99px; background: #c8406b; color: #fff; font-size: 10.5px; font-weight: 800; flex: none; }
+  </style>
+</head>
+<body class="min-h-[100dvh] font-sans antialiased">
+
+  <!-- 회색 쿠션이 (자리 표시용 · 실제 그림은 컴포넌트 명세) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="gb" viewBox="0 0 120 100">
+        <path d="M16 20 Q60 6 104 20 Q116 50 104 80 Q60 94 16 80 Q4 50 16 20Z" fill="#ecebe6" stroke="#57534e" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M23 27 Q60 15 97 27 Q107 50 97 73 Q60 85 23 73 Q13 50 23 27Z" fill="none" stroke="#a7a198" stroke-width="2.4" stroke-dasharray="5 5"/>
+      </symbol>
+      <symbol id="g-hi" viewBox="0 0 120 100"><use href="#gb"/><ellipse cx="46" cy="50" rx="5" ry="6.5" fill="#3b3a37"/><ellipse cx="74" cy="50" rx="5" ry="6.5" fill="#3b3a37"/><path d="M54 61 Q60 68 66 61" stroke="#3b3a37" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>
+      <symbol id="g-safe" viewBox="0 0 120 100"><use href="#gb"/><path d="M39 52 Q46 44 53 52 M67 52 Q74 44 81 52" stroke="#3b3a37" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M51 60 Q60 71 69 60" stroke="#3b3a37" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>
+      <symbol id="g-read" viewBox="0 0 120 100"><use href="#gb"/><ellipse cx="49" cy="53" rx="4.6" ry="5.6" fill="#3b3a37"/><ellipse cx="77" cy="53" rx="4.6" ry="5.6" fill="#3b3a37"/><path d="M40 42 L52 40 M70 40 L82 42 M56 65 L66 65" stroke="#3b3a37" stroke-width="3.6" stroke-linecap="round"/></symbol>
+      <symbol id="g-wait" viewBox="0 0 120 100"><use href="#gb"/><path d="M37 44 L50 39 M83 44 L70 39" stroke="#3b3a37" stroke-width="3.6" stroke-linecap="round"/><ellipse cx="46" cy="53" rx="4.8" ry="6.2" fill="#3b3a37"/><ellipse cx="74" cy="53" rx="4.8" ry="6.2" fill="#3b3a37"/><path d="M52 66 Q56 62 60 66 Q64 70 68 66" stroke="#3b3a37" stroke-width="3.6" fill="none" stroke-linecap="round"/></symbol>
+      <symbol id="g-rest" viewBox="0 0 120 100"><use href="#gb"/><path d="M39 51 Q46 57 53 51 M67 51 Q74 57 81 51" stroke="#3b3a37" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="60" cy="65" r="4" fill="#3b3a37"/><text x="94" y="16" font-family="Pretendard, sans-serif" font-weight="900" font-size="16" fill="#57534e">z</text></symbol>
+    </defs>
+  </svg>
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">와이어프레임</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#legend" class="px-3 py-2 rounded-full hover:bg-white">읽는 법</a>
+        <a href="#flow-g" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">G</a>
+        <a href="#flow-a" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">A</a>
+        <a href="#flow-c" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">C</a>
+        <a href="#flow-d" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">D</a>
+        <a href="#flow-e" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">E</a>
+        <a href="#flow-f" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">F</a>
+        <a href="#screens" class="px-3 py-2 rounded-full hover:bg-white">화면 목록</a>
+        <a href="#char" class="px-3 py-2 rounded-full hover:bg-white">쿠션이 지도</a>
+        <a href="#open" class="px-3 py-2 rounded-full hover:bg-white">미정</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">WIREFRAME · CUSHION TALK · 26.10.16 · 11.02 수정</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>와이어프레임</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        유저 플로우(10.16 · 11.02 결정 반영)에 나오는 <b class="text-ink">모든 화면과 상태 26장</b>을 회색 와이어로 그렸습니다.
+        배치는 확정 시안 <b class="text-ink">E2(쿠션이)</b>를 따릅니다. 쿠션이가 <b class="text-ink">어느 화면에 어떤 표정으로</b> 나오는지까지 정해 두었고,
+        화면마다 분홍 번호 설명과 <b class="text-ink">컴포넌트 명세의 부품 이름</b>을 붙였습니다.
+      </p>
+    </header>
+
+    <!-- 01 읽는 법 -->
+    <section id="legend" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">읽는 법</span>
+        <span class="text-mute">회색 와이어 · 색과 실제 그림은 컴포넌트 명세에서</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 keep">
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center">
+          <div class="w-20 h-16 rounded-xl bg-[#fdebf1] grid place-items-center shrink-0"><span class="num" style="width:26px;height:26px;font-size:13px">1</span></div>
+          <div><p class="font-extrabold text-lg">분홍 번호</p><p class="text-sm text-mute">화면 아래 같은 번호의 설명과 짝</p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:1">
+          <div class="w-20 h-16 rounded-xl bg-[#ecebe6] grid place-items-center shrink-0"><svg width="54" height="45" viewBox="0 0 120 100"><use href="#g-safe"/></svg></div>
+          <div><p class="font-extrabold text-lg">회색 쿠션이</p><p class="text-sm text-mute">자리와 표정만 · 아래 작은 글씨가 표정 이름</p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:2">
+          <div class="w-20 h-16 rounded-xl bg-[#ecebe6] grid place-items-center shrink-0"><div class="w-12 h-7 rounded-lg bg-[#3b3a37]" style="box-shadow:0 4px 0 #1d1c1a"></div></div>
+          <div><p class="font-extrabold text-lg">두툼한 아래</p><p class="text-sm text-mute">눌리는 버튼 · 카드 (E2의 두툼한 아래 테두리)</p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:3">
+          <div class="w-20 h-16 rounded-xl bg-[#ecebe6] grid place-items-center shrink-0"><span class="stk" style="transform:scale(1.4)"><span class="fc"></span>1</span></div>
+          <div><p class="font-extrabold text-lg">얼굴 스티커</p><p class="text-sm text-mute">가린 표현 자리 · 숫자는 가린 순서</p></div>
+        </div>
+      </div>
+      <p class="reveal mt-4 text-sm text-mute keep">근거 문서: 서비스정의서_쿠션톡_261015.md · 유저플로우_쿠션톡_261015.md(10.16 수정) · 컴포넌트명세_쿠션톡_261016.html · 시안 E2. 예시 문구는 앱 정의서 6-7절의 예시를 썼습니다.</p>
+    </section>
+
+    <div id="flows"></div>
+
+    <!-- 화면 목록 -->
+    <section id="screens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">08</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">화면 목록</span>
+        <span class="text-mute">26장 · 화면 번호는 유저 플로우 기준 (6-5 ~ 6-10은 임시)</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[60rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-16">ID</th><th class="px-5 py-3.5 font-extrabold w-20">번호</th><th class="px-5 py-3.5 font-extrabold">화면 · 상태</th><th class="px-5 py-3.5 font-extrabold">플로우</th><th class="px-5 py-3.5 font-extrabold">쿠션이</th><th class="px-5 py-3.5 font-extrabold">쓰는 부품</th></tr></thead>
+          <tbody class="divide-y divide-line" id="screen-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 쿠션이 지도 -->
+    <section id="char" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">09</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">쿠션이 지도</span>
+        <span class="text-mute">26장 중 쿠션이가 나오는 9장 · 나오지 않는 17장</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 lg:grid-cols-2 gap-6 keep">
+        <div class="reveal card rounded-[28px] p-5 md:p-7">
+          <p class="eyebrow text-xs font-bold text-mute">WITH CUSHI</p>
+          <h3 class="mt-1 text-xl font-black tracking-tight">나오는 화면</h3>
+          <ul class="mt-4 grid gap-2.5" id="with-list"></ul>
+        </div>
+        <div class="reveal card rounded-[28px] p-5 md:p-7" style="--i:1">
+          <p class="eyebrow text-xs font-bold text-mute">WITHOUT CUSHI</p>
+          <h3 class="mt-1 text-xl font-black tracking-tight">나오지 않는 화면</h3>
+          <ul class="mt-4 grid gap-2.5" id="without-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 미정 -->
+    <section id="open" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">10</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다음 회의에서 정할 것</span>
+        <span class="text-mute">와이어에서는 임시로 그려 둔 것</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — 서비스정의서_쿠션톡_261015.md · 유저플로우_쿠션톡_261015.md · 컴포넌트명세_쿠션톡_261016.html · 04_디자인시안/E2</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+  // ───────── 예시 문구 (앱 정의서 6-7절) ─────────
+  const RAW = '선생님, 애들 하나 제대로 못 보세요? 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. 그러고도 선생님 소리 듣고 싶으세요? 내일까지 자리 바꿔 주세요.';
+  const RAW_WV = '선생님, <span class="wv">애들 하나 제대로 못 보세요?</span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="wv">그러고도 선생님 소리 듣고 싶으세요?</span> 내일까지 자리 바꿔 주세요.';
+  const RAW_ST = '선생님, <span class="stk"><span class="fc"></span>1</span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="stk" style="transform:rotate(2deg)"><span class="fc"></span>2</span> 내일까지 자리 바꿔 주세요.';
+  const SOFT = '선생님, 민서가 짝이랑 잘 맞지 않아서 요즘 매일 울면서 집에 와요. 내일까지 자리를 바꿔 주실 수 있을까요?';
+  const URGENT = '선생님, 하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고 해요. 오늘 아침에도 팔에 멍이 든 채로 학교에 갔어요. 꼭 확인 부탁드려요.';
+  const THREAT_WV = '답장도 없으시네요. <span class="wv">내일 아침에 교실로 직접 찾아갈 테니 각오하고 계세요.</span>';
+
+  // ───────── 와이어 조각 ─────────
+  const a = (n) => (n ? ` data-a="${n}"` : '');
+  const SB = (t) => `<div class="sb"><b>${t}</b><i class="isl"></i><span class="sig"></span></div>`;
+  const CX = (face, w, label, n = '') => `<span class="cxw"${a(n)}><svg width="${w}" height="${Math.round(w * 0.84)}" viewBox="0 0 120 100"><use href="#g-${face}"/></svg><em>${label}</em></span>`;
+  const HDR = (av, title, sub, right = '', n = '') => `<div class="hdr"><span class="bk">‹</span>${av ? `<span class="av">${av}</span>` : ''}<div class="f1"${a(n)}><b>${title}</b><small>${sub}</small></div>${right}</div>`;
+  const PARENT_HDR = (n = '') => HDR('', '3학년 2반 담임 선생님', '학교 공식 창구 · 쿠션이가 먼저 읽어요', '', n);
+  const GREET = '<div class="bub">안녕하세요, 민서 보호자님. 3학년 2반 담임입니다. 궁금한 점은 이 창구로 편하게 남겨 주세요.</div>';
+  const TTL = (title, side, n = '') => `<div class="ttl"><b${a(n)}>${title}</b><small>${side}</small></div>`;
+  const FILT = (items, on, n = '') => `<div class="filts"${a(n)}>${items.map((it, i) => `<span class="filt${i === on ? ' on' : ''}"><b>${it[1]}</b>${it[0]}</span>`).join('')}</div>`;
+  const TFILT = (c, on, n) => FILT([['답장할 것', c[0]], ['알림', c[1]], ['학교', c[2]]], on, n);
+  const AFILT = (c, on, n) => FILT([['새 알림', c[0]], ['처리 완료', c[1]]], on, n);
+  const TAB = (on) => `<div class="tabbar">${['메시지함', '반 톡방', '설정'].map((t, i) => `<span${i === on ? ' class="on"' : ''}><i></i>${t}</span>`).join('')}</div>`;
+  const COMP = (txt, o = {}) => `<div class="comp"><div class="in"${a(o.n)}><div class="tx${o.f ? ' f' : ''} ${o.cl || ''}">${txt}</div><span class="send${o.off ? ' off' : ''}${o.chk ? ' chk' : ''}">${o.chk ? '<span class="spin"></span>' : '↑'}</span></div></div>`;
+  const SHEET = (inner, warn) => `<div class="dim"></div><div class="sheet${warn ? ' warn' : ''}">${warn ? `<div class="signw"${a(warn)}><span class="sign">잠깐만요!</span><svg width="16" height="9" viewBox="0 0 20 12"><path d="M4 0 L4 12 M16 0 L16 12" stroke="#1d1c1a" stroke-width="3" stroke-linecap="round"/></svg><svg width="62" height="52" viewBox="0 0 120 100" style="margin-top:-2px"><use href="#g-wait"/></svg></div>` : '<span class="handle"></span>'}${inner}</div>`;
+  const GREETING = (n1) => `<div class="cxr">${CX('safe', 58, '쿠션이 · 막았어요')}<div class="say"${a(n1)}>밤사이 거친 말 5개를 폭신하게 막아 뒀어요!</div></div>`;
+  const URG_CARD = (n) => `<div class="urg"${a(n)}><div class="nm"><span class="tg k">긴급 · 학교폭력</span><span class="t">7:50</span></div><p style="font-weight:800;margin-top:3px">하윤 보호자 <span class="cap">원문 그대로</span></p><p class="sum one">선생님, 하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고…</p></div>`;
+  const ROOM_HDR = (right) => HDR('', '3학년 1반 단체 톡방', '학생 24명', right);
+
+  const DETAIL = (n = {}) => HDR('민', '민서 보호자', '3학년 2반 · 어제 오후 9:42', `<span class="tg k"${a(n.due)}>D-1</span>`)
+    + `<div class="body">`
+    + `<div class="cxr"${a(n.sum)}>${CX('read', 42, '읽는 중')}<div class="say b"><p class="lb">쿠션이가 읽어 봤어요</p><p style="font-size:11px;font-weight:800;line-height:1.4">짝과 맞지 않아 매일 우는 아이의 자리를 바꿔 달라는 요청이에요!</p><div class="r2" style="margin-top:4px;gap:4px"><div class="mini"><p>기한</p><p>내일 · 10월 14일</p></div><div class="mini"><p>유형</p><p>자리·모둠</p></div></div></div></div>`
+    + `<span class="chipc">원래 보낸 말</span><div class="bub" style="max-width:100%"${a(n.raw)}>${RAW_ST}</div>`
+    + `<div style="display:flex;align-items:center;gap:6px"><span class="cap f1">거친 표현 2곳에 스티커를 붙였어요</span><span class="btn s sm"${a(n.peel)}>떼고 보기</span></div>`
+    + `</div>` + COMP('답장을 적어 주세요', { n: n.comp });
+
+  const ROOM_TEACHER = (n = {}) => ROOM_HDR(`<span class="btn s sm" style="align-self:center"${a(n.code)}>참여 코드</span>`)
+    + `<div class="body"><div class="banner n"${a(n.band)}>선생님의 개인 메신저 계정은 학생에게 보이지 않아요.</div><span class="chipc">오늘</span><div class="bub me">내일 현장체험학습이 있어요. 8시 40분까지 운동장으로 모여 주세요.</div><p class="who">김서준</p><div class="bub">선생님, 도시락 챙겨 가야 하나요?</div><div class="bub me">네, 도시락과 물을 챙겨 오세요.</div></div>`
+    + COMP('메시지를 적어 주세요', { n: n.comp });
+
+  const ROOM_LIST = (n = {}) => SB('1:20') + TTL('반 톡방', '3학년 2반 · 김하늘 선생님')
+    + `<div class="body"><p class="sec">내 반 톡방</p><div class="ck mc" style="align-items:center"${a(n.row)}><span class="av" style="width:30px;height:30px;border-radius:9px">3-1</span><div class="f1"><p style="font-weight:800">3학년 1반 단체 톡방</p><p class="cap">학생 24명 · 오늘 오후 1:12</p></div><span style="color:#8b867d">›</span></div>`
+    + `<p class="sec" style="margin-top:6px">반 톡방 열기</p><div style="display:flex;gap:5px"${a(n.pick)}><div class="sel">3학년 <span>▾</span></div><div class="sel">1반 <span>▾</span></div><span class="btn" style="padding:0 12px;height:28px">열기</span></div>`
+    + `<p class="cap">이미 있는 반이면 그 톡방으로 들어가요. 없으면 새로 만들고 참여 코드를 드려요.</p></div>` + TAB(1);
+
+  const ADMIN_TOP = (c, on, n) => SB('8:50') + TTL('위협 알림', '교감 · 민원대응팀') + `<div style="padding:4px 10px 0">${AFILT(c, on, n)}</div>`;
+
+  // ───────── 화면 23장 ─────────
+  const FLOWS = [
+    {
+      id: 'g', letter: 'G', who: '학부모 · 교사 · 관리자', what: '로그인 · 가입', goal: '어른 사용자가 아이디 · 비밀번호로 들어오고, 학부모는 가입할 때 학교를 고른다.',
+      screens: [
+        { id: 'G1', num: '6-8', name: '로그인', state: '입력', cushi: '기본 · md',
+          html: SB('9:30') + TTL('쿠션톡', '학부모 · 선생님 · 관리자')
+            + `<div class="body"><div class="cxr"${a(1)}>${CX('hi', 58, '쿠션이 · 기본')}<div class="say">어서 오세요! 아이디로 들어와 주세요.</div></div><p class="lbl">아이디</p><div class="field"${a(2)}>minseo_mom</div><p class="lbl">비밀번호</p><div class="field">••••••••</div><span class="btn">로그인</span><span class="btn s"${a(3)}>처음이에요 · 학부모 가입</span><p class="cap"${a(4)}>학생은 로그인 없이 선생님이 알려 준 참여 코드로 들어와요.</p></div>`,
+          notes: ['기본 표정 쿠션이가 인사 (md, F1과 같은 자리).', '아이디 · 비밀번호는 학부모 · 교사 · 관리자만 (11.02). 로그인하면 학부모는 A0, 교사는 C1, 관리자는 D1로.', '가입 버튼은 학부모용만. 교사 · 관리자 계정은 학교가 만든다고 봄 (임시).', '학생은 로그인하지 않음 → 반 톡방 참여(F1).'],
+          parts: ['ScreenTitle', 'CushionChar · hi', 'SpeechBubble', 'TextField', 'Button'] },
+        { id: 'G2', num: '6-9', name: '학부모 가입', state: '학교 검색', cushi: '없음',
+          html: SB('9:31') + HDR('', '학부모 가입', '아이 학교부터 골라 주세요')
+            + `<div class="body"><p class="lbl">학교 이름 검색</p><div class="field"${a(1)}>해오름</div><div class="ck mc" style="align-items:center;border-color:#1d1c1a"${a(2)}><div class="f1"><p style="font-weight:800">해오름초등학교</p><p class="cap">서울 마포구</p></div><span style="font-weight:900">✓</span></div><div class="ck mc" style="align-items:center"><div class="f1"><p style="font-weight:800">해오름중학교</p><p class="cap">서울 마포구</p></div></div><p class="lbl">이름 · 아이디 · 비밀번호</p><div class="field"${a(3)}>박지영</div><div class="field">minseo_mom</div><div class="field">••••••••</div><span class="btn">가입하기</span></div>`,
+          notes: ['학교 이름을 두 글자 이상 치면 아래에 목록 (11.02).', '고른 학교는 테두리 진하게 + 체크.', '이름 · 아이디 · 비밀번호. 가입하면 바로 선생님 목록(A0)으로.'],
+          parts: ['AppHeader', 'TextField', 'ListRow', 'Button'] },
+      ],
+    },
+    {
+      id: 'a', letter: 'A', who: '학부모', what: '메시지 보내기', goal: '요청은 빠짐없이 보내고, 거친 표현은 보내기 전에 한 번 돌아본다.',
+      screens: [
+        { id: 'A0', num: '6-10', name: '선생님 목록', state: '담임 고르기', cushi: '없음',
+          html: SB('9:38') + TTL('선생님 목록', '해오름초등학교')
+            + `<div class="body"><p class="sec">내 아이 담임</p><div class="ck mc" style="align-items:center"${a(1)}><span class="av" style="width:30px;height:30px;border-radius:9px">3-2</span><div class="f1"><p style="font-weight:800">3학년 2반 김하늘 선생님</p><p class="cap">민서 · 어제 대화</p></div><span style="color:#8b867d">›</span></div>`
+            + `<p class="sec" style="margin-top:6px">다른 반</p><div class="ck mc" style="align-items:center"${a(2)}><span class="av" style="width:30px;height:30px;border-radius:9px">3-1</span><div class="f1"><p style="font-weight:800">3학년 1반 이도윤 선생님</p></div><span style="color:#8b867d">›</span></div><div class="ck mc" style="align-items:center"><span class="av" style="width:30px;height:30px;border-radius:9px">3-3</span><div class="f1"><p style="font-weight:800">3학년 3반 정유나 선생님</p></div><span style="color:#8b867d">›</span></div>`
+            + `<p class="cap"${a(3)}>처음 연락하는 선생님이면 자녀 이름을 한 번 적어요.</p></div>`,
+          notes: ['이미 연락한 담임은 위에 “내 아이 담임”으로. 누르면 A1 대화로.', '목록은 학부모 학교의 반 · 담임 (11.02).', '처음 고르는 선생님이면 자녀 이름 입력 시트가 한 번 뜸 (와이어 생략).'],
+          parts: ['ScreenTitle', 'ListRow'] },
+        { id: 'A1', num: '6-1', name: '학부모 작성', state: '처음 연 화면', cushi: '기본 · sm',
+          html: SB('9:40') + PARENT_HDR(1) + `<div class="body"><div class="cxr"${a(2)}>${CX('hi', 42, '기본')}<div class="say b">제가 먼저 읽고 선생님께 전해 드려요.</div></div><span class="chipc">10월 6일 (화)</span>${GREET}</div>`
+            + `<div style="display:flex;gap:5px;padding:0 10px 2px"${a(4)}><div class="sel">유형 고르기 <span>▾</span></div><div class="sel">기한 (선택) <span>▾</span></div></div>` + COMP('선생님께 전할 내용을 적어 주세요', { n: 3 }),
+          notes: ['부제는 항상 “학교 공식 창구 · 쿠션이가 먼저 읽어요”. 몰래 거르지 않는다는 약속.', '쿠션이 기본 표정으로 처음 한 번만 인사 (처음 쓰는 사람에게만, 임시).', '보내기 전 검사가 켜진 입력창 (precheck = true).', '입력창 위 두 칸: 요청 유형(상담 · 결석·조퇴 · 자리·모둠 · 학습 · 생활 · 기타)은 꼭, 답장 기한은 골라도 되고 안 골라도 됨 (11.02).'],
+          parts: ['AppHeader', 'CushionChar · hi', 'SpeechBubble', 'Bubble', 'DateChip', 'Select', 'Composer'] },
+        { id: 'A2', num: '6-1', name: '학부모 작성', state: '보내기 전 검사 중', cushi: '읽는 중 · sm',
+          html: SB('9:42') + PARENT_HDR() + `<div class="body"><span class="chipc">10월 6일 (화)</span>${GREET}</div>`
+            + `<div style="display:flex;align-items:center;gap:4px;padding:0 12px"${a(1)}>${CX('read', 30, '')}<p class="cap" style="font-weight:800">쿠션이가 표현을 살펴보고 있어요</p></div>` + COMP(RAW, { f: true, cl: 'clamp3', chk: true, n: 2 }),
+          notes: ['보내기를 누르면 검사 시작. 읽는 중 쿠션이가 입력창 위 한 줄에.', '보내기 버튼은 도는 표시, 다시 누를 수 없음. 5초 넘으면 검사 없이 보냄.'],
+          parts: ['Composer · checking', 'CushionChar · read'] },
+        { id: 'A3', num: '6-1', name: '보내기 전 경고 시트', state: '거친 표현 있음', cushi: '잠깐만요 · lg',
+          html: SB('9:42') + PARENT_HDR() + `<div class="body"><span class="chipc">10월 6일 (화)</span>${GREET}</div>`
+            + SHEET(`<p class="sh-t ctr"${a(2)}>이 표현은 교권 침해로 기록될 수 있어요</p><div class="quote clamp2"${a(3)}>${RAW_WV}</div>`
+              + `<div class="opt on"${a(4)}><span class="rec">쿠션이 추천</span><span class="rd"></span><span class="clamp3">${SOFT}</span></div><div class="opt"><span class="rd"></span><span class="one">민서 자리 문제로 연락드려요. 짝과 맞지 않아…</span></div>`
+              + `<div class="tags" style="margin:0"${a(5)}><span class="tg o">자리 바꾸기</span><span class="tg o">내일까지</span><span class="cap" style="align-self:center">그대로 전해져요</span></div>`
+              + `<span class="btn">바꾼 문장으로 보내기</span><div class="r2"><span class="btn s">직접 고치기</span><span class="btn g"${a(6)}>그대로 보내기</span></div>`, 1),
+          notes: ['잠깐만요 표정 쿠션이가 팻말을 들고 시트 위에 걸침 (lg, 이 화면의 유일한 쿠션이).', '경고 문구는 유저 플로우 그대로.', '문제 구절은 물결 밑줄 (E2에서는 산호색).', '첫 제안에 “쿠션이 추천” 딱지, 두 번째는 한 줄로 접힘.', '그대로 전해지는 요청을 태그로 보여 줌.', '그대로 보내기도 막지 않음. 고른 사실은 기록 · 표시하지 않음 (10.16).'],
+          parts: ['Sheet · warning', 'CushionChar · wait', 'SuggestionOption', 'Tag', 'Button'] },
+        { id: 'A4', num: '6-1', name: '학부모 작성', state: '직접 고치기', cushi: '없음',
+          html: SB('9:43') + PARENT_HDR() + `<div class="body"><span class="chipc">10월 6일 (화)</span>${GREET}</div>`
+            + `<p class="cap ctr" style="font-weight:800"${a(2)}>표시된 부분을 고쳐 다시 보내 주세요</p><div class="comp"><div class="in"${a(1)}><div class="tx f" style="min-height:84px;line-height:1.7">${RAW_WV}</div><span class="send">↑</span></div></div>`,
+          notes: ['경고 시트에서 “직접 고치기”를 고르면 입력창이 커지고 문제 구절 물결 밑줄이 남음.', '다시 보내면 한 번 더 검사.'],
+          parts: ['Composer · editing'] },
+        { id: 'A5', num: '6-1', name: '학부모 작성', state: '보낸 뒤', cushi: '없음',
+          html: SB('9:43') + PARENT_HDR() + `<div class="body"><span class="chipc">10월 6일 (화)</span>${GREET}<span class="chipc">오늘</span><div class="bub me">${SOFT}</div><p class="cap" style="align-self:flex-end;margin-top:-4px"${a(1)}>제안 문장으로 보냄 · 오후 9:42</p><div class="banner n"${a(2)}>요청 내용은 빠짐없이 선생님께 전해져요.</div></div>` + COMP('선생님께 전할 내용을 적어 주세요'),
+          notes: ['제안 문장을 골랐을 때만 작게 표시. 그대로 보냈을 때는 표시 없음.', '보낸 뒤 안내 한 번 (안내 띠). 이 화면에는 쿠션이를 다시 띄우지 않음.'],
+          parts: ['Bubble · me', 'Banner · notice'] },
+      ],
+    },
+    {
+      id: 'c', letter: 'C', who: '교사', what: '확인하고 답장', goal: '공격적인 표현을 보지 않고 요청만 확인해 답장한다.',
+      screens: [
+        { id: 'C1', num: '6-2', name: '교사 메시지함', state: '답장할 것', cushi: '막았어요 · md',
+          html: SB('8:40') + TTL('쿠션톡', '3학년 2반 · 10월 13일') + `<div class="body">${GREETING(1)}${TFILT([3, 1, 1], 0, 2)}${URG_CARD(3)}<p class="sec">답장할 것</p>`
+            + `<div class="ck mc"${a(4)}><span class="av">민</span><div class="f1"><div class="nm">민서 보호자<span class="tg k">D-1</span><span class="t">어제 9:42</span></div><p class="sum">자리를 <b>내일까지</b> 바꿔 달라는 요청이에요.</p><div class="tags"><span class="tg">자리·모둠</span><span class="stk"><span class="fc"></span>2곳 막음</span></div></div></div>`
+            + `<div class="ck mc" style="align-items:center"><span class="av">서</span><div class="f1"><div class="nm">서연 보호자<span class="t">어제 8:15</span></div><p class="sum one"><b>다음 주 상담 시간</b>을 잡아 달라는 요청이에요.</p></div></div>`
+            + `<div class="fl mc" style="align-items:center"${a(5)}><span class="av">!</span><div class="f1"><div class="nm">도윤 보호자<span class="t">8:40</span></div><p class="sum one" style="color:#8b867d">AI가 읽지 못했어요 · 원문은 접혀 있어요</p></div></div>`
+            + `</div>` + TAB(0),
+          notes: ['막았어요 표정 쿠션이가 인사 (md, 화면에 한 번).', '눌리는 필터 세 개. 숫자는 주아체, 0이어도 보임.', '긴급은 필터와 상관없이 맨 위. 담임이 답장하면 내려감 (11.02). 쿠션이 · 스티커 없이 원문 그대로.', '요약 한 줄 + D-1 + 얼굴 스티커 “2곳 막음”. 유형 · 기한 태그는 학부모가 고른 값 (11.02). 오래된 요청은 한 줄 카드.', '분석 실패 카드는 점선, 쿠션이 없음.'],
+          parts: ['ScreenTitle', 'CushionChar · safe', 'SpeechBubble', 'FilterButton', 'MessageCard', 'MaskSticker', 'TabBar'] },
+        { id: 'C2', num: '6-2', name: '교사 메시지함', state: '학교 필터', cushi: '막았어요 · md',
+          html: SB('8:40') + TTL('쿠션톡', '3학년 2반 · 10월 13일') + `<div class="body">${GREETING()}${TFILT([3, 1, 1], 2, 1)}${URG_CARD()}<p class="sec">학교가 맡은 일</p>`
+            + `<div class="thr mc"${a(2)}><span class="av" style="background:#fff">▢</span><div class="f1"><div class="nm">민서 보호자 · 공격적 표현<span class="t">어제 9:58</span></div><p class="sum">답장을 받지 못해 내일 아침 교실로 찾아오겠다는 내용이에요.</p><div class="tags"><span class="tg o">교감 선생님이 확인 중</span><span class="stk p">가림 1</span></div></div></div>`
+            + `</div>` + TAB(0),
+          notes: ['학교 필터: 위협으로 넘긴 메시지 (애매해도 위협). 담임에게도 요약은 감.', '위협 카드는 회색 바탕, 쿠션이 얼굴 대신 무늬 없는 스티커. 처리 상황이 바뀌면 태그도 바뀜. 위협 종류는 나누지 않고 “공격적 표현” 하나 (11.02).'],
+          parts: ['FilterButton', 'MessageCard · threat', 'MaskSticker · plain'] },
+        { id: 'C3', num: '6-2', name: '교사 메시지함', state: '새 연락 없음', cushi: '쉬는 중 · md',
+          html: SB('8:40') + TTL('쿠션톡', '3학년 2반 · 10월 14일') + `<div class="body">${TFILT([0, 0, 0], 0, 2)}<div class="empty"${a(1)}>${CX('rest', 74, '쿠션이 · 쉬는 중')}<b>새 연락이 없어요</b><p>쿠션이도 잠깐 쉬고 있어요. 연락이 오면 먼저 읽고 알려 드릴게요.</p></div></div>` + TAB(0),
+          notes: ['쉬는 중 표정 쿠션이. 이 화면에선 인사 쿠션이를 빼고 이것 하나만.', '필터 숫자가 모두 0이어도 버튼은 그대로.'],
+          parts: ['FilterButton', 'EmptyState', 'CushionChar · rest'] },
+        { id: 'C4', num: '6-3', name: '교사 메시지 상세', state: '일반 메시지', cushi: '읽는 중 · sm',
+          html: SB('8:42') + DETAIL({ due: 1, sum: 2, raw: 3, peel: 4, comp: 5 }),
+          notes: ['답장 기한은 머리 오른쪽 D-1 태그로.', '읽는 중 쿠션이가 요약을 말풍선으로. 아래 기한 · 유형 작은 칸 (학부모가 고른 값, 11.02).', '원래 보낸 말 위 얼굴 스티커 ①②. 원문 글자는 화면 코드에 넣지 않음.', '떼고 보기 → 원문 시트.', '교사 답장은 AI 검사 없이 그대로 감 (10.16).'],
+          parts: ['AppHeader', 'SummarySay', 'CushionChar · read', 'DateChip', 'Bubble', 'MaskSticker', 'Button', 'Composer'] },
+        { id: 'C5', num: '6-3', name: '원문 시트', state: '스티커 떼고 보기', cushi: '없음',
+          html: SB('8:42') + DETAIL() + SHEET(`<p class="sh-t"${a(1)}>원문</p><p class="sh-s">어제 오후 9:42 받음 · 거친 표현이 들어 있어요</p><div class="quote"${a(2)}>${RAW_WV}</div><p class="cap">학부모의 요청은 위 요약에 빠짐없이 담겨 있어요.</p><span class="btn s"${a(3)}>닫기</span>`),
+          notes: ['원문은 시트를 열 때 서버에서 받아 옴.', '문제 구절은 물결 밑줄 표시만.', '바깥 누르기 · 아래로 밀기로도 닫힘. 원문을 보는 화면이라 쿠션이 없음.'],
+          parts: ['Sheet', 'Button'] },
+        { id: 'C6', num: '6-3', name: '교사 메시지 상세', state: '긴급 메시지', cushi: '없음',
+          html: SB('7:52') + HDR('하', '하윤 보호자', '3학년 2반 · 오늘 7:50')
+            + `<div class="body"><div class="banner u"${a(1)}>긴급 · 학교폭력 신고 — 원문 그대로 보여 드려요<small>학교폭력 · 아동학대 · 안전 메시지는 AI가 고치거나 가리지 않아요.</small></div><span class="chipc">원래 보낸 말</span><div class="bub" style="max-width:100%"${a(2)}>${URGENT}</div></div>` + COMP('답장을 적어 주세요', { n: 3 }),
+          notes: ['긴급 띠 (Banner · urgent).', '요약 · 스티커 · 쿠션이 없이 원문 전체.', '바로 답장할 수 있음.'],
+          parts: ['AppHeader', 'Banner · urgent', 'Bubble', 'Composer'] },
+        { id: 'C7', num: '6-3', name: '교사 메시지 상세', state: '위협 메시지', cushi: '없음',
+          html: SB('8:45') + HDR('민', '민서 보호자', '3학년 2반 · 어제 오후 9:58')
+            + `<div class="body"><div class="banner s"${a(1)}>학교로 넘겼어요<small>교감 선생님이 확인 중이에요</small></div><div class="ck" style="padding:6px 8px"${a(2)}><p class="cap" style="font-weight:800">요약</p><p style="font-weight:800;font-size:11px">답장을 받지 못해 내일 아침 교실로 찾아오겠다는 내용이에요.</p></div>`
+            + `<span class="chipc">원래 보낸 말</span><div class="bub" style="max-width:100%">답장도 없으시네요. <span class="stk p">가림 1</span></div><span class="btn s sm"${a(3)}>원문 보기</span></div>` + COMP('답장을 적어 주세요', { n: 4 }),
+          notes: ['학교 띠 (Banner · school). 관리자 기록에 따라 “처리 완료”로 바뀜.', '요약은 쿠션이 없이 흰 카드로.', '위협 원문도 담임이 볼 수 있음 (10.16). 스티커는 무늬 없는 회색.', '위협 메시지에도 담임이 직접 답장할 수 있음 (11.02).'],
+          parts: ['AppHeader', 'Banner · school', 'MessageCard 요약', 'MaskSticker · plain', 'Composer'] },
+        { id: 'C8', num: '6-3', name: '교사 메시지 상세', state: '분석 실패', cushi: '없음',
+          html: SB('8:41') + HDR('도', '도윤 보호자', '3학년 2반 · 오늘 8:40')
+            + `<div class="body"><div class="fl"${a(1)}><p style="font-weight:800;font-size:11.5px">AI가 이 메시지를 읽지 못했어요</p><p class="cap">거친 표현이 있을 수 있어서 원문은 접어 두었어요.</p></div><div class="ck mc" style="align-items:center"${a(2)}><p class="f1" style="font-weight:800;font-size:10.5px">원문 · 오늘 8:40 받음</p><span class="tg o">펼치기 ▾</span></div></div>` + COMP('답장을 적어 주세요'),
+          notes: ['분석이 5초를 넘으면 1번 재시도, 또 실패하면 이 상태 (플로우 B). 실패 화면이라 쿠션이 없음.', '누르면 원문이 펼쳐지고 다시 접을 수 있음.'],
+          parts: ['AppHeader', 'MessageCard · failed', 'Composer'] },
+      ],
+    },
+    {
+      id: 'd', letter: 'D', who: '관리자 · 교감 · 민원대응팀', what: '위협 처리', goal: '교사 혼자가 아니라 학교가 위협 메시지에 대응한다. 관리자 화면에는 쿠션이가 없다.',
+      screens: [
+        { id: 'D1', num: '6-4', name: '관리자 알림', state: '새 알림', cushi: '없음',
+          html: ADMIN_TOP([1, 3], 0, 1) + `<div class="body"><div class="thr mc"${a(2)}><span class="av" style="background:#fff">▢</span><div class="f1"><div class="nm">위협 감지<span class="t">어제 9:58</span></div><p class="sum" style="font-weight:700">3학년 2반 담임에게 온 메시지에서 위협 표현이 감지됐어요</p><p class="cap">민서 보호자 → 3학년 2반 담임</p><div class="tags"><span class="tg k">새 알림</span><span class="tg o">공격적 표현</span></div></div></div><div class="ghost"><div class="bar" style="width:70%"></div><div class="bar" style="width:45%"></div></div></div>`,
+          notes: ['필터 두 개 (새 알림 · 처리 완료). 관리자 아래 탭 구성은 미정.', '위협으로 분류되면 바로 알림. 누르면 위협 상세 시트.'],
+          parts: ['ScreenTitle', 'FilterButton · 2개', 'MessageCard · threat'] },
+        { id: 'D2', num: '6-4', name: '위협 상세', state: '시트 · 대응 기록', cushi: '없음',
+          html: ADMIN_TOP([1, 3], 0) + `<div class="body"></div>`
+            + SHEET(`<p class="sh-t">위협 메시지</p><p class="lbl" style="margin:0"${a(1)}>원문 · 고칠 수 없게 보존됨</p><div class="quote">${THREAT_WV}</div>`
+              + `<dl class="kv"${a(2)}><dt>받은 시간</dt><dd>2026.10.12 (월) 오후 9:58:14</dd><dt>위협으로 본 이유</dt><dd>학교로 찾아오겠다는 말과 ‘각오하라’는 말이 함께 있어요.</dd></dl>`
+              + `<p class="lbl"${a(3)}>대응 기록</p><div style="display:flex;flex-wrap:wrap;gap:4px"><span class="rch on"><i></i>학부모 면담</span><span class="rch"><i></i>교육청 보고</span><span class="rch"><i></i>수사기관 신고</span></div><div class="ta">어떤 조치를 했는지 적어 주세요</div>`
+              + `<span class="btn"${a(4)}>기록 저장</span><span class="btn g" style="height:20px"${a(5)}>일반 메시지로 되돌리기</span>`),
+          notes: ['원문 · 받은 시간은 고치거나 지울 수 없음.', 'AI가 위협으로 본 이유를 함께.', '대응 종류 하나 + 메모 (관리자 화면은 고른 색이 slate).', '저장하면 담임에게 처리 상황 알림.', '애매해서 위협이 된 것을 사람이 걸러 냄 → 담임 쪽 일반 메시지로.'],
+          parts: ['Sheet', 'RadioGroup', 'TextArea', 'Button'] },
+        { id: 'D3', num: '6-4', name: '관리자 알림', state: '처리 완료', cushi: '없음',
+          html: ADMIN_TOP([0, 4], 1, 1) + `<div class="body"><div class="ck mc"><span class="av">✓</span><div class="f1"><div class="nm">민서 보호자 → 3학년 2반 담임<span class="t">10.13</span></div><p class="sum">학부모 면담 · 오전 9:10 기록</p><div class="tags"><span class="tg o">담임에게 알림 보냄</span></div></div></div><div class="ghost"><div class="bar" style="width:65%"></div><div class="bar" style="width:40%"></div></div><div class="ghost"><div class="bar" style="width:75%"></div><div class="bar" style="width:35%"></div></div></div>`
+            + `<div class="toast"${a(2)}>기록했어요. 담임 선생님께 처리 상황을 알렸어요.</div>`,
+          notes: ['기록한 건은 처리 완료로. 기록은 고치지 않고 덧붙이기만 (11.02).', '저장 직후 잠깐 안내 (Toast).'],
+          parts: ['FilterButton · 2개', 'MessageCard', 'Toast'] },
+      ],
+    },
+    {
+      id: 'e', letter: 'E', who: '교사', what: '반 톡방 만들기', goal: '개인 메신저 없이 앱 안에 반별 학생 단체 톡방을 연다.',
+      screens: [
+        { id: 'E1', num: '6-5', name: '반 톡방 목록', state: '기본', cushi: '없음',
+          html: ROOM_LIST({ row: 1, pick: 2 }),
+          notes: ['이미 있는 반 톡방 (ListRow). 누르면 6-6으로.', '학년 · 반을 고르고 열기. 없으면 새로 만들고 참여 코드 시트.'],
+          parts: ['ScreenTitle', 'ListRow', 'Select', 'Button', 'TabBar'] },
+        { id: 'E2', num: '6-5', name: '참여 코드 시트', state: '처음 발급', cushi: '없음',
+          html: ROOM_LIST() + SHEET(`<p class="sh-t">3학년 1반 톡방을 만들었어요</p><p class="sh-s">학생에게 아래 참여 코드를 알려 주세요.</p><div class="code"${a(1)}>QK7 M29</div><p class="cap ctr"${a(2)}>남은 시간 24시간 · 참여 코드는 반마다 하나예요</p><span class="btn"${a(3)}>코드 복사</span><span class="btn s">톡방으로 가기</span>`),
+          notes: ['영문 · 숫자 6자리 (임시).', '하루(24시간) 동안 쓸 수 있음 (10.16).', '복사해서 학생에게 알려 주기 → 학생 플로우 F.'],
+          parts: ['Sheet', 'CodeDisplay', 'Button'] },
+        { id: 'E3', num: '6-6', name: '반 단체 톡방', state: '교사', cushi: '없음',
+          html: SB('1:21') + ROOM_TEACHER({ code: 1, band: 2, comp: 3 }),
+          notes: ['참여 코드 다시 보기 · 재발급은 오른쪽 위 작은 흰 버튼.', '개인 메신저 안내 띠는 닫기 없이 항상 보임.', '반 톡방 메시지는 AI 검사 없음.'],
+          parts: ['AppHeader', 'Banner · notice', 'Bubble', 'Composer'] },
+        { id: 'E4', num: '6-6', name: '참여 코드 시트', state: '다시 보기 · 재발급', cushi: '없음',
+          html: SB('1:21') + ROOM_TEACHER() + SHEET(`<p class="sh-t">3학년 1반 참여 코드</p><p class="sh-s">학생에게 알려 주면 바로 들어올 수 있어요.</p><div class="code">QK7 M29</div><p class="cap ctr"${a(1)}>남은 시간 17시간 42분</p><span class="btn">코드 복사</span><span class="btn s"${a(2)}>새 코드 받기</span><p class="cap ctr"${a(3)}>새 코드를 받으면 지금 코드는 바로 막혀요. 이미 들어온 학생은 그대로예요.</p>`),
+          notes: ['남은 시간을 함께 보여 줌.', '새 코드 받기는 흰 보조 버튼 (이전 코드가 막히므로 한 단계 약하게).', '재발급해도 이미 들어온 학생은 그대로 (10.16).'],
+          parts: ['Sheet', 'CodeDisplay', 'Button', 'Toast (복사 뒤)'] },
+      ],
+    },
+    {
+      id: 'f', letter: 'F', who: '학생', what: '반 톡방 참여', goal: '참여 코드로 반 단체 톡방에 들어와 담임과 이야기한다.',
+      screens: [
+        { id: 'F1', num: '6-7', name: '톡방 참여', state: '입력', cushi: '기본 · md',
+          html: SB('3:05') + TTL('반 톡방 참여', '')
+            + `<div class="body"><div class="cxr"${a(1)}>${CX('hi', 58, '쿠션이 · 기본')}<div class="say">반가워요! 선생님이 알려 준 코드를 넣어 주세요.</div></div><p class="lbl">참여 코드</p><div class="field"${a(2)}>QK7 M29</div><p class="lbl">이름</p><div class="field"${a(3)}>김서준</div><span class="btn">참여하기</span><p class="cap">학교 계정 없이 참여 코드와 이름만 넣으면 돼요.</p></div>`,
+          notes: ['기본 표정 쿠션이가 인사 (md).', '참여 코드 6자리.', '학교 계정 · 로그인 없이 이름만 (10.16). 코드 확인 → 맞으면 6-6. 다른 기기에서도 같은 방법으로, 같은 반 같은 이름이면 그 학생으로 이어 줌 (11.02).'],
+          parts: ['ScreenTitle', 'CushionChar · hi', 'SpeechBubble', 'TextField', 'Button'] },
+        { id: 'F2', num: '6-7', name: '톡방 참여', state: '코드 만료 · 틀림', cushi: '없음 (오류)',
+          html: SB('3:05') + TTL('반 톡방 참여', '')
+            + `<div class="body"><p class="lbl">참여 코드</p><div class="field err"${a(1)}>QK7 M29</div><p class="err-t">코드가 만료됐어요. 선생님께 새 코드를 받아 주세요.</p><p class="lbl">이름</p><div class="field">김서준</div><span class="btn off"${a(2)}>참여하기</span><p class="cap">틀린 코드면 “코드가 맞지 않아요”로 알려 줘요.</p></div>`,
+          notes: ['만료와 틀림을 문구로 구분. 오류 상태라 쿠션이 인사를 숨김.', '코드를 고치기 전까지 참여하기는 쓸 수 없음.'],
+          parts: ['TextField · error', 'Button · disabled'] },
+        { id: 'F3', num: '6-6', name: '반 단체 톡방', state: '학생', cushi: '없음',
+          html: SB('3:06') + HDR('', '3학년 1반 단체 톡방', '담임 선생님 · 학생 24명', '', 1)
+            + `<div class="body"><span class="chipc">오늘</span><p class="who">담임 선생님</p><div class="bub">1반 친구들, 반가워요. 공지와 질문은 이 톡방에서 나눠요.</div><p class="who">이하은</p><div class="bub">선생님, 내일 준비물이 뭐예요?</div><div class="bub me">저도 들어왔어요!</div></div>` + COMP('메시지를 적어 주세요', { n: 2 }),
+          notes: ['학생 화면에는 참여 코드 버튼이 없음. 교사와 같은 톡방.', '학생 메시지도 AI 검사 없음 (10.16).'],
+          parts: ['AppHeader', 'Bubble', 'Composer'] },
+      ],
+    },
+  ];
+
+  const SEC_NO = { g: '02', a: '03', c: '04', d: '05', e: '06', f: '07' };
+  document.getElementById('flows').innerHTML = FLOWS.map((f) => `
+    <section id="flow-${f.id}" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-center gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">${SEC_NO[f.id]}</span>
+        <span class="fbadge w-9 h-9">${f.letter}</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">${f.who} · ${f.what}</span>
+        <span class="text-mute">${f.goal}</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-12">
+        ${f.screens.map((s, i) => `
+          <figure class="reveal flex flex-col gap-3" style="--i:${i % 4}">
+            <div class="flex items-center gap-2 keep">
+              <span class="text-xs font-bold text-mute">${s.id}</span>
+              <span class="chip rounded-md px-2 py-0.5 text-[13px] font-bold text-[#2f5fd0]">${s.num}</span>
+              <span class="text-[15px] font-extrabold">${s.name}</span>
+            </div>
+            <p class="-mt-2 text-[13px] text-mute font-semibold keep">${s.state} · 쿠션이 ${s.cushi}</p>
+            <div class="frame rounded-2xl py-4"><div class="ph">${s.html}</div></div>
+            <ol class="text-[13px] leading-relaxed space-y-1.5 keep">${s.notes.map((n, j) => `<li class="flex gap-2 text-[#5a564f]"><span class="num mt-[1px]">${j + 1}</span><span>${n}</span></li>`).join('')}</ol>
+            <p class="flex flex-wrap gap-1.5">${s.parts.map((p) => `<code class="k">${p}</code>`).join('')}</p>
+          </figure>`).join('')}
+      </div>
+    </section>`).join('');
+
+  const ALL = FLOWS.flatMap((f) => f.screens.map((s) => ({ ...s, letter: f.letter })));
+  document.getElementById('screen-rows').innerHTML = ALL.map((s) => `<tr>
+    <td class="px-5 py-3 font-bold text-mute">${s.id}</td>
+    <td class="px-5 py-3 font-bold text-[#2f5fd0]">${s.num}</td>
+    <td class="px-5 py-3 font-semibold">${s.name} <span class="font-normal text-mute">· ${s.state}</span></td>
+    <td class="px-5 py-3"><span class="fbadge w-7 h-7 text-xs">${s.letter}</span></td>
+    <td class="px-5 py-3 text-[#5a564f] whitespace-nowrap">${s.cushi}</td>
+    <td class="px-5 py-3 text-[#5a564f] text-[13.5px]">${s.parts.join(' · ')}</td></tr>`).join('');
+
+  const withC = ALL.filter((s) => !s.cushi.startsWith('없음'));
+  const withoutC = ALL.filter((s) => s.cushi.startsWith('없음'));
+  const WHY = { G2: '입력에 집중', A0: '목록 화면 · 장식 줄임', A4: '고치는 중 · 입력에 집중', A5: '보낸 뒤 안내는 띠로', C2: '', C5: '원문을 보는 화면', C6: '긴급', C7: '위협', C8: '분석 실패', D1: '관리자', D2: '관리자 · 위협', D3: '관리자', E1: '목록 화면 · 장식 줄임', E2: '시트 안 코드에 집중', E3: '반 톡방 대화', E4: '시트 안 코드에 집중', F2: '오류', F3: '반 톡방 대화' };
+  document.getElementById('with-list').innerHTML = withC.map((s) => `<li class="flex items-center gap-3 text-[15px]"><span class="fbadge w-7 h-7 text-xs">${s.letter}</span><b class="w-10">${s.id}</b><span class="flex-1">${s.name} · ${s.state}</span><span class="chip rounded-md px-2 py-0.5 text-[13px] font-bold">${s.cushi}</span></li>`).join('');
+  document.getElementById('without-list').innerHTML = withoutC.map((s) => `<li class="flex items-center gap-3 text-[15px]"><span class="fbadge w-7 h-7 text-xs">${s.letter}</span><b class="w-10">${s.id}</b><span class="flex-1">${s.name} · ${s.state}</span><span class="text-[13px] text-mute">${WHY[s.id] || ''}</span></li>`).join('');
+
+  const OPENS = [
+    ['A', '처음 인사 쿠션이(A1)를 처음 쓰는 사람에게만 한 번 보여 줄지'],
+    ['C', '필터에서 빠지는 조건 (긴급 카드는 답장하면 내려가기로 11.02에 정함)'],
+    ['D', '관리자 앱의 아래 탭 구성'],
+    ['E', '새 코드 받기 전에 한 번 더 물을지 (이전 코드가 바로 막힘)'],
+    ['공통', '6-5 ~ 6-10 화면을 앱 정의서에 추가하고 번호 확정'],
+  ];
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 items-center py-4 border-b border-line" style="--i:${i % 2}">
+      ${o[0].length === 1 ? `<span class="fbadge w-9 h-9">${o[0]}</span>` : `<span class="w-9 h-9 grid place-items-center shrink-0 text-xs font-bold text-mute">${o[0]}</span>`}
+      <span class="text-[15px] font-semibold">${o[1]}</span>
+    </li>`).join('');
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

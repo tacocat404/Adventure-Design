@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 DB 설계</title>
+  <meta name="description" content="[26.10.17] 쿠션톡 DB 설계 · 테이블 13개, ERD, 칸 정의, 원문 보관·열람 규칙, 화면별 테이블, SQLite 생성문">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    .canvas { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .canvas::-webkit-scrollbar { height: 8px; }
+    .canvas::-webkit-scrollbar-thumb { background: #dcd7cd; border-radius: 99px; }
+    .canvas svg { display: block; height: auto; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+    .codebox { background: #1d1c1a; color: #ece9e2; border-radius: 16px; font: 12.5px/1.7 ui-monospace, SFMono-Regular, Consolas, 'D2Coding', monospace; }
+    .codebox pre { margin: 0; padding: 18px 20px; overflow: auto; white-space: pre; max-height: 36rem; }
+    .lock { background: #fdebf1; }
+    .mx td, .mx th { vertical-align: top; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">DB 설계</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#decided" class="px-3 py-2 rounded-full hover:bg-white">정한 것</a>
+        <a href="#list" class="px-3 py-2 rounded-full hover:bg-white">목록</a>
+        <a href="#erd" class="px-3 py-2 rounded-full hover:bg-white">ERD</a>
+        <a href="#original" class="px-3 py-2 rounded-full hover:bg-white">원문</a>
+        <a href="#tables" class="px-3 py-2 rounded-full hover:bg-white">칸</a>
+        <a href="#screens" class="px-3 py-2 rounded-full hover:bg-white">화면</a>
+        <a href="#sql" class="px-3 py-2 rounded-full hover:bg-white">SQL</a>
+        <a href="#open" class="px-3 py-2 rounded-full hover:bg-white">미정</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">DB DESIGN · CUSHION TALK · 26.10.17 · 11.02 보완</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>DB 설계</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        서비스 정의서 · 유저플로우 · 와이어프레임 26장에 나오는 데이터를 <b class="text-ink">테이블 13개</b>로 묶었습니다.
+        사람은 <b class="text-ink">users 한 테이블에 역할 칸</b>으로 나누고, 학부모 메시지 원문은 <b class="text-ink">지우거나 고칠 수 없게</b> 보관합니다.
+        DB는 저장소 README대로 <b class="text-ink">SQLite</b> 기준입니다.
+      </p>
+    </header>
+
+    <!-- 01 정한 것 -->
+    <section id="decided" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">정한 것 · 지킬 원칙</span>
+        <span class="text-mute">10.17 결정 2개 · 11.02 결정 3개 + 설계 원칙</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="rule-list"></div>
+    </section>
+
+    <!-- 02 목록 -->
+    <section id="list" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">테이블 13개 한눈에</span>
+        <span class="text-mute">묶음 세 개 · 사람과 반 / 학부모 메시지 / 위협 처리</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[54rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-16">번호</th><th class="px-5 py-3.5 font-extrabold">테이블</th><th class="px-5 py-3.5 font-extrabold">담는 것</th><th class="px-5 py-3.5 font-extrabold">묶음</th><th class="px-5 py-3.5 font-extrabold">플로우</th></tr></thead>
+          <tbody class="divide-y divide-line" id="list-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 03 ERD -->
+    <section id="erd" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">ERD</span>
+        <span class="text-mute">테이블 사이 관계 · 1 = 하나, N = 여러 개</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl p-4 md:p-6 canvas" id="erd-box"></div>
+      <div class="reveal mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#5a564f] keep">
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm" style="background:#1d1c1a"></span>사람 · 반 · 톡방</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm" style="background:#2f5fd0"></span>학부모 메시지</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm" style="background:#c8406b"></span>위협 처리 · 증거</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm lock border border-[#c8406b]"></span>잠금 칸 (고칠 수 없음)</span>
+        <span>사람을 가리키는 칸(<code class="k">*_id</code> → users)은 선이 너무 많아 생략했습니다. 05 칸 표에 모두 적혀 있습니다.</span>
+      </div>
+    </section>
+
+    <!-- 04 원문 -->
+    <section id="original" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">원문 보관 · 누가 볼 수 있나</span>
+        <span class="text-mute">교사는 골라서 보고, 관리자는 증거로 씀</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[60rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-36">누가</th><th class="px-5 py-3.5 font-extrabold">일반</th><th class="px-5 py-3.5 font-extrabold">긴급</th><th class="px-5 py-3.5 font-extrabold">위협</th><th class="px-5 py-3.5 font-extrabold">분석 실패</th></tr></thead>
+          <tbody class="divide-y divide-line" id="access-rows"></tbody>
+        </table>
+      </div>
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 keep" id="evidence-list"></div>
+    </section>
+
+    <!-- 05 칸 -->
+    <section id="tables" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">테이블별 칸</span>
+        <span class="text-mute">시간은 모두 UTC ISO 글자 (예: 2026-10-17T09:30:00Z)</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 xl:grid-cols-2 gap-6" id="table-specs"></div>
+    </section>
+
+    <!-- 06 화면 -->
+    <section id="screens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">화면 → 테이블</span>
+        <span class="text-mute">와이어프레임 26장 기준 · API 명세(06_API)의 뼈대</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[56rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-40">화면</th><th class="px-5 py-3.5 font-extrabold w-64">읽는 테이블</th><th class="px-5 py-3.5 font-extrabold w-64">쓰는 테이블</th><th class="px-5 py-3.5 font-extrabold">메모</th></tr></thead>
+          <tbody class="divide-y divide-line" id="screen-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 07 SQL -->
+    <section id="sql" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">07</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">SQLite 생성문</span>
+        <span class="text-mute">백엔드 B가 그대로 시작점으로 · 잠금 트리거 포함</span>
+      </h2>
+      <div class="reveal mt-7 codebox relative">
+        <button id="copy-sql" class="absolute top-3 right-3 text-xs font-bold bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5">복사</button>
+        <pre id="sql-text"></pre>
+      </div>
+    </section>
+
+    <!-- 08 미정 -->
+    <section id="open" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">08</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다음 회의에서 정할 것</span>
+        <span class="text-mute">정해지면 이 문서와 생성문을 함께 고침</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — 서비스정의서_쿠션톡_261015.md · 유저플로우_쿠션톡_261015.md · 와이어프레임_쿠션톡_261016.html · Adventure-Design/README.md</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+  // ───────── 01 정한 것 ─────────
+  const RULES = [
+    ['결정', '사람은 users 한 테이블', 'role 칸(parent · teacher · admin · student)으로 나눕니다. 화면 권한도 이 칸 하나로 판단합니다.', 'st-done'],
+    ['결정', '원문: 교사는 골라서, 관리자는 증거로', '교사는 [원문 보기]를 누를 때만 받습니다. 관리자는 위협으로 넘어온 메시지만, 받은 시간 · 지문과 함께 봅니다.', 'st-done'],
+    ['결정', '로그인: 어른은 아이디 · 비밀번호, 학생은 코드 · 이름', '학부모 · 교사 · 관리자는 아이디 · 비밀번호로 로그인합니다. 학생은 10.16 결정대로 참여 코드와 이름만 씁니다. 다른 기기에서도 코드 · 이름으로 다시 들어오고, 같은 반에 같은 이름이 있으면 그 학생으로 이어 줍니다 (11.02).', 'st-done'],
+    ['결정', '학부모는 학교 검색 → 선생님 목록', '가입할 때 학교 이름을 검색해 고르고, 그 학교의 반 · 담임 목록에서 담임을 골라 자녀 이름을 적습니다 (11.02). 고르면 그 반의 class_members에 parent로 들어갑니다.', 'st-done'],
+    ['결정', '유형 · 기한은 학부모가 고름', '보낼 때 요청 유형과 답장 기한을 학부모가 고릅니다 (11.02). 그래서 messages에 두고, AI는 요약 · 가림 · 분류만 합니다.', 'st-done'],
+    ['원칙', '저장이 분석보다 먼저', '메시지를 받으면 원문과 서버 시간을 먼저 저장하고, 그다음에 AI 분석을 돌립니다 (플로우 B).', 'st-doing'],
+    ['원칙', '원문은 고치지도 지우지도 못함', 'messages의 원문 · 받은 시간 · 지문 칸은 트리거로 잠급니다. 행 삭제도 막습니다. 졸업 · 전학 뒤에도 지우지 않습니다 (11.02).', 'st-doing'],
+    ['원칙', 'AI 결과는 따로', '요약 · 가린 곳 · 분류 이유는 analyses에 둡니다. 원문 행은 AI가 몇 번 다시 돌아도 그대로입니다.', 'st-doing'],
+    ['원칙', '저장하지 않는 것', '보내기 전 검사 결과와 경고를 무시한 사실은 남기지 않습니다 (10.16 결정). 제안 문장을 골랐는지만 A5 표시용으로 남기는데, 경고 없이 보낸 글과 구분되지 않아 무시 여부는 알 수 없습니다. 교사 답장 · 톡방 메시지는 AI를 거치지 않습니다.', 'st-wait'],
+  ];
+  document.getElementById('rule-list').innerHTML = RULES.map((r, i) => `
+    <article class="reveal" style="--i:${i % 3}">
+      <div class="flex items-center gap-3 border-t-2 border-ink pt-4"><span class="fbadge w-8 h-8 text-sm">${i + 1}</span><span class="badge ${r[3]}">${r[0]}</span></div>
+      <h3 class="mt-4 text-xl font-black tracking-tight">${r[1]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${r[2]}</p>
+    </article>`).join('');
+
+  // ───────── 테이블 정의 (목록 · ERD · 칸 · SQL 모두 여기서) ─────────
+  // 칸: [이름, 종류, 조건, 설명]  조건: PK · FK→표 · 필수 · 선택 · 잠금
+  const G = { people: ['사람 · 반 · 톡방', '#1d1c1a'], msg: ['학부모 메시지', '#2f5fd0'], threat: ['위협 처리 · 증거', '#c8406b'] };
+  const T = [
+    { n: 'schools', ko: '학교', g: 'people', flow: '공통', what: '학교 하나. 관리자와 반이 어느 학교 소속인지.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['name', 'TEXT', '필수', '학교 이름'], ['created_at', 'TEXT', '필수', '만든 시간'] ] },
+    { n: 'users', ko: '사람', g: 'people', flow: '공통', what: '학부모 · 교사 · 관리자 · 학생 모두. role 칸으로 나눔.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['role', 'TEXT', '필수', 'parent · teacher · admin · student'], ['name', 'TEXT', '필수', '화면에 보이는 이름'],
+      ['school_id', 'INTEGER', 'FK→schools', '소속 학교'], ['login_id', 'TEXT', '선택 · 겹치지 않음', '로그인 아이디. 학생만 비어 있음 (코드와 이름으로 참여)'],
+      ['password_hash', 'TEXT', '선택', '비밀번호 해시 (bcrypt 등). 학생만 비어 있음. 비밀번호 글자는 저장하지 않음'], ['created_at', 'TEXT', '필수', '가입 시간'] ] },
+    { n: 'classes', ko: '반', g: 'people', flow: 'E · F', what: '학년 · 반과 담임. 반 하나에 반 톡방 하나.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['school_id', 'INTEGER', 'FK→schools', ''], ['teacher_id', 'INTEGER', 'FK→users', '담임 (role = teacher)'],
+      ['year', 'INTEGER', '필수', '학년도 (예: 2026)'], ['grade', 'INTEGER', '필수', '학년 1~6'], ['class_no', 'INTEGER', '필수', '반'],
+      ['created_at', 'TEXT', '필수', '톡방을 연 시간'] ], uniq: '같은 학교 · 학년도 · 학년 · 반은 하나만' },
+    { n: 'class_members', ko: '반 사람', g: 'people', flow: 'E · F', what: '반에 속한 학생 · 학부모. 학부모는 선생님 목록에서 담임을 처음 고를 때 생김.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['class_id', 'INTEGER', 'FK→classes', ''], ['user_id', 'INTEGER', 'FK→users', ''],
+      ['member_role', 'TEXT', '필수', 'student · parent'], ['child_name', 'TEXT', '선택', '학부모일 때 자녀 이름 (담임을 고를 때 적음) → "민서 보호자"'],
+      ['join_code_id', 'INTEGER', 'FK→join_codes · 선택', '학생이 들어올 때 쓴 코드'], ['joined_at', 'TEXT', '필수', ''] ], uniq: '같은 반에 같은 사람은 한 번만' },
+    { n: 'join_codes', ko: '참여 코드', g: 'people', flow: 'E · F', what: '반 톡방 참여 코드. 재발급하면 새 행.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['class_id', 'INTEGER', 'FK→classes', ''], ['code', 'TEXT', '필수 · 겹치지 않음', '영문 · 숫자 6자리 (임시). 한 번 쓴 글자는 다시 쓰지 않음'],
+      ['issued_by', 'INTEGER', 'FK→users', '발급한 담임'], ['issued_at', 'TEXT', '필수', ''], ['expires_at', 'TEXT', '필수', 'issued_at + 24시간'],
+      ['revoked_at', 'TEXT', '선택', '새 코드를 받으면 이전 코드에 채움'] ], uniq: '살아 있는 코드(revoked_at 비어 있음)는 반마다 하나. 코드 글자는 막힌 코드까지 포함해 전체에서 하나 — 그래야 예전 코드를 넣었을 때 만료인지 틀림인지 바로 갈림' },
+    { n: 'room_messages', ko: '톡방 메시지', g: 'people', flow: 'E · F', what: '반 톡방 대화. AI 검사 없음.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['class_id', 'INTEGER', 'FK→classes', ''], ['sender_id', 'INTEGER', 'FK→users', '담임 또는 학생'],
+      ['body', 'TEXT', '필수', ''], ['sent_at', 'TEXT', '필수', ''] ] },
+    { n: 'messages', ko: '학부모 메시지', g: 'msg', flow: 'A · B · C', what: '학부모가 담임에게 보낸 글. 원문은 잠금.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['parent_id', 'INTEGER', 'FK→users', '보낸 학부모'], ['teacher_id', 'INTEGER', 'FK→users', '받는 담임'],
+      ['class_id', 'INTEGER', 'FK→classes', '어느 반 일인지'], ['original_text', 'TEXT', '필수 · 잠금', '보낸 글 그대로'],
+      ['received_at', 'TEXT', '필수 · 잠금', '서버가 받은 시간'], ['original_hash', 'TEXT', '필수 · 잠금', 'SHA-256(원문 + 받은 시간). 바뀌지 않았다는 지문'],
+      ['analysis_status', 'TEXT', '필수', 'pending · done · failed'], ['category', 'TEXT', '선택', '지금 분류: urgent · threat · normal. 분석 전 · 실패는 비어 있음'],
+      ['msg_type', 'TEXT', '필수', '학부모가 고른 유형: counsel 상담 · absence 결석·조퇴 · seating 자리·모둠 · study 학습 · life 생활 · other 기타 (11.02)'], ['due_date', 'TEXT', '선택', '학부모가 고른 답장 기한 → D-1 태그 (11.02)'],
+      ['used_suggestion', 'INTEGER', '필수', '제안 문장으로 보냈으면 1, 아니면 0. A5 "제안 문장으로 보냄" 표시용 (11.02)'],
+      ['teacher_state', 'TEXT', '필수', 'new · read · replied. 긴급은 replied가 될 때까지 맨 위 (11.02)'], ['read_at', 'TEXT', '선택', '담임이 처음 연 시간'] ] },
+    { n: 'analyses', ko: 'AI 분석', g: 'msg', flow: 'B · C', what: '메시지 하나에 분석 결과 하나. 성공했을 때만 생김.', cols: [
+      ['message_id', 'INTEGER', 'PK · FK→messages', '메시지와 1 : 1'], ['ai_category', 'TEXT', '필수', 'AI가 처음 본 분류 (관리자가 되돌려도 그대로)'],
+      ['urgent_type', 'TEXT', '선택', 'school_violence · child_abuse · safety'], ['summary', 'TEXT', '필수', '요청 요약 한 줄'],
+      ['requests', 'TEXT', '필수', '요청 목록 JSON 배열'],
+      ['masked_count', 'INTEGER', '필수', '가린 곳 개수 ("2곳 막음")'], ['masked_spans', 'TEXT', '필수', '가린 구간 JSON [{start, end}]'],
+      ['threat_reason', 'TEXT', '선택', 'AI가 위협으로 본 이유. 위협 태그는 종류 없이 "공격적 표현" 하나 (11.02)'], ['attempts', 'INTEGER', '필수', '시도 횟수 1 ~ 2'], ['model', 'TEXT', '필수', '쓴 LLM 이름'], ['analyzed_at', 'TEXT', '필수', ''] ] },
+    { n: 'replies', ko: '교사 답장', g: 'msg', flow: 'C', what: '담임 답장. AI 검사 없이 그대로 감.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['message_id', 'INTEGER', 'FK→messages', ''], ['teacher_id', 'INTEGER', 'FK→users', ''],
+      ['body', 'TEXT', '필수', ''], ['sent_at', 'TEXT', '필수', ''] ] },
+    { n: 'threat_cases', ko: '위협 사건', g: 'threat', flow: 'B · D', what: '관리자에게 넘긴 위협 메시지 한 건.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['message_id', 'INTEGER', 'FK→messages · 겹치지 않음', '메시지 하나에 사건 하나'], ['school_id', 'INTEGER', 'FK→schools', '받을 관리자 학교'],
+      ['status', 'TEXT', '필수', 'new · handled · returned'], ['opened_at', 'TEXT', '필수', '넘긴 시간'], ['closed_at', 'TEXT', '선택', '처리 완료 · 되돌린 시간'] ] },
+    { n: 'case_actions', ko: '대응 기록', g: 'threat', flow: 'D', what: '관리자 대응 기록. 고치거나 지우지 않고 덧붙이기만 (11.02).', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['case_id', 'INTEGER', 'FK→threat_cases', ''], ['admin_id', 'INTEGER', 'FK→users', 'role = admin'],
+      ['action_type', 'TEXT', '필수', 'meeting · report_office · report_police · return_normal · other'], ['memo', 'TEXT', '선택', ''], ['created_at', 'TEXT', '필수', ''] ] },
+    { n: 'original_views', ko: '원문 열람 기록', g: 'threat', flow: 'C · D', what: '원문을 내려줄 때마다 한 줄. 증거의 열람 이력. 관리자와 그 메시지의 담임이 볼 수 있음 (11.02).', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['message_id', 'INTEGER', 'FK→messages', ''], ['viewer_id', 'INTEGER', 'FK→users', ''],
+      ['via', 'TEXT', '필수', 'teacher_sheet · urgent_detail · failed_expand · admin_evidence'], ['viewed_at', 'TEXT', '필수', ''] ] },
+    { n: 'notifications', ko: '알림', g: 'people', flow: 'C · D', what: '새 메시지 · 위협 · 처리 상황 · 답장 알림.', cols: [
+      ['id', 'INTEGER', 'PK', ''], ['user_id', 'INTEGER', 'FK→users', '받는 사람'], ['kind', 'TEXT', '필수', 'new_message · urgent · threat · case_update · reply'],
+      ['ref_type', 'TEXT', '필수', 'message · case · reply'], ['ref_id', 'INTEGER', '필수', '가리키는 행 번호'], ['created_at', 'TEXT', '필수', ''], ['read_at', 'TEXT', '선택', ''] ] },
+  ];
+
+  // ───────── 02 목록 ─────────
+  document.getElementById('list-rows').innerHTML = T.map((t, i) => `
+    <tr class="hover:bg-[#faf9f6]">
+      <td class="px-5 py-3 font-bold text-mute">${String(i + 1).padStart(2, '0')}</td>
+      <td class="px-5 py-3"><a href="#t-${t.n}" class="font-bold hover:underline underline-offset-4">${t.ko}</a> <code class="k">${t.n}</code></td>
+      <td class="px-5 py-3 text-[#5a564f]">${t.what}</td>
+      <td class="px-5 py-3"><span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:${G[t.g][1]}"></span>${G[t.g][0]}</span></td>
+      <td class="px-5 py-3 text-[#5a564f]">${t.flow}</td>
+    </tr>`).join('');
+
+  // ───────── 03 ERD (SVG) ─────────
+  const W = 250, HEAD = 34, ROW = 22;
+  const BOX = {
+    schools:       { x: 30,  y: 60,  show: ['id', 'name'] },
+    users:         { x: 30,  y: 240, show: ['id', 'role', 'name', 'school_id', 'login_id'] },
+    notifications: { x: 30,  y: 520, show: ['id', 'user_id', 'kind', 'ref_id', 'read_at'] },
+    classes:       { x: 340, y: 60,  show: ['id', 'school_id', 'teacher_id', 'grade', 'class_no'] },
+    class_members: { x: 340, y: 270, show: ['id', 'class_id', 'user_id', 'member_role'] },
+    join_codes:    { x: 340, y: 450, show: ['id', 'class_id', 'code', 'expires_at', 'revoked_at'] },
+    room_messages: { x: 340, y: 660, show: ['id', 'class_id', 'sender_id', 'body'] },
+    messages:      { x: 690, y: 60,  show: ['id', 'parent_id', 'teacher_id', 'class_id', 'original_text', 'received_at', 'original_hash', 'category'] },
+    analyses:      { x: 690, y: 350, show: ['message_id', 'summary', 'masked_count', 'urgent_type', 'threat_reason'] },
+    replies:       { x: 690, y: 580, show: ['id', 'message_id', 'teacher_id', 'body'] },
+    threat_cases:  { x: 1000, y: 60,  show: ['id', 'message_id', 'school_id', 'status'] },
+    case_actions:  { x: 1000, y: 260, show: ['id', 'case_id', 'admin_id', 'action_type'] },
+    original_views:{ x: 1000, y: 450, show: ['id', 'message_id', 'viewer_id', 'via'] },
+  };
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const boxH = (n) => HEAD + BOX[n].show.length * ROW + 10;
+  const boxSvg = (t) => {
+    const b = BOX[t.n], h = boxH(t.n), c = G[t.g][1];
+    const rows = b.show.map((cn, i) => {
+      const col = t.cols.find((x) => x[0] === cn);
+      const cond = col[2];
+      const tag = cond.startsWith('PK') ? 'PK' : cond.startsWith('FK') ? 'FK' : '';
+      const locked = cond.includes('잠금');
+      const y = b.y + HEAD + 6 + i * ROW;
+      return `${locked ? `<rect x="${b.x + 6}" y="${y}" width="${W - 12}" height="${ROW - 2}" rx="4" fill="#fdebf1"/>` : ''}
+        <text x="${b.x + 14}" y="${y + 15}" font-size="12.5" font-family="ui-monospace,Consolas,monospace" fill="#1d1c1a" ${tag === 'PK' ? 'font-weight="700"' : ''}>${cn}</text>
+        ${tag ? `<text x="${b.x + W - 14}" y="${y + 15}" font-size="11" text-anchor="end" font-weight="700" fill="${tag === 'PK' ? '#9a6614' : '#8b867d'}">${tag}</text>` : ''}
+        ${locked ? `<text x="${b.x + W - 14}" y="${y + 15}" font-size="11" text-anchor="end" font-weight="700" fill="#c8406b">잠금</text>` : ''}`;
+    }).join('');
+    return `<g>
+      <rect x="${b.x}" y="${b.y}" width="${W}" height="${h}" rx="12" fill="#fff" stroke="#d8d3c8" stroke-width="1.5"/>
+      <path d="M${b.x} ${b.y + 12} a12 12 0 0 1 12 -12 h${W - 24} a12 12 0 0 1 12 12 v${HEAD - 12} h-${W} z" fill="${c}"/>
+      <text x="${b.x + 14}" y="${b.y + 22}" font-size="14" font-weight="800" fill="#fff">${t.ko}</text>
+      <text x="${b.x + W - 14}" y="${b.y + 22}" font-size="12" text-anchor="end" fill="#ffffffcc" font-family="ui-monospace,Consolas,monospace">${t.n}</text>
+      ${rows}</g>`;
+  };
+  // 선: [경로 점들, 시작 라벨, 끝 라벨]
+  const L = [
+    [[[280, 100], [340, 100]], '1', 'N'],                                  // schools → classes
+    [[[155, 148], [155, 240]], '1', 'N'],                                  // schools → users
+    [[[280, 270], [310, 270], [310, 170], [340, 170]], '1', 'N'],          // users(담임) → classes
+    [[[280, 330], [340, 330]], '1', 'N'],                                  // users → class_members
+    [[[155, 394], [155, 520]], '1', 'N'],                                  // users → notifications
+    [[[465, 214], [465, 270]], '1', 'N'],                                  // classes → class_members
+    [[[590, 150], [620, 150], [620, 510], [590, 510]], '1', 'N'],          // classes → join_codes
+    [[[620, 510], [620, 720], [590, 720]], '', 'N'],                       // classes → room_messages
+    [[[590, 100], [690, 100]], '1', 'N'],                                  // classes → messages
+    [[[815, 280], [815, 350]], '1', '1'],                                  // messages → analyses
+    [[[690, 250], [665, 250], [665, 630], [690, 630]], '1', 'N'],          // messages → replies
+    [[[940, 100], [1000, 100]], '1', '0..1'],                              // messages → threat_cases
+    [[[940, 220], [970, 220], [970, 500], [1000, 500]], '1', 'N'],         // messages → original_views
+    [[[1125, 192], [1125, 260]], '1', 'N'],                                // threat_cases → case_actions
+  ];
+  const lineSvg = ([pts, a, b]) => {
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join(' ');
+    const lab = (p, q, s) => {
+      if (!s) return '';
+      const dx = Math.sign(q[0] - p[0]), dy = Math.sign(q[1] - p[1]);
+      const x = p[0] + dx * 12 + (dy ? 8 : 0), y = p[1] + dy * 14 + (dx ? -6 : 4);
+      return `<text x="${x}" y="${y}" font-size="11.5" font-weight="800" fill="#57534e" ${dx < 0 ? 'text-anchor="end"' : ''}>${s}</text>`;
+    };
+    const last = pts.length - 1;
+    return `<path d="${d}" fill="none" stroke="#8b867d" stroke-width="1.6"/>
+      <circle cx="${pts[last][0]}" cy="${pts[last][1]}" r="3.5" fill="#8b867d"/>
+      ${lab(pts[0], pts[1], a)}${lab(pts[last], pts[last - 1], b)}`;
+  };
+  document.getElementById('erd-box').innerHTML = `
+    <svg viewBox="0 0 1280 810" style="width:100%;min-width:1000px" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, system-ui, sans-serif" role="img" aria-label="쿠션톡 ERD">
+      <text x="30" y="36" font-size="13" font-weight="800" fill="#8b867d" letter-spacing="2">사람 · 반 · 톡방</text>
+      <text x="690" y="36" font-size="13" font-weight="800" fill="#2f5fd0" letter-spacing="2">학부모 메시지</text>
+      <text x="1000" y="36" font-size="13" font-weight="800" fill="#c8406b" letter-spacing="2">위협 처리 · 증거</text>
+      ${L.map(lineSvg).join('')}
+      ${T.map(boxSvg).join('')}
+    </svg>`;
+
+  // ───────── 04 원문 열람 ─────────
+  const ACCESS = [
+    ['학부모 (보낸 사람)', '자기가 보낸 글이라 볼 수 있음', '같음', '같음', '같음'],
+    ['교사 (담임)', '<b>숨김.</b> [원문 보기]를 누를 때만 받음 · 기록 남음', '<b>처음부터 원문.</b> 대응이 급해서 · 기록 남음', '<b>숨김.</b> [원문 보기]로 받을 수 있음 · 기록 남음', '<b>접힘.</b> 펼치면 받음 · 기록 남음'],
+    ['관리자', '볼 수 없음', '볼 수 없음', '<b>증거로 봄.</b> 원문 + 받은 시간 + 지문 + AI 이유 · 기록 남음', '볼 수 없음'],
+    ['학생', '볼 수 없음', '볼 수 없음', '볼 수 없음', '볼 수 없음'],
+  ];
+  document.getElementById('access-rows').innerHTML = ACCESS.map((r) => `
+    <tr>${r.map((c, i) => `<td class="px-5 py-3.5 ${i ? 'text-[#5a564f]' : 'font-bold'} leading-relaxed">${c}</td>`).join('')}</tr>`).join('');
+  const EVID = [
+    ['받자마자 저장', '분석 전에 원문 · 서버 시간을 먼저 넣습니다. 학부모 기기 시간이 아니라 서버 시간입니다.'],
+    ['잠금', 'original_text · received_at · original_hash는 UPDATE 트리거로 막고, messages 행 DELETE도 막습니다.'],
+    ['지문', 'SHA-256(원문 + 받은 시간)을 같이 저장합니다. 나중에 다시 계산해 같으면 바뀌지 않았다는 뜻입니다.'],
+    ['열람 기록', '원문을 서버에서 내려줄 때마다 original_views에 한 줄. 누가 언제 봤는지가 증거와 함께 남습니다. 이 기록은 관리자와 그 메시지의 담임이 볼 수 있습니다 (11.02).'],
+  ];
+  document.getElementById('evidence-list').innerHTML = EVID.map((e, i) => `
+    <div class="reveal card rounded-2xl p-5" style="--i:${i}"><p class="font-extrabold">${e[0]}</p><p class="mt-2 text-sm text-[#5a564f] leading-relaxed">${e[1]}</p></div>`).join('');
+
+  // ───────── 05 칸 ─────────
+  const condBadge = (c) => {
+    if (c.startsWith('PK')) return `<span class="badge st-temp">${c}</span>`;
+    if (c.includes('잠금')) return `<span class="badge st-hold">${c}</span>`;
+    if (c.startsWith('FK')) return `<span class="badge st-doing">${c}</span>`;
+    if (c.startsWith('필수')) return `<span class="badge st-done">${c}</span>`;
+    return `<span class="badge st-wait">${c}</span>`;
+  };
+  document.getElementById('table-specs').innerHTML = T.map((t, i) => `
+    <article id="t-${t.n}" class="reveal card rounded-2xl overflow-hidden keep">
+      <div class="px-6 pt-5 pb-4 border-b border-line">
+        <p class="eyebrow text-[11px] font-bold" style="color:${G[t.g][1]}">TABLE ${String(i + 1).padStart(2, '0')} · ${G[t.g][0]}</p>
+        <h3 class="mt-2 text-xl font-black tracking-tight">${t.ko} <code class="k">${t.n}</code></h3>
+        <p class="mt-1.5 text-[15px] text-[#5a564f]">${t.what}</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[34rem] text-sm">
+          <thead><tr class="text-left text-mute"><th class="px-6 py-2.5 font-bold">칸</th><th class="px-3 py-2.5 font-bold">종류</th><th class="px-3 py-2.5 font-bold">조건</th><th class="px-3 py-2.5 pr-6 font-bold">설명</th></tr></thead>
+          <tbody class="divide-y divide-line">${t.cols.map((c) => `
+            <tr class="${c[2].includes('잠금') ? 'lock' : ''}"><td class="px-6 py-2.5"><code class="k">${c[0]}</code></td><td class="px-3 py-2.5 text-mute">${c[1]}</td><td class="px-3 py-2.5">${condBadge(c[2])}</td><td class="px-3 py-2.5 pr-6 text-[#5a564f]">${c[3]}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${t.uniq ? `<p class="px-6 py-3 text-sm text-[#5a564f] border-t border-line"><b class="text-ink">겹치면 안 됨</b> — ${t.uniq}</p>` : ''}
+    </article>`).join('');
+
+  // ───────── 06 화면 → 테이블 ─────────
+  const SCR = [
+    ['G1 · G2 로그인 · 가입', 'users · schools', 'users', '학부모 · 교사 · 관리자만 아이디 · 비밀번호 (11.02). 학부모 가입은 학교 이름 검색(schools.name)으로 school_id를 고름. 비밀번호는 해시로만 저장.'],
+    ['A0 선생님 목록', 'classes · users · class_members', 'class_members', '학부모 학교의 반 · 담임 목록. 처음 고르면 자녀 이름과 함께 class_members에 parent로 넣음 (11.02).'],
+    ['A1 ~ A4 학부모 작성', '—', '—', '보내기 전 검사는 저장하지 않음. 경고 시트도 저장 없음. 유형 · 기한 고르기 칸이 입력창에 들어감 (11.02, 와이어 고칠 것).'],
+    ['A5 보낸 뒤', 'messages · replies', 'messages', '보내면 원문 · 받은 시간 · 지문 · 유형 · 기한 저장 → 분석 시작. 제안 문장을 골랐으면 used_suggestion = 1. 담임 답장은 replies에서.'],
+    ['C1 · C2 · C3 메시지함', 'messages · analyses · threat_cases', '—', '필터 숫자: category · teacher_state로 셈. 긴급은 teacher_state가 replied가 될 때까지 맨 위. 학교 필터 태그는 threat_cases.status, 위협 태그는 "공격적 표현" 하나.'],
+    ['C4 메시지 상세 · 일반', 'messages · analyses', 'messages', '처음 열면 teacher_state = read · read_at. 원문 글자는 보내지 않음.'],
+    ['C5 원문 시트', 'messages', 'original_views', '시트를 열 때만 원문을 내려줌 (via = teacher_sheet).'],
+    ['C6 긴급 상세', 'messages · analyses', 'original_views · replies', '원문을 바로 보여 주므로 기록 (via = urgent_detail).'],
+    ['C7 위협 상세 (교사)', 'messages · analyses · threat_cases', 'replies', '"학교로 넘겼어요" · 처리 상황은 threat_cases.status. 담임이 직접 답장할 수 있음 (11.02).'],
+    ['C8 분석 실패', 'messages', 'original_views', 'analysis_status = failed. 펼치면 기록 (via = failed_expand).'],
+    ['답장 보내기 (C4 · C6 · C7)', '—', 'replies · messages · notifications', 'teacher_state = replied, 학부모에게 reply 알림.'],
+    ['D1 · D3 관리자 알림', 'threat_cases · messages · notifications', 'notifications', '필터: status = new / handled.'],
+    ['D2 위협 상세 · 대응 기록', 'messages · analyses · threat_cases · case_actions', 'case_actions · threat_cases · original_views · notifications', '원문 · 받은 시간 · 지문 · threat_reason. 저장하면 status 변경 + 담임에게 case_update. 되돌리면 messages.category = normal.'],
+    ['E1 반 톡방 목록', 'classes', 'classes · join_codes', '없는 반을 열면 반 + 첫 코드 생성.'],
+    ['E2 · E4 참여 코드 시트', 'join_codes', 'join_codes', '남은 시간 = expires_at - 지금. 새 코드 받기 = 이전 행 revoked_at 채우고 새 행.'],
+    ['E3 · F3 반 단체 톡방', 'room_messages · class_members', 'room_messages', 'AI 검사 없음.'],
+    ['F1 · F2 톡방 참여', 'join_codes', 'users · class_members', '참여 코드 · 이름만. 같은 반에 같은 이름 학생이 있으면 그 사람으로 이어 주고, 없으면 users · class_members를 새로 만듦 (11.02). 코드 확인: 글자로 찾아 없으면 "틀림". 있는데 revoked_at이 차 있거나 expires_at이 지났으면 "만료". 둘 다 아니면 통과.'],
+  ];
+  document.getElementById('screen-rows').innerHTML = SCR.map((r) => `
+    <tr><td class="px-5 py-3 font-bold">${r[0]}</td>${[r[1], r[2]].map((c) => `<td class="px-5 py-3">${c === '—' ? '<span class="text-mute">—</span>' : c.split(' · ').map((x) => `<code class="k">${x}</code>`).join(' ')}</td>`).join('')}<td class="px-5 py-3 text-[#5a564f] leading-relaxed">${r[3]}</td></tr>`).join('');
+
+  // ───────── 07 SQL ─────────
+  const SQL = `-- 쿠션톡 DB (SQLite) · 26.10.17 · 11.02 보완
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE schools (
+  id          INTEGER PRIMARY KEY,
+  name        TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+
+CREATE TABLE users (
+  id             INTEGER PRIMARY KEY,
+  role           TEXT NOT NULL CHECK (role IN ('parent','teacher','admin','student')),
+  name           TEXT NOT NULL,
+  school_id      INTEGER NOT NULL REFERENCES schools(id),
+  login_id       TEXT UNIQUE,            -- 학생은 NULL (코드와 이름으로 참여)
+  password_hash  TEXT,                   -- 해시만 저장 · 학생은 NULL
+  created_at     TEXT NOT NULL,
+  CHECK (role = 'student' OR (login_id IS NOT NULL AND password_hash IS NOT NULL))
+);
+CREATE INDEX school_search ON schools(name);   -- 학부모 가입: 학교 이름 검색
+
+CREATE TABLE classes (
+  id          INTEGER PRIMARY KEY,
+  school_id   INTEGER NOT NULL REFERENCES schools(id),
+  teacher_id  INTEGER NOT NULL REFERENCES users(id),
+  year        INTEGER NOT NULL,
+  grade       INTEGER NOT NULL CHECK (grade BETWEEN 1 AND 6),
+  class_no    INTEGER NOT NULL,
+  created_at  TEXT NOT NULL,
+  UNIQUE (school_id, year, grade, class_no)
+);
+
+CREATE TABLE join_codes (
+  id          INTEGER PRIMARY KEY,
+  class_id    INTEGER NOT NULL REFERENCES classes(id),
+  code        TEXT NOT NULL UNIQUE,      -- 막힌 코드까지 전체에서 하나 · 다시 쓰지 않음
+  issued_by   INTEGER NOT NULL REFERENCES users(id),
+  issued_at   TEXT NOT NULL,
+  expires_at  TEXT NOT NULL,             -- issued_at + 24시간
+  revoked_at  TEXT                       -- 새 코드를 받으면 채움
+);
+-- 살아 있는 코드: 반마다 하나 (새 코드를 받기 전에 이전 행 revoked_at을 채움)
+CREATE UNIQUE INDEX one_live_code_per_class ON join_codes(class_id) WHERE revoked_at IS NULL;
+
+CREATE TABLE class_members (
+  id            INTEGER PRIMARY KEY,
+  class_id      INTEGER NOT NULL REFERENCES classes(id),
+  user_id       INTEGER NOT NULL REFERENCES users(id),
+  member_role   TEXT NOT NULL CHECK (member_role IN ('student','parent')),
+  child_name    TEXT,
+  join_code_id  INTEGER REFERENCES join_codes(id),
+  joined_at     TEXT NOT NULL,
+  UNIQUE (class_id, user_id)
+);
+
+CREATE TABLE room_messages (
+  id         INTEGER PRIMARY KEY,
+  class_id   INTEGER NOT NULL REFERENCES classes(id),
+  sender_id  INTEGER NOT NULL REFERENCES users(id),
+  body       TEXT NOT NULL,
+  sent_at    TEXT NOT NULL
+);
+
+CREATE TABLE messages (
+  id               INTEGER PRIMARY KEY,
+  parent_id        INTEGER NOT NULL REFERENCES users(id),
+  teacher_id       INTEGER NOT NULL REFERENCES users(id),
+  class_id         INTEGER NOT NULL REFERENCES classes(id),
+  original_text    TEXT NOT NULL,        -- 잠금
+  received_at      TEXT NOT NULL,        -- 잠금 · 서버 시간
+  original_hash    TEXT NOT NULL,        -- 잠금 · SHA-256(original_text || received_at)
+  analysis_status  TEXT NOT NULL DEFAULT 'pending' CHECK (analysis_status IN ('pending','done','failed')),
+  category         TEXT CHECK (category IN ('urgent','threat','normal')),
+  msg_type         TEXT NOT NULL CHECK (msg_type IN ('counsel','absence','seating','study','life','other')),  -- 학부모가 고름
+  due_date         TEXT,                 -- 학부모가 고른 답장 기한
+  used_suggestion  INTEGER NOT NULL DEFAULT 0 CHECK (used_suggestion IN (0,1)),  -- A5 표시용
+  teacher_state    TEXT NOT NULL DEFAULT 'new' CHECK (teacher_state IN ('new','read','replied')),
+  read_at          TEXT
+);
+CREATE INDEX inbox ON messages(teacher_id, category, teacher_state, received_at);
+
+-- 원문 잠금: 고치기 · 지우기 막기
+CREATE TRIGGER lock_original BEFORE UPDATE OF original_text, received_at, original_hash ON messages
+BEGIN
+  SELECT RAISE(ABORT, 'original is locked');
+END;
+CREATE TRIGGER keep_messages BEFORE DELETE ON messages
+BEGIN
+  SELECT RAISE(ABORT, 'messages cannot be deleted');
+END;
+
+CREATE TABLE analyses (
+  message_id     INTEGER PRIMARY KEY REFERENCES messages(id),
+  ai_category    TEXT NOT NULL CHECK (ai_category IN ('urgent','threat','normal')),
+  urgent_type    TEXT CHECK (urgent_type IN ('school_violence','child_abuse','safety')),
+  summary        TEXT NOT NULL,
+  requests       TEXT NOT NULL,          -- JSON 배열
+  masked_count   INTEGER NOT NULL DEFAULT 0,
+  masked_spans   TEXT NOT NULL DEFAULT '[]',  -- JSON [{start, end}]
+  threat_reason  TEXT,
+  attempts       INTEGER NOT NULL CHECK (attempts BETWEEN 1 AND 2),
+  model          TEXT NOT NULL,
+  analyzed_at    TEXT NOT NULL
+);
+
+CREATE TABLE replies (
+  id          INTEGER PRIMARY KEY,
+  message_id  INTEGER NOT NULL REFERENCES messages(id),
+  teacher_id  INTEGER NOT NULL REFERENCES users(id),
+  body        TEXT NOT NULL,
+  sent_at     TEXT NOT NULL
+);
+
+CREATE TABLE threat_cases (
+  id          INTEGER PRIMARY KEY,
+  message_id  INTEGER NOT NULL UNIQUE REFERENCES messages(id),
+  school_id   INTEGER NOT NULL REFERENCES schools(id),
+  status      TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new','handled','returned')),
+  opened_at   TEXT NOT NULL,
+  closed_at   TEXT
+);
+
+CREATE TABLE case_actions (
+  id           INTEGER PRIMARY KEY,
+  case_id      INTEGER NOT NULL REFERENCES threat_cases(id),
+  admin_id     INTEGER NOT NULL REFERENCES users(id),
+  action_type  TEXT NOT NULL CHECK (action_type IN ('meeting','report_office','report_police','return_normal','other')),
+  memo         TEXT,
+  created_at   TEXT NOT NULL
+);
+-- 대응 기록은 덧붙이기만 (11.02 확정)
+CREATE TRIGGER append_only_actions BEFORE UPDATE ON case_actions
+BEGIN
+  SELECT RAISE(ABORT, 'case_actions are append-only');
+END;
+CREATE TRIGGER keep_actions BEFORE DELETE ON case_actions
+BEGIN
+  SELECT RAISE(ABORT, 'case_actions cannot be deleted');
+END;
+
+CREATE TABLE original_views (
+  id          INTEGER PRIMARY KEY,
+  message_id  INTEGER NOT NULL REFERENCES messages(id),
+  viewer_id   INTEGER NOT NULL REFERENCES users(id),
+  via         TEXT NOT NULL CHECK (via IN ('teacher_sheet','urgent_detail','failed_expand','admin_evidence')),
+  viewed_at   TEXT NOT NULL
+);
+
+CREATE TABLE notifications (
+  id          INTEGER PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  kind        TEXT NOT NULL CHECK (kind IN ('new_message','urgent','threat','case_update','reply')),
+  ref_type    TEXT NOT NULL CHECK (ref_type IN ('message','case','reply')),
+  ref_id      INTEGER NOT NULL,
+  created_at  TEXT NOT NULL,
+  read_at     TEXT
+);
+CREATE INDEX unread ON notifications(user_id, read_at);`;
+  document.getElementById('sql-text').textContent = SQL;
+  document.getElementById('copy-sql').addEventListener('click', (e) => {
+    navigator.clipboard.writeText(SQL).then(() => { e.target.textContent = '복사됨'; setTimeout(() => { e.target.textContent = '복사'; }, 1500); });
+  });
+
+  // ───────── 08 미정 ─────────
+  const OPENS = [
+    ['완료', '11.02에 남은 것을 모두 정했습니다. 어른은 아이디 · 비밀번호, 학생은 코드 · 이름 · 학부모는 학교 이름 검색 → 선생님 목록 · 유형 6개와 기한은 학부모가 고름 · 위협 태그는 "공격적 표현" 하나 · 위협 메시지에도 담임 답장 가능 · 긴급은 답장하면 내려감 · 열람 기록은 관리자와 담임 · 대응 기록은 덧붙이기만 · 원문은 지우지 않음. 근거는 유저플로우 7절.'],
+  ];
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 py-5 border-b border-line" style="--i:${i % 2}">
+      <span class="fbadge w-8 h-8 text-sm">${i + 1}</span>
+      <div><span class="badge st-temp">${o[0]}</span><p class="mt-2 text-[15px] leading-relaxed">${o[1]}</p></div>
+    </li>`).join('');
+
+  // ───────── 나타나기 ─────────
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>
