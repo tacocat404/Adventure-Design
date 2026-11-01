@@ -1,7 +1,7 @@
 // A0 선생님 목록 · A1~A5 학부모 작성 · 경고 시트
 import { useState } from 'react'
-import { api, usePoll, TYPES, when } from '../api.js'
-import { Btn, Composer, Cushi, Header, Marked, Sheet, Title } from '../components/ui.jsx'
+import { api, usePoll, useUnread, TYPES, when } from '../api.js'
+import { Btn, Composer, Cushi, Dot, Header, Marked, Sheet, Title } from '../components/ui.jsx'
 
 export default function Parent({ me, onOut }) {
   const [cls, setCls] = useState(null)
@@ -13,6 +13,7 @@ function Teachers({ me, onOut, onOpen }) {
   const [pick, setPick] = useState(null)
   const [child, setChild] = useState('')
   const [err, setErr] = useState(null)
+  const [unread, clearUnread] = useUnread()
   usePoll(async () => setData(await api('/parent/teachers')), [])
   const link = async () => {
     try {
@@ -32,8 +33,9 @@ function Teachers({ me, onOut, onOpen }) {
     <div className="app">
       <Title title="선생님 목록" side={me.school_name || ''} right={<button className="cap" onClick={onOut}>로그아웃</button>} />
       <div className="page tight">
-        {data.mine.length > 0 && <p className="sec">내 아이 담임</p>}
-        {data.mine.map((c) => <Row key={c.class_id} c={c} onClick={() => onOpen(c)} />)}
+        {data.mine.length > 0 && <p className="sec">내 아이 담임{unread > 0 && <> · 새 답장<Dot n={unread} /></>}</p>}
+        {/* ponytail: 알림에 반 번호가 없어 대화를 열면 모두 읽음. 담임이 여럿인 학부모가 많아지면 반별로 */}
+        {data.mine.map((c) => <Row key={c.class_id} c={c} onClick={() => { clearUnread(); onOpen(c) }} />)}
         <p className="sec">다른 반</p>
         {data.others.map((c) => <Row key={c.class_id} c={c} onClick={() => { setPick(c); setChild(''); setErr(null) }} />)}
         <p className="cap">처음 연락하는 선생님이면 자녀 이름을 한 번 적어요.</p>

@@ -45,9 +45,11 @@ export const Filters = ({ items, on, onPick }) => (
   </div>
 )
 
-export const TabBar = ({ tabs, on, onPick }) => (
+export const Dot = ({ n }) => n > 0 ? <span className="dot" aria-label={`새 알림 ${n}개`}>{n > 99 ? '99+' : n}</span> : null
+
+export const TabBar = ({ tabs, on, onPick, badges = {} }) => (
   <nav className="tabbar">
-    {tabs.map((t) => <button key={t} className={`tab${on === t ? ' on' : ''}`} onClick={() => onPick(t)}>{t}</button>)}
+    {tabs.map((t) => <button key={t} className={`tab${on === t ? ' on' : ''}`} onClick={() => onPick(t)}>{t}<Dot n={badges[t]} /></button>)}
   </nav>
 )
 

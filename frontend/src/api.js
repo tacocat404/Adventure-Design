@@ -1,5 +1,5 @@
 // API 부르기 · 공통 글자 — docs/06_API/API명세_쿠션톡_261102.html
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const store = {
   get: (k) => { try { return localStorage.getItem(k) } catch { return null } },
@@ -34,6 +34,14 @@ export function usePoll(fn, deps, ms = 10000) {
     const t = setInterval(() => fn().catch(() => {}), ms)
     return () => clearInterval(t)
   }, deps) // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+// 안 읽은 알림 수(N-1)와 모두 읽음(N-2)
+export function useUnread() {
+  const [n, setN] = useState(0)
+  usePoll(async () => setN((await api('/notifications?unread=1')).unread_count), [])
+  const clear = () => api('/notifications/read', { method: 'POST', body: {} }).then(() => setN(0)).catch(() => {})
+  return [n, clear]
 }
 
 // 명세 04절 오류 코드 → 화면 문구

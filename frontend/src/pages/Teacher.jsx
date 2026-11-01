@@ -1,32 +1,33 @@
 // C1~C3 메시지함 · C4~C8 상세 · C5 원문 시트 · 탭(메시지함 · 반 톡방 · 설정)
 import { useEffect, useState } from 'react'
-import { api, usePoll, CASE, TYPES, URGENT, dday, dueText, when } from '../api.js'
+import { api, usePoll, useUnread, CASE, TYPES, URGENT, dday, dueText, when } from '../api.js'
 import { Btn, Composer, Cushi, Filters, Header, Marked, Sheet, Sticker, TabBar, Title } from '../components/ui.jsx'
 import { TeacherRooms } from './Rooms.jsx'
 
 export default function Teacher({ me, onOut }) {
   const [tab, setTab] = useState('메시지함')
   const [open, setOpen] = useState(null)
+  const [unread, clearUnread] = useUnread()
   if (open) return <Detail id={open} onBack={() => setOpen(null)} />
   return (
     <>
-      {tab === '메시지함' && <Inbox onOpen={setOpen} />}
+      {tab === '메시지함' && <Inbox onOpen={setOpen} onSeen={clearUnread} />}
       {tab === '반 톡방' && <TeacherRooms me={me} />}
       {tab === '설정' && (
         <div className="app"><Title title="설정" side={me.name} />
           <div className="page"><Btn kind="white" onClick={onOut}>로그아웃</Btn></div></div>
       )}
-      <TabBar tabs={['메시지함', '반 톡방', '설정']} on={tab} onPick={setTab} />
+      <TabBar tabs={['메시지함', '반 톡방', '설정']} on={tab} onPick={setTab} badges={{ 메시지함: tab === '메시지함' ? 0 : unread }} />
     </>
   )
 }
 
 const today = () => new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
 
-function Inbox({ onOpen }) {
+function Inbox({ onOpen, onSeen }) {
   const [filter, setFilter] = useState('todo')
   const [d, setD] = useState(null)
-  usePoll(async () => setD(await api(`/teacher/inbox?filter=${filter}`)), [filter])
+  usePoll(async () => { setD(await api(`/teacher/inbox?filter=${filter}`)); onSeen() }, [filter]) // 메시지함을 보고 있으면 알림은 읽은 것
   if (!d) return <div className="app" />
   const empty = !d.urgent.length && !d.items.length
   return (
