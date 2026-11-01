@@ -126,7 +126,7 @@ function Detail({ id, onBack }) {
         {d.segments && <>
           <span className="chipc">원래 보낸 말</span>
           <div className="bub full">{segs}</div>
-          {d.masked_count > 0 && <div className="row"><span className="cap grow">거친 표현 {d.masked_count}곳에 {threat ? '가림' : '스티커'}을 붙였어요</span>
+          {d.masked_count > 0 && <div className="row"><span className="cap grow">거친 표현 {d.masked_count}곳에 {threat ? '가림 표시를' : '스티커를'} 붙였어요</span>
             <button className="btn b-white sm" onClick={() => original('teacher_sheet')}>{threat ? '원문 보기' : '떼고 보기'}</button></div>}
         </>}
 

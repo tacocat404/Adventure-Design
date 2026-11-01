@@ -81,7 +81,7 @@ def analyze(original_text: str) -> dict:
         "summary": summary,
         "requests": requests,
         "masked_spans": spans,
-        "threat_reason": "위협 표현이 들어 있어요: " + ", ".join(w for w in THREAT if w in original_text) if threat else None,
+        "threat_reason": ", ".join(f"‘{w}’" for w in THREAT if w in original_text) + " 같은 위협 표현이 들어 있어요." if threat else None,
         "model": MODEL,
     }
 
