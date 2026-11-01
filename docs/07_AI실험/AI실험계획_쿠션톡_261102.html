@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 AI 실험 계획</title>
+  <meta name="description" content="[26.11.02] 쿠션톡 AI 실험 계획 · 판단은 로컬 학습 모델, 작성은 API · 데이터 · 라벨 기준 · 비교 지표 · 6주 일정">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+    .mx td, .mx th { vertical-align: top; }
+    .step { display: flex; flex-direction: column; gap: 6px; }
+    .arrow-r { color: #8b867d; font-weight: 900; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">AI 실험 계획</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#decided" class="px-3 py-2 rounded-full hover:bg-white">정한 것</a>
+        <a href="#pipeline" class="px-3 py-2 rounded-full hover:bg-white">처리 순서</a>
+        <a href="#data" class="px-3 py-2 rounded-full hover:bg-white">데이터</a>
+        <a href="#labels" class="px-3 py-2 rounded-full hover:bg-white">라벨 기준</a>
+        <a href="#metrics" class="px-3 py-2 rounded-full hover:bg-white">지표</a>
+        <a href="#schedule" class="px-3 py-2 rounded-full hover:bg-white">일정</a>
+        <a href="#risks" class="px-3 py-2 rounded-full hover:bg-white">위험</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">AI EXPERIMENT · CUSHION TALK · 26.11.02</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>AI 실험 계획</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        거친 표현을 <b class="text-ink">판단하는 일은 우리가 학습시킨 로컬 모델</b>이, 요약과 순한 문장을 <b class="text-ink">쓰는 일은 API LLM</b>이 맡습니다.
+        같은 평가셋으로 우리 모델과 기존 LLM(Kimi · Claude · GPT)을 비교해 근거를 남기고, 학기 말까지 <b class="text-ink">6주</b> 안에 앱에 붙입니다.
+      </p>
+    </header>
+
+    <!-- 01 정한 것 -->
+    <section id="decided" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">정한 것 · 지킬 원칙</span>
+        <span class="text-mute">11.02 결정</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="rule-list"></div>
+    </section>
+
+    <!-- 02 처리 순서 -->
+    <section id="pipeline" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">메시지 한 통의 처리 순서</span>
+        <span class="text-mute">API 명세 05절 <code class="k">precheck</code> · <code class="k">analyze</code> 함수 안쪽</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl p-5 md:p-7">
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-3 items-stretch keep" id="pipe"></div>
+        <p class="mt-5 text-sm text-[#5a564f] leading-relaxed keep">긴급은 원문을 그대로 보여 주므로 요약이 늦거나 실패해도 교사 화면이 막히지 않습니다. 보내기 전 경고는 로컬 모델이 바로 판단하고, 제안 문장은 API가 씁니다. 제안 문장이 늦으면 경고만 먼저 보여 줍니다.</p>
+      </div>
+      <div class="reveal mt-6 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[52rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-52">맡는 일</th><th class="px-5 py-3.5 font-extrabold">모델</th><th class="px-5 py-3.5 font-extrabold">학습</th><th class="px-5 py-3.5 font-extrabold w-56">어디서</th></tr></thead>
+          <tbody class="divide-y divide-line" id="model-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 03 데이터 -->
+    <section id="data" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">데이터</span>
+        <span class="text-mute">레포에 올리지 않고 공유 드라이브에 둠 · 경로만 적기</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[52rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-48">이름</th><th class="px-5 py-3.5 font-extrabold w-28">쓰임</th><th class="px-5 py-3.5 font-extrabold">내용</th><th class="px-5 py-3.5 font-extrabold w-28">상태</th></tr></thead>
+          <tbody class="divide-y divide-line" id="data-rows"></tbody>
+        </table>
+      </div>
+      <p class="reveal mt-4 text-sm text-mute keep">공개 데이터는 인터넷 댓글이라 학부모 메시지와 말투가 다릅니다. 그래서 교권 메시지 데이터가 꼭 필요합니다. 실제 학부모 메시지는 쓰지 않고, LLM으로 늘린 문장은 사람이 검수한 것만 씁니다.</p>
+    </section>
+
+    <!-- 04 라벨 기준 -->
+    <section id="labels" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">라벨 기준 (초안)</span>
+        <span class="text-mute">평가셋 · 교권 데이터를 쓰기 전에 팀이 함께 확정</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4" id="label-list"></div>
+      <div class="reveal mt-6 card rounded-2xl p-5 md:p-6 keep">
+        <p class="font-extrabold text-lg">가릴 구간은 이렇게</p>
+        <ul class="mt-3 text-[14.5px] leading-relaxed space-y-1.5" id="span-rules"></ul>
+      </div>
+    </section>
+
+    <!-- 05 지표 -->
+    <section id="metrics" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">비교 대상 · 지표</span>
+        <span class="text-mute">같은 평가셋 300개 · 같은 출력 형식(05절 JSON)</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="target-list"></div>
+      <div class="reveal mt-6 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[56rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-52">지표</th><th class="px-5 py-3.5 font-extrabold w-24">대상</th><th class="px-5 py-3.5 font-extrabold">계산</th><th class="px-5 py-3.5 font-extrabold">왜 보나</th><th class="px-5 py-3.5 font-extrabold w-28">목표</th></tr></thead>
+          <tbody class="divide-y divide-line" id="metric-rows"></tbody>
+        </table>
+      </div>
+      <p class="reveal mt-4 text-sm text-mute keep">결과는 지표 표 · 혼동행렬 · 틀린 예시 모음으로 정리해 발표 자료에 넣습니다. 채점은 <code class="k">ml/evaluate.py</code> 하나로 모든 모델을 같은 방식으로 합니다.</p>
+    </section>
+
+    <!-- 06 일정 -->
+    <section id="schedule" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">6주 일정</span>
+        <span class="text-mute">백엔드 A 주도 + 1명 · 평가셋은 팀 전원 · 앱 개발과 따로 진행</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[52rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-28">주</th><th class="px-5 py-3.5 font-extrabold">할 일</th><th class="px-5 py-3.5 font-extrabold w-56">끝나면</th><th class="px-5 py-3.5 font-extrabold w-24">상태</th></tr></thead>
+          <tbody class="divide-y divide-line" id="week-rows"></tbody>
+        </table>
+      </div>
+      <p class="reveal mt-4 text-sm text-mute keep">앱 개발은 05절 계약만 맞추면 따로 진행할 수 있습니다. 실험이 끝나기 전까지 다른 팀원은 키워드 규칙이나 API LLM으로 만든 임시 <code class="k">analyze</code>로 개발을 계속합니다.</p>
+    </section>
+
+    <!-- 07 위험 -->
+    <section id="risks" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">07</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">위험과 대비 · 정할 것</span>
+        <span class="text-mute">실패해도 API LLM으로 돌아갈 수 있게</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-4" id="risk-list"></div>
+      <p class="reveal mt-12 text-sm font-bold text-mute keep">다음 회의에서 정할 것</p>
+      <ol class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — API명세_쿠션톡_261102.html(05절 AI 계약) · DB설계_쿠션톡_261017.html(analyses) · 서비스정의서_쿠션톡_261015.md</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+  const li = (n) => `<li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>${n}</span></li>`;
+
+  // 01 정한 것
+  const RULES = [
+    ['결정', '판단은 로컬, 작성은 API', '거친지 · 어디를 가릴지 · 긴급/위협/일반은 우리가 학습시킨 로컬 모델이 판단합니다. 요약 · 순한 문장 제안은 API LLM이 씁니다.', 'st-done'],
+    ['결정', 'Kimi는 비교 대상', 'Kimi K2는 전체 1조 파라미터라 노트북(6GB)과 Colab 어디에도 올라가지 않습니다. Moonshot API로 불러 비교에만 씁니다.', 'st-done'],
+    ['결정', '학습은 Colab 무료 T4', '한국어 인코더(약 1억 파라미터)를 1시간 안에 학습합니다. 실행은 시연 노트북(RTX 3060 6GB)에서 0.1초 안.', 'st-done'],
+    ['원칙', '원문은 밖으로 그대로 안 나감', 'API로 보내기 전에 학생 · 학부모 이름을 바꾸고, 거친 표현을 먼저 가린 문장만 보냅니다. 긴급 원문은 API로 보내지 않습니다.', 'st-hold'],
+    ['원칙', 'AI 계약은 그대로', 'API 명세 05절 precheck · analyze 함수 모양을 바꾸지 않습니다. analyses.model에 판단한 모델 이름이 남습니다.', 'st-doing'],
+    ['원칙', '놓치는 것보다 한 번 더', '위협 · 긴급은 재현율을 가장 먼저 봅니다. 애매하면 위협으로 붙입니다 (서비스 정의서와 같음).', 'st-doing'],
+  ];
+  document.getElementById('rule-list').innerHTML = RULES.map((r, i) => `
+    <article class="reveal" style="--i:${i % 3}">
+      <div class="flex items-center gap-3 border-t-2 border-ink pt-4"><span class="fbadge w-8 h-8 text-sm">${i + 1}</span><span class="badge ${r[3]}">${r[0]}</span></div>
+      <h3 class="mt-4 text-xl font-black tracking-tight">${r[1]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${r[2]}</p>
+    </article>`).join('');
+
+  // 02 처리 순서
+  const PIPE = [
+    ['1', '이름 바꾸기', '학생 · 학부모 이름을 [학생1] · [보호자1]로', '서버 안', 'st-wait'],
+    ['2', '판단 (로컬)', '거친 표현 감지 · 가릴 구간 · 긴급/위협/일반', '우리 학습 모델', 'st-doing'],
+    ['3', '작성 (API)', '가린 문장으로 요청 요약 · 순한 문장 제안', 'API LLM', 'st-temp'],
+    ['4', '이름 되돌리기', '요약 · 제안 속 이름을 원래대로', '서버 안', 'st-wait'],
+  ];
+  document.getElementById('pipe').innerHTML = PIPE.map((p, i) => `
+    <div class="step chip rounded-2xl p-4"><span class="badge ${p[4]} self-start">${p[3]}</span><p class="text-lg font-black tracking-tight">${p[0]}. ${p[1]}</p><p class="text-sm text-[#5a564f] leading-relaxed">${p[2]}</p></div>
+    ${i < PIPE.length - 1 ? '<div class="arrow-r grid place-items-center text-xl md:rotate-0 rotate-90">→</div>' : ''}`).join('');
+
+  const MODELS = [
+    ['거친 표현 감지 + 가릴 구간', '한국어 인코더 (KcELECTRA-base 또는 KLUE-RoBERTa-base) · 글자 단위 구간 태깅', '공개 혐오표현 데이터 → 교권 메시지 데이터로 추가 학습', '학습 Colab · 실행 노트북'],
+    ['긴급 · 위협 · 일반 분류', '같은 인코더에 분류 머리 하나 더', '교권 메시지 데이터', '〃'],
+    ['요청 요약 · 순한 문장 제안', 'API LLM (Claude · GPT · Kimi 중 3주차 비교로 하나)', '학습 없음 · 프롬프트와 예시만', '서버에서 API 호출 · 키는 .env'],
+  ];
+  document.getElementById('model-rows').innerHTML = MODELS.map((m) => `<tr><td class="px-5 py-3.5 font-bold">${m[0]}</td><td class="px-5 py-3.5 text-[#5a564f]">${m[1]}</td><td class="px-5 py-3.5 text-[#5a564f]">${m[2]}</td><td class="px-5 py-3.5 text-[#5a564f]">${m[3]}</td></tr>`).join('');
+
+  // 03 데이터
+  const DATA = [
+    ['K-MHaS', '1차 학습', '한국어 다중 라벨 혐오표현 (뉴스 댓글)', '라이선스 확인'],
+    ['KOLD', '1차 학습', '한국어 공격 표현 · 공격 구간 라벨 있음 → 가릴 구간 학습', '라이선스 확인'],
+    ['BEEP! · APEACH · UnSmile', '1차 학습', '한국어 혐오 · 편견 · 악성 댓글', '라이선스 확인'],
+    ['교권 메시지 데이터', '추가 학습', '팀이 직접 만든 학부모 → 교사 메시지 약 600개 · 긴급/위협/일반 + 가릴 구간', '작성 전'],
+    ['평가셋', '채점만', '팀원 6명 × 50개 = 300개 · 학습에 절대 넣지 않음 · 민서 · 하윤 · 방문 위협 예시 포함', '작성 전'],
+  ];
+  document.getElementById('data-rows').innerHTML = DATA.map((d) => `<tr><td class="px-5 py-3.5 font-bold">${d[0]}</td><td class="px-5 py-3.5"><span class="badge ${d[1] === '채점만' ? 'st-hold' : 'st-doing'}">${d[1]}</span></td><td class="px-5 py-3.5 text-[#5a564f]">${d[2]}</td><td class="px-5 py-3.5"><span class="badge st-wait">${d[3]}</span></td></tr>`).join('');
+
+  // 04 라벨 기준
+  const LABELS = [
+    ['긴급', 'st-hold', '학교폭력 · 아동학대 · 안전에 관한 알림이나 신고. 표현이 거칠어도 긴급이 먼저입니다.', ['“하윤이가 쉬는 시간마다 맞는다고 해요.”', '“집에서 맞고 온 것 같아요. 멍이 있어요.”', '“통학로 공사장 펜스가 무너져 있어요.”']],
+    ['위협', 'st-temp', '교사나 학교에 대한 협박 · 찾아가겠다 · 신고 · 해코지 암시. 애매하면 위협입니다.', ['“내일 교실로 직접 찾아갈 테니 각오하세요.”', '“가만 안 둘 거예요.”', '“어디 사시는지 알아요.”']],
+    ['일반', 'st-done', '그 밖의 요청 · 문의 · 항의. 거친 표현이 있어도 위협이 아니면 일반이고, 거친 부분만 가립니다.', ['“애들 하나 제대로 못 보세요? 내일까지 자리 바꿔 주세요.”', '“다음 주 상담 시간 잡아 주세요.”', '“숙제가 너무 많아요.”']],
+  ];
+  document.getElementById('label-list').innerHTML = LABELS.map((l, i) => `
+    <div class="reveal card rounded-2xl p-5 keep" style="--i:${i}">
+      <span class="badge ${l[1]}">${l[0]}</span>
+      <p class="mt-3 text-[15px] leading-relaxed">${l[2]}</p>
+      <ul class="mt-3 text-[14px] leading-relaxed space-y-1.5">${l[3].map(li).join('')}</ul>
+    </div>`).join('');
+  document.getElementById('span-rules').innerHTML = [
+    '가리는 것은 <b>모욕 · 비하 · 욕설 · 인신공격</b> 구절입니다. 요청 내용(“자리 바꿔 주세요”, “내일까지”)은 절대 가리지 않습니다.',
+    '구간은 구절 단위로 잡습니다. 예: “애들 하나 제대로 못 보세요?” 전체가 한 구간.',
+    '단순한 감정 표현(“너무 속상해요”, “화가 나요”)은 가리지 않습니다.',
+    '두 사람이 같은 문장을 따로 라벨링해서 30개 이상 겹치게 하고, 일치율이 낮으면 기준을 고칩니다.',
+  ].map(li).join('');
+
+  // 05 지표
+  const TARGETS = [
+    ['①', '우리 학습 모델', '공개 데이터 + 교권 데이터로 학습한 인코더', 'st-doing'],
+    ['②', '1차 인코더', '공개 데이터로만 학습 · 교권 데이터 효과를 보는 기준', 'st-wait'],
+    ['③', 'API LLM에 판단까지', 'Kimi · Claude · GPT에 같은 출력 형식으로 판단을 맡김', 'st-temp'],
+    ['작성', 'API 요약 비교', '같은 가린 문장으로 API 2~3개의 요약 · 제안을 비교해 하나를 고름', 'st-temp'],
+  ];
+  document.getElementById('target-list').innerHTML = TARGETS.map((t, i) => `
+    <div class="reveal card rounded-2xl p-5 keep" style="--i:${i}"><span class="badge ${t[3]}">${t[0]}</span><p class="mt-3 text-lg font-black tracking-tight">${t[1]}</p><p class="mt-1 text-sm text-[#5a564f] leading-relaxed">${t[2]}</p></div>`).join('');
+  const METRICS = [
+    ['위협 재현율', '판단', '진짜 위협 중 위협으로 잡은 비율', '위협을 놓치면 안 됨 (애매하면 위협)', '0.95 이상'],
+    ['긴급 재현율', '판단', '진짜 긴급 중 긴급으로 잡은 비율', '학교폭력 · 아동학대 · 안전을 놓치면 안 됨', '0.95 이상'],
+    ['3분류 macro-F1', '판단', '긴급 · 위협 · 일반 F1의 평균', '전체 분류 정확도', '비교용'],
+    ['가림 구간 F1', '판단', '정답 구간과 글자 단위로 겹친 정도', '가릴 곳만 정확히 가렸나', '비교용'],
+    ['과잉 가림률', '판단', '가릴 것이 없는 메시지 중 무언가 가린 비율', '멀쩡한 문장을 가리면 학부모 불만', '낮을수록'],
+    ['요청 보존률', '작성', '평가셋에 적어 둔 요청 목록이 요약에 다 들어간 비율 (사람이 체크)', '요청은 하나도 빼지 않는다는 서비스 약속', '0.95 이상'],
+    ['제안 문장 평가', '작성', '순하게 바뀌었나 · 뜻이 같나를 1~5점으로 팀원 2명이 채점', '경고 시트 제안 품질', '비교용'],
+    ['응답 시간 p95', '둘 다', '100번 중 95번째로 느린 시간', '보내기 전 검사 5초 규칙', '판단 0.5초 · 전체 5초 안'],
+    ['비용 · 외부 전송', '둘 다', '1,000건당 원 · 밖으로 나가는 글자', '로컬 판단의 장점을 숫자로', '표로'],
+  ];
+  document.getElementById('metric-rows').innerHTML = METRICS.map((m) => `<tr><td class="px-5 py-3 font-bold">${m[0]}</td><td class="px-5 py-3"><span class="badge ${m[1] === '판단' ? 'st-doing' : m[1] === '작성' ? 'st-temp' : 'st-wait'}">${m[1]}</span></td><td class="px-5 py-3 text-[#5a564f]">${m[2]}</td><td class="px-5 py-3 text-[#5a564f]">${m[3]}</td><td class="px-5 py-3 font-semibold">${m[4]}</td></tr>`).join('');
+
+  // 06 일정
+  const WEEKS = [
+    ['1주 (11/3~)', '라벨 기준 확정 · 평가셋 300 작성(팀 전원) · 공개 데이터 수집과 라이선스 확인 · Colab 환경', '평가셋 확정'],
+    ['2주', '기준선 측정(③ API) · 인코더 1차 학습(공개 데이터 = ②) · API 요약 프롬프트 초안', '첫 비교표'],
+    ['3주', '교권 데이터 600 추가 학습(①) · 가릴 구간 학습 · API 2~3개 요약 비교 → 쓸 API 결정', '우리 모델 v2 · API 결정'],
+    ['4주', 'backend/app/ai/에 연결 (05절 계약 그대로) · 노트북에서 속도 측정', '앱에서 동작'],
+    ['5주', '틀린 예시를 보고 데이터 보강 · 다시 학습', '최종 비교표'],
+    ['6주', '시연 · 발표 자료', '—'],
+  ];
+  document.getElementById('week-rows').innerHTML = WEEKS.map((w) => `<tr><td class="px-5 py-3.5 font-bold">${w[0]}</td><td class="px-5 py-3.5 text-[#5a564f]">${w[1]}</td><td class="px-5 py-3.5 font-semibold">${w[2]}</td><td class="px-5 py-3.5"><span class="badge st-wait">대기</span></td></tr>`).join('');
+
+  // 07 위험
+  const RISKS = [
+    ['교권 데이터가 모자라거나 라벨이 흔들림', '라벨 기준표를 먼저 확정하고 두 사람이 겹쳐 라벨링. 애매한 건 위협으로.'],
+    ['API 요약이 느리거나 실패', '판단은 로컬이 바로 끝내고 요약은 저장 뒤 따로. 5초 넘으면 1번 다시, 또 실패하면 “분석 실패”로 교사에게.'],
+    ['API 키 · 비용', '키는 .env에만 (.env.example엔 이름만). 평가 전에 1,000건당 비용을 계산해 둠.'],
+    ['Colab 무료 세션이 끊김', '체크포인트를 Google Drive에 저장. 1시간 안에 끝나는 크기의 인코더만 씀.'],
+    ['혐오표현 데이터를 다룸', '데이터 · 평가셋은 레포에 올리지 않고 공유 드라이브에. 레포엔 경로만.'],
+    ['우리 모델이 API보다 못함', '05절 계약이 같아서 판단도 API로 바로 바꿀 수 있음. 그 결과 자체가 비교 지표의 결론.'],
+  ];
+  document.getElementById('risk-list').innerHTML = RISKS.map((r, i) => `
+    <div class="reveal card rounded-2xl p-5 keep" style="--i:${i % 2}"><p class="font-extrabold">${r[0]}</p><p class="mt-2 text-[14.5px] text-[#5a564f] leading-relaxed">${r[1]}</p></div>`).join('');
+  const OPENS = [
+    ['실험 담당', '백엔드 A와 함께할 1명'],
+    ['API', '비교할 API 2~3개와 키 · 비용 관리할 사람 (Kimi는 Moonshot 가입 필요)'],
+    ['데이터', '공유 드라이브 위치 · 평가셋 작성 마감일'],
+    ['라벨', '04절 라벨 기준 초안 확정'],
+  ];
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 items-center py-4 border-b border-line" style="--i:${i % 2}">
+      <span class="min-w-[4.5rem] text-xs font-bold text-mute">${o[0]}</span>
+      <span class="text-[15px] font-semibold">${o[1]}</span>
+    </li>`).join('');
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>
