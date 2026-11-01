@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 API 명세</title>
+  <meta name="description" content="[26.11.02] 쿠션톡 API 명세 · FastAPI 엔드포인트 28개, 요청·응답 JSON, 오류 코드, AI 분석 계약, 화면별 API">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: { paper: '#f4f2ee', ink: '#1d1c1a', line: '#e5e1d8', mute: '#8b867d' },
+        },
+      },
+    }
+  </script>
+  <!-- 디자인_형식서.md · 디자인_컴포넌트.html 공통 CSS -->
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .fbadge { display: grid; place-items: center; flex-shrink: 0; border-radius: 9999px; border: 2px solid #c8406b; color: #c8406b; background: #fdebf1; font-weight: 900; }
+    .badge { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .st-wait { background: #ecebe6; color: #57534e; }
+    .st-doing { background: #e8eefb; color: #2f5fd0; }
+    .st-done { background: #e4f1e9; color: #2f7a57; }
+    .st-hold { background: #fbe9e6; color: #cf3b2c; }
+    .st-temp { background: #fbf0dc; color: #9a6614; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+  <!-- 이 페이지에서만 쓰는 CSS -->
+  <style>
+    code.k { font: 12.5px ui-monospace, SFMono-Regular, Consolas, monospace; background: #f1efea; border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+    .path { font: 700 15px ui-monospace, SFMono-Regular, Consolas, monospace; word-break: break-all; }
+    .m { display: inline-grid; place-items: center; min-width: 3.6rem; border-radius: 6px; padding: 2px 8px; font: 800 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .m-GET { background: #e8eefb; color: #2f5fd0; }
+    .m-POST { background: #e4f1e9; color: #2f7a57; }
+    .m-PATCH { background: #fbf0dc; color: #9a6614; }
+    .m-DELETE { background: #fbe9e6; color: #cf3b2c; }
+    .codebox { background: #1d1c1a; color: #ece9e2; border-radius: 14px; font: 12.5px/1.65 ui-monospace, SFMono-Regular, Consolas, 'D2Coding', monospace; }
+    .codebox pre { margin: 0; padding: 14px 16px; overflow: auto; white-space: pre; max-height: 26rem; }
+    .codebox .lb { display: block; padding: 10px 16px 0; font: 700 11px Pretendard, system-ui, sans-serif; letter-spacing: .12em; color: #a8a297; }
+    .mx td, .mx th { vertical-align: top; }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .chev { transform: rotate(90deg); }
+    .chev { transition: transform .2s; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">API 명세</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold whitespace-nowrap">
+        <a href="#rules" class="px-3 py-2 rounded-full hover:bg-white">공통 규칙</a>
+        <a href="#list" class="px-3 py-2 rounded-full hover:bg-white">목록</a>
+        <a href="#detail" class="px-3 py-2 rounded-full hover:bg-white">상세</a>
+        <a href="#errors" class="px-3 py-2 rounded-full hover:bg-white">오류</a>
+        <a href="#ai" class="px-3 py-2 rounded-full hover:bg-white">AI 계약</a>
+        <a href="#screens" class="px-3 py-2 rounded-full hover:bg-white">화면</a>
+        <a href="#open" class="px-3 py-2 rounded-full hover:bg-white">미정</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">API SPEC · CUSHION TALK · 26.11.02</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>API 명세</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
+        와이어프레임 26장과 DB 설계(테이블 13개)를 이어 주는 <b class="text-ink">API <span id="api-count">28</span>개</b>를 정했습니다.
+        프론트는 이 문서의 요청 · 응답 모양만 보고 화면을 만들고, 백엔드는 이 모양대로 돌려줍니다.
+        서버는 저장소 README대로 <b class="text-ink">Python FastAPI</b>, 주소는 모두 <code class="k">/api</code>로 시작합니다.
+      </p>
+    </header>
+
+    <!-- 01 공통 규칙 -->
+    <section id="rules" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">공통 규칙</span>
+        <span class="text-mute">모든 API가 지킴</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="rule-list"></div>
+      <div class="reveal mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="codebox"><span class="lb">로그인한 뒤 모든 요청의 머리</span><pre>Authorization: Bearer &lt;token&gt;
+Content-Type: application/json</pre></div>
+        <div class="codebox"><span class="lb">오류 응답 모양 (모든 API 같음)</span><pre id="err-shape"></pre></div>
+      </div>
+      <div class="reveal mt-6 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[44rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-28">역할</th><th class="px-5 py-3.5 font-extrabold w-56">토큰 받는 곳</th><th class="px-5 py-3.5 font-extrabold">부를 수 있는 묶음</th></tr></thead>
+          <tbody class="divide-y divide-line" id="role-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 02 목록 -->
+    <section id="list" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">API 한눈에</span>
+        <span class="text-mute">번호를 누르면 상세로 이동 · 담당은 README 역할 기준</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[62rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-20">번호</th><th class="px-5 py-3.5 font-extrabold w-24">메서드</th><th class="px-5 py-3.5 font-extrabold">경로</th><th class="px-5 py-3.5 font-extrabold">하는 일</th><th class="px-5 py-3.5 font-extrabold w-24">누가</th><th class="px-5 py-3.5 font-extrabold w-28">화면</th><th class="px-5 py-3.5 font-extrabold w-24">담당</th></tr></thead>
+          <tbody id="list-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 03 상세 -->
+    <section id="detail" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">API 상세</span>
+        <span class="text-mute">카드를 누르면 요청 · 응답이 펼쳐짐 · 예시 값은 와이어프레임의 예시</span>
+      </h2>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="open-all" class="text-sm font-bold card rounded-full px-4 py-2 hover:border-ink">모두 펼치기</button>
+        <button id="close-all" class="text-sm font-bold card rounded-full px-4 py-2 hover:border-ink">모두 접기</button>
+      </div>
+      <div id="detail-list" class="mt-6 space-y-10"></div>
+    </section>
+
+    <!-- 04 오류 코드 -->
+    <section id="errors" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">오류 코드</span>
+        <span class="text-mute">화면은 code로 문구를 고름 · message는 개발용</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[52rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-56">code</th><th class="px-5 py-3.5 font-extrabold w-20">HTTP</th><th class="px-5 py-3.5 font-extrabold">언제</th><th class="px-5 py-3.5 font-extrabold">화면에 보일 말</th></tr></thead>
+          <tbody class="divide-y divide-line" id="error-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 05 AI 계약 -->
+    <section id="ai" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">AI 분석 계약</span>
+        <span class="text-mute">HTTP가 아니라 서버 안 함수 · 백엔드 A(<code class="k">backend/app/ai/</code>) ↔ 백엔드 B(<code class="k">backend/app/api/</code>)</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 xl:grid-cols-2 gap-6" id="ai-list"></div>
+    </section>
+
+    <!-- 06 화면 → API -->
+    <section id="screens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">화면 → API</span>
+        <span class="text-mute">와이어프레임 26장 기준 · 프론트가 화면마다 부르는 것</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[54rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold w-24">ID</th><th class="px-5 py-3.5 font-extrabold w-64">화면 · 상태</th><th class="px-5 py-3.5 font-extrabold w-72">부르는 API</th><th class="px-5 py-3.5 font-extrabold">메모</th></tr></thead>
+          <tbody class="divide-y divide-line" id="screen-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 07 미정 -->
+    <section id="open" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">07</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다음 회의에서 정할 것</span>
+        <span class="text-mute">이 문서에서는 임시로 정해 둔 것 · 정해지면 문서와 코드를 함께 고침</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — DB설계_쿠션톡_261017.html · 와이어프레임_쿠션톡_261016.html · 유저플로우_쿠션톡_261015.md(11.02 수정) · Adventure-Design/README.md</p>
+    <p>양식 — 디자인_형식서.md · 디자인_컴포넌트.html</p>
+  </footer>
+
+  <script>
+  // ───────── 01 공통 규칙 ─────────
+  const RULES = [
+    ['주소', '모두 /api 아래, JSON으로', '요청과 응답 몸통은 JSON(UTF-8)입니다. 개발 중 주소는 http://localhost:8000/api, 문서는 FastAPI가 만드는 /docs에서도 볼 수 있습니다.', 'st-done'],
+    ['로그인', '토큰 하나로 사람을 알아봄', '로그인(G) · 학생 참여(F)에 성공하면 token을 받습니다. 그 뒤 모든 요청 머리에 Bearer 토큰을 붙이고, 서버는 토큰으로 users.role을 보고 권한을 판단합니다. 토큰 기한은 14일 (임시).', 'st-done'],
+    ['시간', 'UTC ISO 글자', 'DB와 같이 2026-10-12T12:58:14Z 모양으로 주고받습니다. “어제 오후 9:58” 같은 표시는 프론트가 바꿉니다.', 'st-done'],
+    ['원문', '원문 글자는 필요한 API에서만', '학부모 원문(original_text)은 ‘원문’이 이름에 들어간 API와 긴급 상세에서만 내려갑니다. 내려줄 때마다 서버가 original_views에 한 줄 남깁니다. 다른 API는 가린 형태(segments)만 줍니다.', 'st-hold'],
+    ['새 소식', '실시간 연결 없이 다시 묻기', '웹소켓은 쓰지 않습니다 (임시). 메시지함 · 알림 · 톡방은 화면이 열려 있는 동안 10초마다 다시 부릅니다. 톡방은 after_id로 새 것만 받습니다.', 'st-temp'],
+    ['목록', '길면 끊어서', '목록 API는 limit(기본 30) · before_id로 끊어 받습니다. 응답의 next_before_id가 null이면 끝입니다.', 'st-wait'],
+  ];
+  document.getElementById('rule-list').innerHTML = RULES.map((r, i) => `
+    <article class="reveal" style="--i:${i % 3}">
+      <div class="flex items-center gap-3 border-t-2 border-ink pt-4"><span class="fbadge w-8 h-8 text-sm">${i + 1}</span><span class="badge ${r[3]}">${r[0]}</span></div>
+      <h3 class="mt-4 text-xl font-black tracking-tight">${r[1]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${r[2]}</p>
+    </article>`).join('');
+
+  const J = (o) => JSON.stringify(o, null, 2);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  document.getElementById('err-shape').textContent = J({ error: { code: 'CODE_EXPIRED', message: 'join code expired at 2026-11-03T04:20:00Z' } });
+
+  const ROLES = [
+    ['parent', 'G 로그인 · 가입', '공통 · 학부모 · 알림'],
+    ['teacher', 'G 로그인', '공통 · 교사 메시지 · 반 톡방 · 알림 · 원문 열람 기록(내 반 메시지만)'],
+    ['admin', 'G 로그인', '공통 · 관리자 · 알림 · 원문 열람 기록(우리 학교)'],
+    ['student', 'F 반 톡방 참여', '반 톡방(내가 들어간 반만)'],
+  ];
+  document.getElementById('role-rows').innerHTML = ROLES.map((r) => `<tr><td class="px-5 py-3"><code class="k">${r[0]}</code></td><td class="px-5 py-3 text-[#5a564f]">${r[1]}</td><td class="px-5 py-3 text-[#5a564f]">${r[2]}</td></tr>`).join('');
+
+  // ───────── API 정의 (목록 · 상세 · 화면표 모두 여기서) ─────────
+  // { id, g(묶음), m, p, who, scr, own, sum, req, res, err, db: [읽기, 쓰기], notes }
+  const GROUPS = {
+    auth: ['G', '로그인 · 가입', '학부모 · 교사 · 관리자'],
+    parent: ['A', '학부모', '선생님 고르기 · 보내기 · 대화 보기'],
+    teacher: ['C', '교사 메시지', '메시지함 · 상세 · 원문 · 답장'],
+    admin: ['D', '관리자', '위협 사건 · 대응 기록 · 되돌리기'],
+    room: ['E · F', '반 톡방', '반 만들기 · 참여 코드 · 학생 참여 · 대화'],
+    common: ['공통', '알림 · 열람 기록', '모든 어른'],
+  };
+  const MSG_ITEM = { id: 41, child_name: '민서', category: 'normal', analysis_status: 'done', summary: '자리를 내일까지 바꿔 달라는 요청이에요.', msg_type: 'seating', due_date: '2026-10-14', masked_count: 2, received_at: '2026-10-12T12:42:00Z', teacher_state: 'new' };
+  const API = [
+    // G 로그인 · 가입
+    { id: 'G-1', g: 'auth', m: 'POST', p: '/api/auth/login', who: '어른', scr: 'G1', own: '백엔드 B', sum: '아이디 · 비밀번호로 로그인',
+      req: { login_id: 'minseo_mom', password: '********' },
+      res: { token: 'eyJhbGciOi…', user: { id: 7, role: 'parent', name: '박지영', school_id: 1 } },
+      err: ['WRONG_CREDENTIALS', 'VALIDATION'], db: ['users', '—'],
+      notes: ['학생은 이 API를 쓰지 않습니다 (login_id가 없음). 학생은 F-1 반 톡방 참여.', 'role에 따라 프론트가 첫 화면을 고릅니다: parent → A0, teacher → C1, admin → D1.'] },
+    { id: 'G-2', g: 'auth', m: 'GET', p: '/api/schools?q=해오름', who: '누구나', scr: 'G2', own: '백엔드 B', sum: '학교 이름 검색 (로그인 전)',
+      req: null,
+      res: { schools: [{ id: 1, name: '해오름초등학교' }, { id: 2, name: '해오름중학교' }] },
+      err: ['VALIDATION'], db: ['schools', '—'],
+      notes: ['q는 두 글자 이상. 이름에 q가 들어간 학교를 최대 20개.', '토큰 없이 부를 수 있는 API는 G-1 · G-2 · G-3 · F-1 넷뿐입니다.'] },
+    { id: 'G-3', g: 'auth', m: 'POST', p: '/api/auth/signup', who: '누구나', scr: 'G2', own: '백엔드 B', sum: '학부모 가입',
+      req: { school_id: 1, name: '박지영', login_id: 'minseo_mom', password: '********' },
+      res: { token: 'eyJhbGciOi…', user: { id: 7, role: 'parent', name: '박지영', school_id: 1 } },
+      err: ['LOGIN_ID_TAKEN', 'NOT_FOUND', 'VALIDATION'], db: ['schools', 'users'], status: 201,
+      notes: ['가입은 학부모만. 교사 · 관리자 계정은 학교가 만듭니다 (임시: 처음엔 SQL로 넣기).', '비밀번호는 8자 이상. 서버는 bcrypt 해시만 저장합니다.'] },
+    { id: 'G-4', g: 'auth', m: 'GET', p: '/api/me', who: '모두', scr: '앱 시작', own: '백엔드 B', sum: '토큰 주인 확인',
+      req: null,
+      res: { user: { id: 7, role: 'parent', name: '박지영', school_id: 1, school_name: '해오름초등학교' } },
+      err: ['UNAUTHORIZED'], db: ['users · schools', '—'],
+      notes: ['앱을 다시 열 때 저장해 둔 토큰이 아직 쓸 수 있는지 확인합니다. 401이면 로그인 화면으로.'] },
+    { id: 'G-5', g: 'auth', m: 'POST', p: '/api/auth/logout', who: '모두', scr: '설정', own: '백엔드 B', sum: '로그아웃 (토큰 끊기)',
+      req: null, res: null, status: 204,
+      err: ['UNAUTHORIZED'], db: ['—', '—'],
+      notes: ['서버가 토큰을 막는 목록에 넣습니다. 프론트는 저장해 둔 토큰을 지웁니다.'] },
+
+    // A 학부모
+    { id: 'A-1', g: 'parent', m: 'GET', p: '/api/parent/teachers', who: '학부모', scr: 'A0', own: '백엔드 B', sum: '선생님 목록 (우리 학교 반 · 담임)',
+      req: null,
+      res: { mine: [{ class_id: 3, grade: 3, class_no: 2, teacher_name: '김하늘', child_name: '민서', last_at: '2026-10-12T12:42:00Z' }],
+             others: [{ class_id: 2, grade: 3, class_no: 1, teacher_name: '이도윤' }, { class_id: 4, grade: 3, class_no: 3, teacher_name: '정유나' }] },
+      err: ['FORBIDDEN'], db: ['classes · users · class_members · messages', '—'],
+      notes: ['mine = 이 학부모가 class_members에 parent로 들어 있는 반. others = 같은 학교 올해 나머지 반.'] },
+    { id: 'A-2', g: 'parent', m: 'POST', p: '/api/parent/classes/{class_id}/link', who: '학부모', scr: 'A0', own: '백엔드 B', sum: '처음 고른 담임과 잇기 (자녀 이름)',
+      req: { child_name: '민서' },
+      res: { class_id: 3, child_name: '민서' }, status: 201,
+      err: ['ALREADY_LINKED', 'NOT_FOUND', 'VALIDATION'], db: ['classes', 'class_members'],
+      notes: ['others에서 고르면 먼저 이 API로 잇고, 그다음 A1 대화로 갑니다.', '같은 반에 자녀가 둘이면 (임시) 이름을 “민서 · 민준”처럼 한 칸에 적습니다.'] },
+    { id: 'A-3', g: 'parent', m: 'GET', p: '/api/parent/classes/{class_id}/conversation', who: '학부모', scr: 'A1 · A5', own: '백엔드 B', sum: '담임과의 대화 (내 메시지 + 답장)',
+      req: null,
+      res: { teacher_name: '김하늘', items: [
+        { kind: 'message', id: 41, text: '선생님, 민서가 짝이랑 잘 맞지 않아서…', msg_type: 'seating', due_date: '2026-10-14', used_suggestion: true, at: '2026-10-12T12:42:00Z' },
+        { kind: 'reply', id: 9, text: '내일 아침에 자리를 바꿔 볼게요.', at: '2026-10-12T23:10:00Z' }], next_before_id: null },
+      err: ['NOT_LINKED'], db: ['messages · replies', '—'],
+      notes: ['학부모는 자기가 보낸 원문을 그대로 봅니다 (열람 기록 안 남김).', '“제안 문장으로 보냄” 표시는 used_suggestion이 true일 때만. 분류(category) · 위협 여부는 학부모에게 주지 않습니다.'] },
+    { id: 'A-4', g: 'parent', m: 'POST', p: '/api/parent/precheck', who: '학부모', scr: 'A2 · A3', own: '백엔드 A · B', sum: '보내기 전 표현 검사 (저장 안 함)',
+      req: { text: '선생님, 애들 하나 제대로 못 보세요? …' },
+      res: { rough: true, spans: [{ start: 5, end: 21 }, { start: 52, end: 70 }], suggestions: ['선생님, 민서가 짝이랑 잘 맞지 않아서 요즘 매일 울면서 집에 와요. 내일까지 자리를 바꿔 주실 수 있을까요?', '민서 자리 문제로 연락드려요. …'], keeps: ['자리 바꾸기', '내일까지'] },
+      err: ['AI_TIMEOUT', 'VALIDATION'], db: ['—', '—'],
+      notes: ['결과도, 경고를 무시했는지도 저장하지 않습니다 (10.16 결정).', '프론트는 5초 안에 답이 없으면 기다리지 않고 바로 A-5로 보냅니다. 서버도 5초를 넘기면 AI_TIMEOUT.', 'rough가 false면 경고 시트 없이 바로 A-5.'] },
+    { id: 'A-5', g: 'parent', m: 'POST', p: '/api/parent/messages', who: '학부모', scr: 'A3 · A4 · A5', own: '백엔드 B', sum: '메시지 보내기 (원문 저장 → 분석 시작)',
+      req: { class_id: 3, text: '선생님, 민서가 짝이랑 잘 맞지 않아서…', msg_type: 'seating', due_date: '2026-10-14', used_suggestion: true },
+      res: { id: 41, received_at: '2026-10-12T12:42:00Z', analysis_status: 'pending' }, status: 201,
+      err: ['NOT_LINKED', 'VALIDATION'], db: ['class_members', 'messages · notifications'],
+      notes: ['순서: ① 원문 · 서버 시간 · 지문(SHA-256) 저장 → ② 201 응답 → ③ 뒤에서 AI 분석(05절). 분석을 기다리지 않습니다.', 'msg_type은 counsel · absence · seating · study · life · other 중 하나 (필수). due_date는 YYYY-MM-DD (선택).', 'teacher_id는 서버가 classes.teacher_id에서 채웁니다.'] },
+
+    // C 교사
+    { id: 'C-1', g: 'teacher', m: 'GET', p: '/api/teacher/inbox?filter=todo', who: '교사', scr: 'C1 · C2 · C3', own: '백엔드 B', sum: '메시지함 (필터 · 긴급 고정)',
+      req: null,
+      res: { counts: { todo: 3, notice: 1, school: 1 }, masked_since_last_visit: 5,
+             urgent: [{ id: 44, child_name: '하윤', urgent_type: 'school_violence', preview: '선생님, 하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고…', received_at: '2026-10-12T22:50:00Z' }],
+             items: [MSG_ITEM, { id: 45, child_name: '도윤', category: null, analysis_status: 'failed', received_at: '2026-10-12T23:40:00Z', teacher_state: 'new' }],
+             next_before_id: null },
+      err: ['FORBIDDEN'], db: ['messages · analyses · threat_cases', '—'],
+      notes: ['filter: todo(답장할 것) · notice(알림) · school(학교). 숫자는 필터와 상관없이 셋 다 줍니다.', 'urgent는 필터와 상관없이 항상 맨 위. teacher_state가 replied가 되면 빠집니다 (11.02).', 'school 필터 항목에는 case_status(new · handled · returned)와 label “공격적 표현”이 붙습니다.', 'preview는 긴급 원문 앞 40자. 긴급은 원문을 바로 보여 주는 규칙이라 여기서는 기록하지 않고, 상세(C-2)를 열 때 기록합니다.', 'masked_since_last_visit = 마지막으로 메시지함을 연 뒤 가린 곳 수 (C1 쿠션이 인사).'] },
+    { id: 'C-2', g: 'teacher', m: 'GET', p: '/api/teacher/messages/{id}', who: '교사', scr: 'C4 · C6 · C7 · C8', own: '백엔드 B', sum: '메시지 상세 (요약 먼저)',
+      req: null,
+      res: { id: 41, child_name: '민서', grade: 3, class_no: 2, received_at: '2026-10-12T12:42:00Z', category: 'normal', analysis_status: 'done',
+             msg_type: 'seating', due_date: '2026-10-14', summary: '짝과 맞지 않아 매일 우는 아이의 자리를 바꿔 달라는 요청이에요!', requests: ['자리 바꾸기'],
+             masked_count: 2, segments: [{ t: '선생님, ' }, { mask: 1 }, { t: ' 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. ' }, { mask: 2 }, { t: ' 내일까지 자리 바꿔 주세요.' }],
+             original_text: null, case: null, replies: [] },
+      err: ['NOT_FOUND', 'FORBIDDEN'], db: ['messages · analyses · threat_cases · replies', 'messages · original_views'],
+      notes: ['처음 열면 teacher_state = read, read_at을 채웁니다.', 'segments: 가린 곳은 {mask: 번호}로만 오고 글자는 오지 않습니다 → 얼굴 스티커 ①②.', '긴급(C6): segments 대신 original_text가 오고 original_views(via = urgent_detail)에 기록.', '위협(C7): case = { status, label: "공격적 표현" }. 원문은 C-3으로.', '분석 실패(C8): summary · segments 없음. 펼치면 C-3(via = failed_expand).'] },
+    { id: 'C-3', g: 'teacher', m: 'POST', p: '/api/teacher/messages/{id}/original', who: '교사', scr: 'C5 · C7 · C8', own: '백엔드 B', sum: '원문 받기 (열람 기록 남음)',
+      req: { via: 'teacher_sheet' },
+      res: { original_text: '선생님, 애들 하나 제대로 못 보세요? …', received_at: '2026-10-12T12:42:00Z', rough_spans: [{ start: 5, end: 21 }, { start: 52, end: 70 }] },
+      err: ['NOT_FOUND', 'FORBIDDEN', 'VALIDATION'], db: ['messages · analyses', 'original_views'],
+      notes: ['via: teacher_sheet(원문 시트 · 위협 [원문 보기]) · failed_expand(분석 실패 펼치기).', '기록을 남기는 일이라 GET이 아니라 POST입니다. 시트를 열 때마다 부릅니다.', 'rough_spans는 원문 시트의 물결 밑줄 자리 (masked_spans와 같은 값).'] },
+    { id: 'C-4', g: 'teacher', m: 'POST', p: '/api/teacher/messages/{id}/replies', who: '교사', scr: 'C4 · C6 · C7', own: '백엔드 B', sum: '답장 보내기 (AI 검사 없음)',
+      req: { body: '내일 아침에 자리를 바꿔 볼게요.' },
+      res: { id: 9, sent_at: '2026-10-12T23:10:00Z' }, status: 201,
+      err: ['NOT_FOUND', 'FORBIDDEN', 'VALIDATION'], db: ['messages', 'replies · messages · notifications'],
+      notes: ['teacher_state = replied → 긴급이면 메시지함 맨 위에서 내려갑니다.', '위협 메시지에도 답장할 수 있습니다 (11.02).', '학부모에게 reply 알림을 만듭니다.'] },
+
+    // D 관리자
+    { id: 'D-1', g: 'admin', m: 'GET', p: '/api/admin/cases?status=new', who: '관리자', scr: 'D1 · D3', own: '풀스택', sum: '위협 알림 목록',
+      req: null,
+      res: { counts: { new: 1, handled: 3 }, cases: [{ id: 5, message_id: 46, status: 'new', label: '공격적 표현', child_name: '민서', grade: 3, class_no: 2, teacher_name: '김하늘', opened_at: '2026-10-12T12:58:14Z', last_action: null }], next_before_id: null },
+      err: ['FORBIDDEN'], db: ['threat_cases · messages · case_actions', '—'],
+      notes: ['status: new(새 알림) · handled(처리 완료). returned는 handled 목록에 같이 나옵니다 (임시).', '관리자 학교(users.school_id)의 사건만.'] },
+    { id: 'D-2', g: 'admin', m: 'GET', p: '/api/admin/cases/{id}', who: '관리자', scr: 'D2', own: '풀스택', sum: '위협 상세 · 증거 (열람 기록 남음)',
+      req: null,
+      res: { id: 5, status: 'new', original_text: '답장도 없으시네요. 내일 아침에 교실로 직접 찾아갈 테니 각오하고 계세요.', received_at: '2026-10-12T12:58:14Z',
+             original_hash: '9f2c…e41a', hash_ok: true, threat_reason: '학교로 찾아오겠다는 말과 ‘각오하라’는 말이 함께 있어요.', rough_spans: [{ start: 11, end: 40 }],
+             actions: [{ id: 2, action_type: 'meeting', memo: '10.13 오전 면담', admin_name: '교감', created_at: '2026-10-13T00:10:00Z' }] },
+      err: ['NOT_FOUND', 'FORBIDDEN'], db: ['threat_cases · messages · analyses · case_actions', 'original_views'],
+      notes: ['열 때마다 original_views(via = admin_evidence)에 기록.', 'hash_ok: 서버가 SHA-256(원문 + 받은 시간)을 다시 계산해 저장값과 같으면 true. 원문이 바뀌지 않았다는 증거.'] },
+    { id: 'D-3', g: 'admin', m: 'POST', p: '/api/admin/cases/{id}/actions', who: '관리자', scr: 'D2 → D3', own: '풀스택', sum: '대응 기록 남기기 (덧붙이기만)',
+      req: { action_type: 'meeting', memo: '10.13 오전 면담' },
+      res: { id: 2, case_status: 'handled', created_at: '2026-10-13T00:10:00Z' }, status: 201,
+      err: ['NOT_FOUND', 'FORBIDDEN', 'VALIDATION'], db: ['threat_cases', 'case_actions · threat_cases · notifications'],
+      notes: ['action_type: meeting · report_office · report_police · other. (return_normal은 D-4만 씁니다.)', '첫 기록이면 status = handled, closed_at을 채웁니다. 담임에게 case_update 알림.', '기록은 고치거나 지울 수 없습니다 (11.02). 고치는 API는 없습니다.'] },
+    { id: 'D-4', g: 'admin', m: 'POST', p: '/api/admin/cases/{id}/return', who: '관리자', scr: 'D2', own: '풀스택', sum: '일반 메시지로 되돌리기',
+      req: { memo: '단순 항의로 판단' },
+      res: { case_status: 'returned', message_category: 'normal' },
+      err: ['NOT_FOUND', 'FORBIDDEN', 'ALREADY_CLOSED'], db: ['threat_cases', 'threat_cases · case_actions · messages · notifications'],
+      notes: ['한 번에: status = returned, case_actions에 return_normal 한 줄, messages.category = normal, 담임에게 case_update 알림.', 'analyses.ai_category는 그대로 남습니다 (AI가 처음 본 분류).'] },
+
+    // E · F 반 톡방
+    { id: 'E-1', g: 'room', m: 'GET', p: '/api/teacher/rooms', who: '교사', scr: 'E1', own: '백엔드 B', sum: '내 반 톡방 목록',
+      req: null,
+      res: { rooms: [{ class_id: 2, grade: 3, class_no: 1, student_count: 24, last_at: '2026-11-02T04:12:00Z' }] },
+      err: ['FORBIDDEN'], db: ['classes · class_members · room_messages', '—'], notes: ['담임(classes.teacher_id)인 반만.'] },
+    { id: 'E-2', g: 'room', m: 'POST', p: '/api/teacher/rooms', who: '교사', scr: 'E1 → E2 · E3', own: '백엔드 B', sum: '반 톡방 열기 (없으면 만들기)',
+      req: { grade: 3, class_no: 1 },
+      res: { class_id: 2, created: true, join_code: { code: 'QK7M29', expires_at: '2026-11-03T04:20:00Z' } }, status: '201 · 200',
+      err: ['CLASS_TAKEN', 'VALIDATION'], db: ['classes', 'classes · join_codes'],
+      notes: ['이미 있는 내 반이면 200 + created: false (join_code 없음) → E3로.', '새로 만들면 201 + 첫 참여 코드 → E2 시트.', '같은 학년 · 반을 다른 교사가 이미 맡았으면 CLASS_TAKEN.'] },
+    { id: 'E-3', g: 'room', m: 'GET', p: '/api/teacher/rooms/{class_id}/join-code', who: '교사', scr: 'E4', own: '백엔드 B', sum: '지금 참여 코드 다시 보기',
+      req: null,
+      res: { code: 'QK7M29', issued_at: '2026-11-02T04:20:00Z', expires_at: '2026-11-03T04:20:00Z', expired: false },
+      err: ['NOT_FOUND', 'FORBIDDEN'], db: ['join_codes', '—'],
+      notes: ['남은 시간(17시간 42분)은 프론트가 expires_at - 지금으로 셉니다.', '하루가 지나 expired: true면 시트에서 [새 코드 받기]를 강조합니다.'] },
+    { id: 'E-4', g: 'room', m: 'POST', p: '/api/teacher/rooms/{class_id}/join-code', who: '교사', scr: 'E4', own: '백엔드 B', sum: '새 코드 받기 (이전 코드 막기)',
+      req: null,
+      res: { code: 'H4P9XA', issued_at: '2026-11-02T13:38:00Z', expires_at: '2026-11-03T13:38:00Z', expired: false }, status: 201,
+      err: ['NOT_FOUND', 'FORBIDDEN'], db: ['join_codes', 'join_codes'],
+      notes: ['한 트랜잭션: 살아 있는 코드의 revoked_at 채우기 → 새 행. 이미 들어온 학생은 그대로.', '코드 글자는 한 번 쓴 것을 다시 쓰지 않습니다 (영문 대문자 · 숫자 6자리, 헷갈리는 0 · O · 1 · I 제외).'] },
+    { id: 'F-1', g: 'room', m: 'POST', p: '/api/rooms/join', who: '학생', scr: 'F1 · F2', own: '백엔드 B', sum: '참여 코드 + 이름으로 들어오기',
+      req: { code: 'QK7M29', name: '김서준' },
+      res: { token: 'eyJhbGciOi…', user: { id: 31, role: 'student', name: '김서준' }, class_id: 2, rejoined: false },
+      err: ['CODE_NOT_FOUND', 'CODE_EXPIRED', 'VALIDATION'], db: ['join_codes · class_members · users', 'users · class_members'],
+      notes: ['코드 글자로 찾아 없으면 CODE_NOT_FOUND(틀림). 있는데 revoked_at이 있거나 기한이 지났으면 CODE_EXPIRED(만료).', '같은 반에 같은 이름 학생이 있으면 그 학생 토큰을 줍니다 (rejoined: true, 11.02). 없으면 users · class_members 새로.', '코드 띄어쓰기(“QK7 M29”)는 서버가 지우고 대문자로 바꿔 비교합니다.'] },
+    { id: 'F-2', g: 'room', m: 'GET', p: '/api/rooms/{class_id}/messages?after_id=120', who: '교사 · 학생', scr: 'E3 · F3', own: '백엔드 B', sum: '톡방 대화 받기',
+      req: null,
+      res: { class_name: '3학년 1반', member_count: 24, messages: [{ id: 121, sender_id: 31, sender_name: '김서준', sender_role: 'student', body: '선생님, 도시락 챙겨 가야 하나요?', sent_at: '2026-11-02T04:13:00Z' }] },
+      err: ['FORBIDDEN', 'NOT_FOUND'], db: ['room_messages · class_members · users', '—'],
+      notes: ['after_id가 없으면 최근 50개. 있으면 그보다 새 것만 (10초마다).', '그 반 담임과 그 반 학생만 부를 수 있습니다.'] },
+    { id: 'F-3', g: 'room', m: 'POST', p: '/api/rooms/{class_id}/messages', who: '교사 · 학생', scr: 'E3 · F3', own: '백엔드 B', sum: '톡방에 말하기 (AI 검사 없음)',
+      req: { body: '네, 도시락과 물을 챙겨 오세요.' },
+      res: { id: 122, sent_at: '2026-11-02T04:14:00Z' }, status: 201,
+      err: ['FORBIDDEN', 'VALIDATION'], db: ['class_members', 'room_messages'],
+      notes: ['교사 · 학생 메시지 모두 AI를 거치지 않습니다 (10.16).'] },
+
+    // 공통
+    { id: 'N-1', g: 'common', m: 'GET', p: '/api/notifications?unread=1', who: '어른', scr: '알림 · 탭 배지', own: '백엔드 B', sum: '내 알림',
+      req: null,
+      res: { unread_count: 2, notifications: [{ id: 80, kind: 'reply', ref_type: 'reply', ref_id: 9, message_id: 41, created_at: '2026-10-12T23:10:00Z', read_at: null }] },
+      err: ['UNAUTHORIZED'], db: ['notifications', '—'],
+      notes: ['kind: new_message · urgent · threat(관리자) · case_update(담임) · reply(학부모).', '프론트는 kind와 ref로 갈 화면을 고릅니다. 문구는 프론트가 만듭니다.'] },
+    { id: 'N-2', g: 'common', m: 'POST', p: '/api/notifications/read', who: '어른', scr: '알림', own: '백엔드 B', sum: '알림 읽음 표시',
+      req: { ids: [80, 81] }, res: { updated: 2 },
+      err: ['VALIDATION'], db: ['notifications', 'notifications'],
+      notes: ['ids를 빼면 내 알림 전부 읽음.'] },
+    { id: 'N-3', g: 'common', m: 'GET', p: '/api/messages/{id}/views', who: '교사 · 관리자', scr: 'D2 (임시)', own: '풀스택', sum: '원문 열람 기록 보기',
+      req: null,
+      res: { views: [{ viewer_name: '김하늘', viewer_role: 'teacher', via: 'teacher_sheet', viewed_at: '2026-10-12T23:05:00Z' }, { viewer_name: '교감', viewer_role: 'admin', via: 'admin_evidence', viewed_at: '2026-10-13T00:02:00Z' }] },
+      err: ['FORBIDDEN', 'NOT_FOUND'], db: ['original_views · users', '—'],
+      notes: ['관리자(우리 학교) · 그 메시지의 담임만 (11.02).', '이 기록을 보여 줄 화면은 아직 와이어에 없습니다 (07 미정).'] },
+  ];
+  document.getElementById('api-count').textContent = API.length;
+
+  // ───────── 02 목록 ─────────
+  const mBadge = (m) => `<span class="m m-${m}">${m}</span>`;
+  document.getElementById('list-rows').innerHTML = Object.entries(GROUPS).map(([k, g]) => {
+    const rows = API.filter((a) => a.g === k);
+    return `<tr class="border-t-2 border-ink bg-[#faf9f6]"><td colspan="7" class="px-5 py-2.5"><span class="inline-flex items-center gap-2"><span class="fbadge ${g[0].length > 1 ? 'px-2 h-7 rounded-full text-xs' : 'w-7 h-7 text-xs'}">${g[0]}</span><b>${g[1]}</b><span class="text-sm text-mute">${g[2]} · ${rows.length}개</span></span></td></tr>`
+      + rows.map((a) => `<tr class="border-t border-line hover:bg-[#faf9f6]">
+        <td class="px-5 py-3"><a href="#api-${a.id}" class="font-bold hover:underline underline-offset-4">${a.id}</a></td>
+        <td class="px-5 py-3">${mBadge(a.m)}</td>
+        <td class="px-5 py-3"><code class="k">${esc(a.p)}</code></td>
+        <td class="px-5 py-3 text-[#5a564f]">${a.sum}</td>
+        <td class="px-5 py-3 text-[#5a564f] text-sm">${a.who}</td>
+        <td class="px-5 py-3 text-[#5a564f] text-sm">${a.scr}</td>
+        <td class="px-5 py-3 text-[#5a564f] text-sm whitespace-nowrap">${a.own}</td></tr>`).join('');
+  }).join('');
+
+  // ───────── 03 상세 ─────────
+  const box = (label, body) => `<div class="codebox min-w-0"><span class="lb">${label}</span><pre>${esc(body)}</pre></div>`;
+  document.getElementById('detail-list').innerHTML = Object.entries(GROUPS).map(([k, g]) => `
+    <div>
+      <p class="reveal flex items-center gap-3 keep"><span class="fbadge ${g[0].length > 1 ? 'px-2.5 h-8 rounded-full text-xs' : 'w-8 h-8 text-sm'}">${g[0]}</span><span class="text-xl font-black tracking-tight">${g[1]}</span><span class="text-sm text-mute">${g[2]}</span></p>
+      <div class="mt-4 space-y-3">${API.filter((a) => a.g === k).map((a) => `
+        <details id="api-${a.id}" class="reveal card rounded-2xl overflow-hidden keep">
+          <summary class="px-5 py-4 flex flex-wrap items-center gap-x-3 gap-y-2 hover:bg-[#faf9f6]">
+            <span class="text-sm font-bold text-mute w-10">${a.id}</span>${mBadge(a.m)}
+            <span class="path">${esc(a.p)}</span>
+            <span class="text-[15px] text-[#5a564f]">${a.sum}</span>
+            <span class="ml-auto flex items-center gap-2 text-sm text-mute"><span class="chip rounded-md px-2 py-0.5 font-semibold">${a.who}</span><span class="chev">›</span></span>
+          </summary>
+          <div class="px-5 pb-5 pt-1 border-t border-line">
+            <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-[#5a564f]">
+              <span><b class="text-ink">화면</b> ${a.scr}</span><span><b class="text-ink">담당</b> ${a.own}</span>
+              <span><b class="text-ink">성공</b> ${a.status || 200}</span>
+              <span><b class="text-ink">DB 읽기</b> ${a.db[0]}</span><span><b class="text-ink">DB 쓰기</b> ${a.db[1]}</span>
+            </div>
+            <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+              ${box('요청 몸통', a.req ? J(a.req) : '없음')}
+              ${box(`응답 ${a.status || 200}`, a.res ? J(a.res) : '몸통 없음')}
+            </div>
+            <ul class="mt-4 text-[14px] leading-relaxed space-y-1.5">${a.notes.map((n) => `<li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>${n}</span></li>`).join('')}</ul>
+            <p class="mt-3 flex flex-wrap gap-1.5 items-center text-sm"><b class="mr-1">오류</b>${a.err.map((e) => `<a href="#err-${e}" class="badge st-hold hover:underline">${e}</a>`).join('')}</p>
+          </div>
+        </details>`).join('')}
+      </div>
+    </div>`).join('');
+  const details = () => document.querySelectorAll('#detail-list details');
+  document.getElementById('open-all').onclick = () => details().forEach((d) => { d.open = true; });
+  document.getElementById('close-all').onclick = () => details().forEach((d) => { d.open = false; });
+  document.querySelectorAll('a[href^="#api-"]').forEach((l) => l.addEventListener('click', () => { const d = document.querySelector(l.getAttribute('href')); if (d) d.open = true; }));
+
+  // ───────── 04 오류 코드 ─────────
+  const ERRORS = [
+    ['VALIDATION', 422, '필수 값이 없거나 모양이 틀림 (FastAPI 기본 검사 포함)', '입력한 내용을 다시 확인해 주세요.'],
+    ['UNAUTHORIZED', 401, '토큰이 없거나 기한이 지남', '(로그인 화면으로 이동)'],
+    ['WRONG_CREDENTIALS', 401, '아이디나 비밀번호가 틀림', '아이디 또는 비밀번호가 맞지 않아요.'],
+    ['FORBIDDEN', 403, '역할이 맞지 않거나 내 반 · 내 학교 것이 아님', '볼 수 없는 내용이에요.'],
+    ['NOT_FOUND', 404, '해당 번호의 메시지 · 사건 · 반 · 학교가 없음', '찾을 수 없어요.'],
+    ['LOGIN_ID_TAKEN', 409, '가입할 때 아이디가 이미 있음', '이미 쓰고 있는 아이디예요.'],
+    ['ALREADY_LINKED', 409, '이미 이은 담임을 다시 이으려 함', '(그대로 대화로 이동)'],
+    ['NOT_LINKED', 403, '잇지 않은 반에 보내거나 대화를 보려 함', '선생님 목록에서 먼저 선생님을 골라 주세요.'],
+    ['CLASS_TAKEN', 409, '다른 교사가 이미 맡은 학년 · 반', '이미 다른 선생님이 연 반이에요.'],
+    ['ALREADY_CLOSED', 409, '되돌린 사건을 다시 되돌리려 함', '이미 처리된 알림이에요.'],
+    ['CODE_NOT_FOUND', 404, '참여 코드 글자가 없음 (틀림)', '코드가 맞지 않아요.'],
+    ['CODE_EXPIRED', 410, '막힌 코드이거나 하루가 지남 (만료)', '코드가 만료됐어요. 선생님께 새 코드를 받아 주세요.'],
+    ['AI_TIMEOUT', 504, '보내기 전 검사가 5초를 넘김', '(경고 없이 그대로 보냄)'],
+  ];
+  document.getElementById('error-rows').innerHTML = ERRORS.map((e) => `<tr id="err-${e[0]}"><td class="px-5 py-3"><code class="k">${e[0]}</code></td><td class="px-5 py-3 font-bold">${e[1]}</td><td class="px-5 py-3 text-[#5a564f]">${e[2]}</td><td class="px-5 py-3 text-[#5a564f]">${e[3]}</td></tr>`).join('');
+
+  // ───────── 05 AI 계약 ─────────
+  const AI = [
+    { t: 'precheck(text) → 보내기 전 검사', who: 'A-4에서 부름 · 5초 안에 끝나야 함',
+      code: `def precheck(text: str) -> dict:
+    # 돌려주는 모양 (A-4 응답 그대로)
+    return {
+        "rough": True,                       # 거친 표현이 있나
+        "spans": [{"start": 5, "end": 21}],  # 원문 글자 위치 (끝은 포함 안 함)
+        "suggestions": ["순한 문장 1", "순한 문장 2"],  # 1~2개
+        "keeps": ["자리 바꾸기", "내일까지"],   # 그대로 전해지는 요청
+    }`,
+      notes: ['아무것도 저장하지 않습니다.', '키워드 필터로 먼저 거르고, 걸리면 LLM으로 제안 문장을 만듭니다 (README의 ai/ 순서).'] },
+    { t: 'analyze(original_text) → 서버 분석', who: 'A-5 저장 뒤 뒤에서 (FastAPI BackgroundTasks)',
+      code: `def analyze(original_text: str) -> dict:
+    return {
+        "category": "normal",          # urgent · threat · normal
+        "urgent_type": None,           # school_violence · child_abuse · safety
+        "summary": "자리를 내일까지 바꿔 달라는 요청이에요.",
+        "requests": ["자리 바꾸기"],
+        "masked_spans": [{"start": 5, "end": 21}, {"start": 52, "end": 70}],
+        "threat_reason": None,         # threat일 때만
+        "model": "claude-sonnet-5-5",
+    }`,
+      notes: ['백엔드 B가 결과를 analyses에 넣고 messages.category · analysis_status = done으로 바꿉니다.', '5초 넘으면 1번 더. 또 실패하면 analysis_status = failed, analyses 행은 만들지 않습니다 (attempts 1 ~ 2).', '애매하면 threat. threat이면 threat_cases를 만들고 관리자에게 threat, 담임에게 new_message 알림. urgent면 담임에게 urgent 알림.', '긴급은 요약하더라도 화면에선 원문을 보여 줍니다. masked_spans는 비워 둡니다.', '이름 가림: LLM에 보내기 전에 학생 · 학부모 이름을 바꿔 보내고, 돌아온 요약에서 되돌립니다 (README의 ai/ 순서).'] },
+  ];
+  document.getElementById('ai-list').innerHTML = AI.map((x, i) => `
+    <article class="reveal card rounded-2xl p-5 md:p-6 keep" style="--i:${i}">
+      <p class="eyebrow text-[11px] font-bold text-mute">${x.who}</p>
+      <h3 class="mt-2 text-xl font-black tracking-tight"><code class="k" style="font-size:15px">${x.t}</code></h3>
+      <div class="mt-4">${box('파이썬 함수 모양', x.code)}</div>
+      <ul class="mt-4 text-[14px] leading-relaxed space-y-1.5">${x.notes.map((n) => `<li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>${n}</span></li>`).join('')}</ul>
+    </article>`).join('');
+
+  // ───────── 06 화면 → API ─────────
+  const SCR = [
+    ['G1', '로그인 · 입력', 'G-1', '앱을 열 때 저장된 토큰이 있으면 G-4로 확인하고 건너뜀.'],
+    ['G2', '학부모 가입 · 학교 검색', 'G-2 · G-3', '두 글자부터 검색. 가입하면 바로 A0.'],
+    ['A0', '선생님 목록', 'A-1 · A-2', 'others에서 고르면 A-2 (자녀 이름 시트) 뒤에 A1.'],
+    ['A1', '학부모 작성 · 처음', 'A-3', '유형 목록(6개)은 프론트에 고정. 서버에서 받지 않음.'],
+    ['A2', '보내기 전 검사 중', 'A-4', '5초 넘으면 A-5로 바로.'],
+    ['A3', '경고 시트', 'A-5', '[바꾼 문장으로 보내기] → used_suggestion: true. [그대로 보내기] → false.'],
+    ['A4', '직접 고치기', 'A-4', '다시 보내면 한 번 더 검사.'],
+    ['A5', '보낸 뒤', 'A-3', '보낸 직후 목록에 내 말풍선 추가. 답장은 10초마다 A-3.'],
+    ['C1 · C2 · C3', '교사 메시지함', 'C-1', 'filter = todo · notice · school. 0개면 C3 빈 화면.'],
+    ['C4', '상세 · 일반', 'C-2 · C-4', 'segments로 스티커 그리기.'],
+    ['C5', '원문 시트', 'C-3', 'via = teacher_sheet.'],
+    ['C6', '상세 · 긴급', 'C-2 · C-4', 'original_text가 바로 옴 (기록은 서버가).'],
+    ['C7', '상세 · 위협', 'C-2 · C-3 · C-4', '[원문 보기] = C-3 (teacher_sheet). case.status로 띠 문구.'],
+    ['C8', '상세 · 분석 실패', 'C-2 · C-3 · C-4', '[펼치기] = C-3 (failed_expand).'],
+    ['D1 · D3', '관리자 알림', 'D-1', 'status = new · handled.'],
+    ['D2', '위협 상세 · 대응 기록', 'D-2 · D-3 · D-4', '[기록 저장] = D-3, [일반 메시지로 되돌리기] = D-4.'],
+    ['E1', '반 톡방 목록', 'E-1 · E-2', '[열기] = E-2.'],
+    ['E2', '참여 코드 · 처음', 'E-2 응답', '따로 부르지 않음.'],
+    ['E3', '반 단체 톡방 · 교사', 'F-2 · F-3', '[참여 코드] → E4.'],
+    ['E4', '참여 코드 · 다시 보기', 'E-3 · E-4', '[새 코드 받기] = E-4.'],
+    ['F1 · F2', '톡방 참여', 'F-1', 'CODE_NOT_FOUND / CODE_EXPIRED로 F2 문구를 고름.'],
+    ['F3', '반 단체 톡방 · 학생', 'F-2 · F-3', '참여 코드 버튼 없음.'],
+    ['공통', '알림 · 탭 배지', 'N-1 · N-2', '10초마다 unread_count.'],
+  ];
+  document.getElementById('screen-rows').innerHTML = SCR.map((r) => `<tr><td class="px-5 py-3 font-bold text-mute">${r[0]}</td><td class="px-5 py-3 font-semibold">${r[1]}</td><td class="px-5 py-3">${r[2].split(' · ').map((x) => { const id = x.split(' ')[0]; return API.some((a) => a.id === id) ? `<a href="#api-${id}" class="badge st-doing hover:underline mr-1 mb-1">${x}</a>` : `<span class="badge st-wait mr-1 mb-1">${x}</span>`; }).join('')}</td><td class="px-5 py-3 text-[#5a564f]">${r[3]}</td></tr>`).join('');
+  document.querySelectorAll('#screen-rows a[href^="#api-"]').forEach((l) => l.addEventListener('click', () => { const d = document.querySelector(l.getAttribute('href')); if (d) d.open = true; }));
+
+  // ───────── 07 미정 ─────────
+  const OPENS = [
+    ['C', '메시지함 “알림” 필터에 무엇이 들어가나. 임시: 답장이 필요 없는 메시지 (분류 규칙 미정이라 지금은 0개).'],
+    ['G', '교사 · 관리자 계정을 누가 어떻게 만드나. 임시: 처음엔 SQL로 넣고, 관리자 화면은 나중에.'],
+    ['G', '학교 검색 결과의 지역 줄(“서울 마포구”). 와이어에는 있는데 schools에 칸이 없음 → 필요하면 schools.region 추가.'],
+    ['공통', '실시간 알림 방식. 임시: 10초마다 다시 묻기. 나중에 웹소켓 · 푸시를 쓸지.'],
+    ['D', '원문 열람 기록(N-3)을 보여 줄 화면. 지금은 API만 있음.'],
+    ['공통', '토큰 기한(임시 14일)과 학생 토큰 기한. 학생은 로그인이 없어 기한이 지나면 코드로 다시 들어와야 함.'],
+  ];
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 items-center py-4 border-b border-line" style="--i:${i % 2}">
+      ${o[0].length === 1 ? `<span class="fbadge w-9 h-9">${o[0]}</span>` : `<span class="w-9 h-9 grid place-items-center shrink-0 text-xs font-bold text-mute">${o[0]}</span>`}
+      <span class="text-[15px] font-semibold">${o[1]}</span>
+    </li>`).join('');
+
+  // ───────── 나타나기 ─────────
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

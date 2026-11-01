@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 시안 B2</title>
+  <meta name="description" content="쿠션톡 디자인 초안 B2 · 선명한 업무 데스크 다듬기 · 화면 3장과 공통 부품 세트">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] } } } }
+  </script>
+  <style>
+    :root {
+      /* B → B2: 차가운 회색을 덜 푸른 따뜻한 회색으로 (Linear 2026 리프레시 참고) */
+      --bg: #F3F3F1; --surface: #FFFFFF; --chip: #F0F0EE; --line: #E6E6E3;
+      --ink: #1A1C1E; --sub: #63666B; --faint: #8E9196;
+      --blue: #2F6BFF; --blue-deep: #1D4FD8; --blue-soft: #EBF0FF;
+      --red: #EB4A55; --red-soft: #FDEDEE;
+      --green: #12A06A; --green-soft: #E7F6EF;
+      --school: #5B6B82; --school-soft: #EEF1F5;
+      --redact: #2C2F33;
+      --r-row: 0px; --r-card: 18px; --r-control: 14px; --r-sheet: 24px;
+    }
+    body { background: #E8E8E5; color: var(--ink); }
+    .keep { word-break: keep-all; }
+    .num { font-variant-numeric: tabular-nums; }
+    iconify-icon { display: inline-block; vertical-align: middle; }
+
+    .t-display { font-size: 26px; font-weight: 700; letter-spacing: -.03em; line-height: 1.25; }
+    .t-title { font-size: 18px; font-weight: 700; letter-spacing: -.02em; line-height: 1.4; }
+    .t-body { font-size: 15px; font-weight: 500; line-height: 1.55; }
+    .t-small { font-size: 13px; font-weight: 600; line-height: 1.45; }
+    .t-cap { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--faint); }
+
+    .phone { width: 395px; height: 820px; border-radius: 54px; background: #121314; padding: 10px; box-shadow: 0 30px 60px -24px rgba(26, 28, 30, .45); flex: none; }
+    .screen { width: 375px; height: 800px; border-radius: 44px; overflow: hidden; position: relative; background: var(--surface); display: flex; flex-direction: column; word-break: keep-all; color: var(--ink); }
+    .status { height: 50px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 34px; font-size: 15px; font-weight: 600; position: relative; }
+    .island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; }
+
+    /* 공통 부품 */
+    .tag { display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 7px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--chip); color: var(--sub); }
+    .t-red { background: var(--red-soft); color: #C7313C; }
+    .t-blue { background: var(--blue-soft); color: var(--blue-deep); }
+    .t-green { background: var(--green-soft); color: #0B7F53; }
+    .t-school { background: var(--school-soft); color: var(--school); }
+    .t-due { background: var(--ink); color: #fff; }
+    .ai { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: var(--blue-deep); }
+    .split { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+    .split > div { padding: 8px 0 10px; text-align: center; position: relative; color: var(--faint); }
+    .split b { display: block; font-size: 22px; font-weight: 700; line-height: 1.1; letter-spacing: -.02em; }
+    .split span { font-size: 12px; font-weight: 600; }
+    .split .on { color: var(--ink); }
+    .split .on::after { content: ''; position: absolute; left: 24%; right: 24%; bottom: -1px; height: 2.5px; border-radius: 2px; background: var(--ink); }
+    .row { position: relative; display: flex; gap: 12px; padding: 14px 20px; background: var(--surface); }
+    .rows > .row + .row, .rows > .swipe + .row, .rows > .row + .swipe { border-top: 1px solid var(--line); }
+    .sq { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; background: var(--chip); color: var(--sub); }
+    .unread { width: 7px; height: 7px; border-radius: 99px; background: var(--blue); flex: none; }
+    .swipe { position: relative; overflow: hidden; }
+    .swipe .acts { position: absolute; right: 0; top: 0; bottom: 0; display: flex; }
+    .swipe .acts > div { width: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 700; color: #fff; }
+    .swipe .row { transform: translateX(-144px); box-shadow: 6px 0 12px -6px rgba(0,0,0,.15); }
+    .redact { display: inline-block; height: 1.05em; vertical-align: -0.14em; border-radius: 4px; background: var(--redact); margin: 0 2px; position: relative; }
+    .redact i { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); width: 15px; height: 15px; border-radius: 99px; background: #fff; color: var(--ink); font-style: normal; font-size: 10px; font-weight: 800; display: grid; place-items: center; }
+    .del { background: var(--red-soft); color: #C7313C; text-decoration: line-through; text-decoration-thickness: 1.5px; border-radius: 4px; padding: 0 2px; }
+    .ins { background: var(--blue-soft); color: var(--blue-deep); border-radius: 4px; padding: 0 2px; font-weight: 600; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 52px; border-radius: var(--r-control); font-size: 16px; font-weight: 700; }
+    .b-primary { background: var(--blue); color: #fff; }
+    .b-primary.pressed { background: var(--blue-deep); }
+    .b-secondary { background: var(--chip); color: var(--ink); }
+    .b-ghost { color: var(--sub); }
+    .b-disabled { background: var(--chip); color: #B9BBBE; }
+    .seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 11px; background: var(--chip); }
+    .seg > div { height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 13.5px; font-weight: 600; color: var(--sub); }
+    .seg .on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .input { display: flex; align-items: center; gap: 8px; }
+    .input .box { flex: 1; min-width: 0; height: 44px; border-radius: 12px; padding: 0 14px; display: flex; align-items: center; background: var(--chip); font-size: 15px; color: var(--faint); }
+    .send { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--blue); color: #fff; flex: none; }
+    .tabbar { height: 84px; flex: none; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); padding-top: 10px; background: var(--surface); }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--faint); }
+    .tab.on { color: var(--ink); }
+    .kv { display: grid; grid-template-columns: 22px 44px 1fr; gap: 9px 6px; align-items: center; font-size: 14px; }
+    .kv iconify-icon { color: var(--faint); }
+    .kv dt { color: var(--faint); font-weight: 600; }
+    .kv dd { margin: 0; font-weight: 600; }
+    .board { background: var(--surface); border-radius: 22px; padding: 24px; }
+    .board h3 { font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--sub); }
+    @media (max-width: 440px) { .phone { zoom: .86; } }
+    @media (max-width: 390px) { .phone { zoom: .8; } }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-[100dvh]">
+
+  <header class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pt-12 md:pt-16 pb-6 keep">
+    <p class="text-xs md:text-sm font-bold tracking-[.2em] text-[#63666B]">CUSHION TALK · DRAFT B2 · 26.10.16</p>
+    <div class="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 items-end">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1]">시안 B2<br><span class="text-[#2F6BFF]">선명한 업무 데스크 · 다듬기</span></h1>
+        <p class="mt-4 text-[15px] md:text-base text-[#4C4F54] leading-relaxed max-w-[40rem]">
+          B의 “목록에서 바로 판단한다”를 더 밀었습니다. 긴급은 맨 위에 고정하고, 나머지는 <b class="text-[#1A1C1E]">아직 할 일이 남은 것만</b> 탭 세 개로 나눕니다.
+          한 줄 요약이 미리보기 자리를 대신하고, 한 화면에서 <b class="text-[#1A1C1E]">한 가지만 판단</b>하게 했습니다.
+        </p>
+      </div>
+      <div class="board">
+        <p class="text-xs font-bold tracking-[.16em] text-[#63666B]">B → B2 바뀐 점</p>
+        <ul class="mt-3 grid gap-2 text-[14.5px] leading-relaxed">
+          <li class="flex gap-2"><iconify-icon icon="solar:check-circle-bold" width="18" style="color:#2F6BFF" class="mt-0.5"></iconify-icon><span>아침 브리핑 대신 <b>큰 숫자 탭 세 개</b>(답장 필요 · 알림 · 학교 처리). 처리한 연락은 탭에서 빠짐</span></li>
+          <li class="flex gap-2"><iconify-icon icon="solar:check-circle-bold" width="18" style="color:#2F6BFF" class="mt-0.5"></iconify-icon><span>목록 미리보기 자리에 <b>AI 요약</b>, 옆으로 밀면 <b>원문 · 답장</b> 버튼</span></li>
+          <li class="flex gap-2"><iconify-icon icon="solar:check-circle-bold" width="18" style="color:#2F6BFF" class="mt-0.5"></iconify-icon><span>상세 화면에 <b>“답장 필요 · 내일까지”</b> 띠, 가린 곳에 번호(①②)를 붙여 브리핑과 연결</span></li>
+          <li class="flex gap-2"><iconify-icon icon="solar:check-circle-bold" width="18" style="color:#2F6BFF" class="mt-0.5"></iconify-icon><span>학부모 확인 카드에 <b>제안 1 · 2 전환</b>과 “빼는 말 · 바뀐 말” 범례. 문구는 짧게 다듬음</span></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pb-12">
+    <div class="flex flex-wrap justify-center gap-x-9 gap-y-14 mt-6">
+
+      <!-- ① 교사 메시지함 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:40</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex-1 overflow-hidden">
+            <div class="px-5 pt-1 flex items-end justify-between">
+              <div><p class="t-cap num">10월 13일 화요일 · 3학년 2반</p><h2 class="t-display mt-0.5">받은 메시지</h2></div>
+              <span class="flex gap-4 text-[#63666B] mb-1"><iconify-icon icon="solar:magnifer-linear" width="23"></iconify-icon><iconify-icon icon="solar:bell-linear" width="23"></iconify-icon></span>
+            </div>
+
+            <!-- 우선 확인 (긴급 고정) -->
+            <div class="mx-4 mt-4 rounded-[18px] p-3.5 flex gap-3" style="background:var(--red-soft)">
+              <div class="sq" style="background:var(--red);color:#fff"><iconify-icon icon="solar:bell-bing-bold" width="20"></iconify-icon></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5"><p class="text-[12px] font-bold" style="color:#C7313C">긴급 · 맨 위 고정</p><span class="ml-auto num t-cap" style="color:#C7313C">07:50</span></div>
+                <p class="mt-0.5 font-bold text-[15px]">하윤 보호자 · 학교폭력 신고</p>
+                <p class="mt-0.5 text-[13.5px] truncate" style="color:#5A3135">하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고…</p>
+              </div>
+            </div>
+
+            <!-- 할 일 탭 -->
+            <div class="split mt-4 mx-1">
+              <div class="on"><b class="num">2</b><span>답장 필요</span></div>
+              <div><b class="num">1</b><span>알림</span></div>
+              <div><b class="num">1</b><span>학교 처리</span></div>
+            </div>
+
+            <div class="rows">
+              <!-- 밀어 둔 줄 -->
+              <div class="swipe">
+                <div class="acts">
+                  <div style="background:#8E9196"><iconify-icon icon="solar:eye-linear" width="20"></iconify-icon>원문</div>
+                  <div style="background:var(--blue)"><iconify-icon icon="solar:pen-new-square-linear" width="20"></iconify-icon>답장</div>
+                </div>
+                <div class="row">
+                  <div class="sq">민</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5"><span class="unread"></span><p class="font-bold text-[15px]">민서 보호자</p><span class="tag t-due" style="height:20px;padding:0 6px;font-size:11px">D-1</span></div>
+                    <p class="mt-0.5 text-[14px] text-[#2A2C30] line-clamp-1"><span class="ai"><iconify-icon icon="solar:magic-stick-3-linear" width="12"></iconify-icon>요약</span> 자리를 내일까지 바꿔 달라는 요청</p>
+                    <div class="mt-1.5 flex gap-1"><span class="tag">자리·모둠</span><span class="tag"><iconify-icon icon="solar:eye-closed-linear" width="12"></iconify-icon>가림 2</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="sq">서</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5"><span class="unread"></span><p class="font-bold text-[15px]">서연 보호자</p><span class="ml-auto num t-cap">어제 20:15</span></div>
+                  <p class="mt-0.5 text-[14px] text-[#2A2C30] line-clamp-1"><span class="ai"><iconify-icon icon="solar:magic-stick-3-linear" width="12"></iconify-icon>요약</span> 다음 주 상담 시간을 잡아 달라는 요청</p>
+                  <div class="mt-1.5 flex gap-1"><span class="tag">상담 요청</span><span class="tag">다음 주</span></div>
+                </div>
+              </div>
+              <div class="px-5 py-3 border-t border-[#E6E6E3] text-[12.5px] text-[#8E9196] flex items-center gap-1.5"><iconify-icon icon="solar:hand-shake-linear" width="15"></iconify-icon>왼쪽으로 밀면 원문 보기 · 답장</div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab on"><iconify-icon icon="solar:inbox-line-bold" width="24"></iconify-icon>메시지함</div>
+            <div class="tab"><iconify-icon icon="solar:users-group-rounded-linear" width="24"></iconify-icon>반 톡방</div>
+            <div class="tab"><iconify-icon icon="solar:settings-linear" width="24"></iconify-icon>설정</div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#63666B]">6-2 · 교사 메시지함</p>
+          <p class="mt-1 text-[15px] text-[#4C4F54] leading-relaxed">긴급은 탭과 상관없이 <b class="text-[#1A1C1E]">맨 위 빨간 칸</b>. 그 아래 큰 숫자 탭으로 할 일을 나누고, 목록에서는 미리보기 대신 AI 요약 한 줄. 줄을 밀면 원문 · 답장.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ② 교사 메시지 상세 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-2 px-3 pb-3">
+            <span class="w-10 h-10 grid place-items-center"><iconify-icon icon="solar:alt-arrow-left-linear" width="24"></iconify-icon></span>
+            <div class="flex-1 min-w-0"><p class="font-bold text-[17px] leading-tight">민서 보호자</p><p class="t-cap">3학년 2반 · 학부모</p></div>
+            <span class="w-10 h-10 grid place-items-center text-[#63666B]"><iconify-icon icon="solar:menu-dots-bold" width="22"></iconify-icon></span>
+          </div>
+          <div class="mx-4 rounded-[12px] px-3.5 py-2.5 flex items-center gap-2 text-[13.5px] font-semibold" style="background:var(--blue-soft);color:var(--blue-deep)">
+            <iconify-icon icon="solar:clock-circle-linear" width="17"></iconify-icon>답장 필요 · 내일(10월 14일)까지
+          </div>
+
+          <div class="flex-1 overflow-hidden mt-3" style="background:var(--bg)">
+            <div class="m-4 rounded-[18px] bg-white p-4">
+              <p class="ai text-[12px]"><iconify-icon icon="solar:magic-stick-3-linear" width="14"></iconify-icon>AI 요청 브리핑</p>
+              <p class="mt-1.5 t-title">짝과 맞지 않아 매일 우는 아이의 자리를 내일까지 바꿔 달라는 요청</p>
+              <dl class="kv mt-3.5 pt-3.5 border-t border-[#E6E6E3]">
+                <iconify-icon icon="solar:calendar-linear" width="18"></iconify-icon><dt>기한</dt><dd class="num">내일 · 10월 14일 (수)</dd>
+                <iconify-icon icon="solar:tag-linear" width="18"></iconify-icon><dt>유형</dt><dd>자리·모둠</dd>
+                <iconify-icon icon="solar:info-circle-linear" width="18"></iconify-icon><dt>사실</dt><dd class="font-medium">짝과 맞지 않아 매일 울며 귀가</dd>
+                <iconify-icon icon="solar:eye-closed-linear" width="18"></iconify-icon><dt>표현</dt><dd class="font-medium">거친 표현 2곳 가림 (①②)</dd>
+              </dl>
+            </div>
+
+            <div class="px-4 flex flex-col gap-2">
+              <p class="self-center t-cap num">어제 21:42 받은 원문</p>
+              <div class="self-start max-w-[88%] rounded-[18px] rounded-tl-[6px] bg-white px-4 py-3 text-[14.5px] leading-[1.8]">
+                선생님, <span class="redact" style="width:112px"><i>1</i></span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="redact" style="width:146px"><i>2</i></span> 내일까지 자리 바꿔 주세요.
+              </div>
+              <div class="self-start flex items-center gap-2 mt-1">
+                <span class="h-8 px-3 rounded-[9px] bg-white text-[13px] font-semibold flex items-center gap-1"><iconify-icon icon="solar:eye-linear" width="15"></iconify-icon>원문 보기</span>
+                <span class="t-cap">거친 표현이 그대로 보여요</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-3 pt-3 pb-8 border-t border-[#E6E6E3] bg-white">
+            <div class="input">
+              <span class="w-10 h-10 grid place-items-center text-[#8E9196]"><iconify-icon icon="solar:add-circle-linear" width="26"></iconify-icon></span>
+              <div class="box">답장을 적어 주세요</div>
+              <span class="send"><iconify-icon icon="solar:arrow-up-linear" width="22"></iconify-icon></span>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#63666B]">6-3 · 교사 메시지 상세</p>
+          <p class="mt-1 text-[15px] text-[#4C4F54] leading-relaxed">맨 위 파란 띠가 <b class="text-[#1A1C1E]">언제까지 답해야 하는지</b>만 알려 줍니다. 브리핑의 “①②”가 원문의 검은 띠 번호와 이어져, 무엇을 가렸는지 위치로 연결됩니다.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ③ 학부모 작성 · 확인 카드 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>9:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-2 px-3 pb-3 border-b border-[#E6E6E3]">
+            <span class="w-10 h-10 grid place-items-center"><iconify-icon icon="solar:alt-arrow-left-linear" width="24"></iconify-icon></span>
+            <div class="flex-1 min-w-0"><p class="font-bold text-[17px] leading-tight">3학년 2반 담임 선생님</p><p class="t-cap flex items-center gap-1"><iconify-icon icon="solar:shield-check-linear" width="13"></iconify-icon>AI가 먼저 읽고 전하는 학교 공식 창구</p></div>
+          </div>
+          <div class="flex-1 overflow-hidden px-4 pt-4" style="background:var(--bg)">
+            <div class="max-w-[84%] rounded-[18px] rounded-tl-[6px] bg-white px-4 py-3 text-[14.5px]">안녕하세요, 민서 보호자님. 3학년 2반 담임입니다.</div>
+          </div>
+
+          <div class="bg-white border-t border-[#E6E6E3] px-4 pt-4 pb-3" style="border-radius:var(--r-sheet) var(--r-sheet) 0 0;box-shadow:0 -10px 24px -16px rgba(0,0,0,.18)">
+            <div class="flex items-start gap-2.5">
+              <span class="w-8 h-8 rounded-[10px] grid place-items-center flex-none" style="background:var(--red-soft);color:var(--red)"><iconify-icon icon="solar:danger-triangle-linear" width="18"></iconify-icon></span>
+              <div>
+                <p class="text-[16px] font-bold leading-snug">보내기 전에 확인해 주세요</p>
+                <p class="text-[13.5px]" style="color:var(--sub)">이 표현은 교권 침해로 기록될 수 있어요.</p>
+              </div>
+            </div>
+            <div class="seg mt-3"><div class="on">제안 1</div><div>제안 2</div></div>
+            <div class="mt-2.5 rounded-[14px] p-3.5 text-[14px] leading-[1.75]" style="background:var(--bg)">
+              선생님, <span class="del">애들 하나 제대로 못 보세요?</span> <span class="ins">민서가</span> 짝이랑 잘 안 맞아서 요즘 매일 울면서 집에 와요. <span class="del">그러고도 선생님 소리 듣고 싶으세요?</span> 내일까지 자리를 <span class="ins">바꿔 주실 수 있을까요?</span>
+            </div>
+            <div class="mt-2 flex items-center gap-3 text-[11.5px]" style="color:var(--faint)">
+              <span class="flex items-center gap-1"><i class="w-3 h-3 rounded-sm" style="background:var(--red-soft);box-shadow:inset 0 0 0 1px #F2B9BE"></i>빼는 말</span>
+              <span class="flex items-center gap-1"><i class="w-3 h-3 rounded-sm" style="background:var(--blue-soft);box-shadow:inset 0 0 0 1px #BFD0FF"></i>바뀐 말</span>
+              <span class="ml-auto flex items-center gap-1" style="color:#0B7F53"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon>요청은 그대로</span>
+            </div>
+            <div class="mt-3 btn b-primary">고친 문장으로 보내기</div>
+            <div class="mt-2 grid grid-cols-2 gap-2">
+              <div class="btn b-secondary" style="height:46px;font-size:15px">직접 고치기</div>
+              <div class="btn b-ghost" style="height:46px;font-size:15px">그대로 보내기</div>
+            </div>
+          </div>
+          <div class="px-3 pt-1 pb-8 bg-white">
+            <div class="input">
+              <div class="box" style="color:var(--ink);box-shadow:inset 0 0 0 1.5px #F2B9BE"><span class="w-1.5 h-1.5 rounded-full mr-2 flex-none" style="background:var(--red)"></span><span class="truncate">선생님, 애들 하나 제대로 못 보세요? 우리 민서가…</span></div>
+              <span class="send" style="background:var(--chip);color:#B9BBBE"><iconify-icon icon="solar:arrow-up-linear" width="22"></iconify-icon></span>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#63666B]">6-1 · 학부모 작성 · 확인 카드</p>
+          <p class="mt-1 text-[15px] text-[#4C4F54] leading-relaxed">입력창 위에 확인 카드가 올라오고, <b class="text-[#1A1C1E]">제안 1 · 2를 탭으로</b> 바꿔 봅니다. 범례로 빨강(빼는 말) · 파랑(바뀐 말)을 설명하고, 오른쪽에 “요청은 그대로”.</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- 부품 세트 -->
+    <section class="mt-24">
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="text-sm font-bold tracking-[.2em] text-[#63666B]">KIT</span>
+        <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">공통 부품 세트</h2>
+        <span class="text-[#63666B]">프론트에서 먼저 만들 것 · 화면은 이걸 조립</span>
+      </div>
+      <div class="mt-7 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 keep">
+
+        <div class="board">
+          <h3>색 토큰</h3>
+          <div class="mt-4 grid grid-cols-2 gap-2.5 text-[13px]">
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)"></span><div><b>bg</b><p class="text-[11.5px] text-[#8E9196]">#F3F3F1</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:#fff;box-shadow:inset 0 0 0 1px var(--line)"></span><div><b>surface</b><p class="text-[11.5px] text-[#8E9196]">#FFFFFF</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--ink)"></span><div><b>ink</b><p class="text-[11.5px] text-[#8E9196]">#1A1C1E</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--blue)"></span><div><b>blue</b><p class="text-[11.5px] text-[#8E9196]">#2F6BFF · 행동 하나</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--redact)"></span><div><b>redact</b><p class="text-[11.5px] text-[#8E9196]">#2C2F33 · 가림</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--red)"></span><div><b>red</b><p class="text-[11.5px] text-[#8E9196]">#EB4A55 · 긴급 · 빼는 말</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--green)"></span><div><b>green</b><p class="text-[11.5px] text-[#8E9196]">#12A06A · 그대로 전달</p></div></div>
+            <div class="flex items-center gap-2.5"><span class="w-9 h-9 rounded-xl" style="background:var(--school)"></span><div><b>school</b><p class="text-[11.5px] text-[#8E9196]">#5B6B82 · 학교</p></div></div>
+          </div>
+        </div>
+
+        <div class="board">
+          <h3>글자 · 숫자</h3>
+          <div class="mt-4 grid gap-2.5">
+            <div class="flex items-baseline gap-3"><span class="w-16 text-[11.5px] text-[#8E9196] font-semibold">display 26</span><span class="t-display">받은 메시지</span></div>
+            <div class="flex items-baseline gap-3"><span class="w-16 text-[11.5px] text-[#8E9196] font-semibold">title 18</span><span class="t-title">요청 브리핑 한 문장</span></div>
+            <div class="flex items-baseline gap-3"><span class="w-16 text-[11.5px] text-[#8E9196] font-semibold">body 15</span><span class="t-body">목록 요약 · 말풍선</span></div>
+            <div class="flex items-baseline gap-3"><span class="w-16 text-[11.5px] text-[#8E9196] font-semibold">small 13</span><span class="t-small">탭 이름 · 보조 버튼</span></div>
+            <div class="flex items-baseline gap-3"><span class="w-16 text-[11.5px] text-[#8E9196] font-semibold">cap 12</span><span class="t-cap">시간 · 반 · 안내</span></div>
+          </div>
+          <p class="mt-4 text-[13px] text-[#63666B] leading-relaxed">숫자(개수 · 시간 · 날짜)는 모두 <b class="text-[#1A1C1E]">고정폭 숫자</b>로 맞춰 줄이 흔들리지 않게. 문구는 한 줄을 넘기지 않게 짧게.</p>
+        </div>
+
+        <div class="board">
+          <h3>버튼 · 전환 탭</h3>
+          <div class="mt-4 grid gap-2.5">
+            <div class="btn b-primary">기본 · 고친 문장으로 보내기</div>
+            <div class="btn b-primary pressed">눌렀을 때</div>
+            <div class="grid grid-cols-2 gap-2"><div class="btn b-secondary">보조</div><div class="btn b-ghost">글자</div></div>
+            <div class="btn b-disabled">쓸 수 없을 때</div>
+            <div class="seg"><div class="on">제안 1</div><div>제안 2</div></div>
+          </div>
+        </div>
+
+        <div class="board">
+          <h3>태그 · 가림 · 고친 곳</h3>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="tag t-red">긴급</span><span class="tag t-due">D-1</span><span class="tag">자리·모둠</span><span class="tag"><iconify-icon icon="solar:eye-closed-linear" width="12"></iconify-icon>가림 2</span><span class="tag t-school"><iconify-icon icon="solar:buildings-2-linear" width="12"></iconify-icon>학교 처리 중</span><span class="tag t-green">요청은 그대로</span><span class="tag"><iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>분석 실패</span>
+          </div>
+          <p class="mt-5 text-[14.5px] leading-[1.9]">선생님, <span class="redact" style="width:96px"><i>1</i></span> 우리 민서가…</p>
+          <p class="mt-2 text-[14px] leading-[1.8]"><span class="del">애들 하나 제대로 못 보세요?</span> <span class="ins">민서가</span> 짝이랑…</p>
+        </div>
+
+        <div class="board">
+          <h3>목록 줄 · 할 일 탭</h3>
+          <div class="mt-3 split" style="margin:0 -8px">
+            <div class="on"><b class="num">2</b><span>답장 필요</span></div>
+            <div><b class="num">1</b><span>알림</span></div>
+            <div><b class="num">1</b><span>학교 처리</span></div>
+          </div>
+          <div class="rows -mx-6 mt-1">
+            <div class="row" style="padding:12px 24px"><div class="sq" style="width:34px;height:34px;font-size:13px">민</div><div class="flex-1 min-w-0"><div class="flex items-center gap-1.5"><span class="unread"></span><p class="font-bold text-[14px]">안 읽음</p><span class="tag t-due" style="height:20px;font-size:11px;padding:0 6px">D-1</span></div><p class="text-[13px] text-[#2A2C30] truncate"><span class="ai">요약</span> 자리를 내일까지 바꿔 달라는 요청</p></div></div>
+            <div class="row" style="padding:12px 24px;background:var(--red-soft)"><div class="sq" style="width:34px;height:34px;background:var(--red);color:#fff"><iconify-icon icon="solar:bell-bing-bold" width="17"></iconify-icon></div><div class="flex-1 min-w-0"><p class="font-bold text-[14px]">긴급 · 원문 그대로</p><p class="text-[13px] truncate" style="color:#5A3135">하윤이가 쉬는 시간마다 맞는다고…</p></div></div>
+            <div class="row" style="padding:12px 24px"><div class="sq" style="width:34px;height:34px;background:var(--school-soft);color:var(--school)"><iconify-icon icon="solar:lock-keyhole-minimalistic-linear" width="17"></iconify-icon></div><div class="flex-1 min-w-0"><p class="font-bold text-[14px]">위협 · 학교 처리</p><p class="text-[13px] truncate" style="color:var(--school)">교감 선생님이 확인 중</p></div></div>
+            <div class="row" style="padding:12px 24px"><div class="sq" style="width:34px;height:34px"><iconify-icon icon="solar:danger-circle-linear" width="17"></iconify-icon></div><div class="flex-1 min-w-0"><p class="font-bold text-[14px]">분석 실패</p><p class="text-[13px] truncate text-[#8E9196]">AI가 읽지 못했어요 · 원문은 접혀 있어요</p></div></div>
+          </div>
+        </div>
+
+        <div class="board">
+          <h3>입력창 · 기한 띠 · 탭 바</h3>
+          <div class="mt-4 grid gap-3">
+            <div class="rounded-[12px] px-3.5 py-2.5 flex items-center gap-2 text-[13.5px] font-semibold" style="background:var(--blue-soft);color:var(--blue-deep)"><iconify-icon icon="solar:clock-circle-linear" width="17"></iconify-icon>답장 필요 · 내일(10월 14일)까지</div>
+            <div class="input"><div class="box">답장을 적어 주세요</div><span class="send"><iconify-icon icon="solar:arrow-up-linear" width="22"></iconify-icon></span></div>
+            <div class="input"><div class="box" style="color:var(--ink);box-shadow:inset 0 0 0 1.5px #F2B9BE"><span class="w-1.5 h-1.5 rounded-full mr-2 flex-none" style="background:var(--red)"></span><span class="truncate">선생님, 애들 하나 제대로…</span></div><span class="send" style="background:var(--chip);color:#B9BBBE"><iconify-icon icon="solar:arrow-up-linear" width="22"></iconify-icon></span></div>
+            <p class="t-cap -mt-1">거친 표현이 있으면 빨간 점 · 보내기 버튼은 확인 카드에서</p>
+            <div class="h-[64px] rounded-[16px] grid grid-cols-3 items-center" style="box-shadow:inset 0 0 0 1px var(--line)">
+              <div class="tab on"><iconify-icon icon="solar:inbox-line-bold" width="22"></iconify-icon>메시지함</div>
+              <div class="tab"><iconify-icon icon="solar:users-group-rounded-linear" width="22"></iconify-icon>반 톡방</div>
+              <div class="tab"><iconify-icon icon="solar:settings-linear" width="22"></iconify-icon>설정</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-16 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 keep">
+      <div class="board">
+        <p class="text-xs font-bold tracking-[.18em] text-[#63666B]">FROM APPLE MAIL</p>
+        <p class="mt-2 text-[18px] font-bold leading-snug">급한 건 위로, 요약은 미리보기 자리에</p>
+        <p class="mt-2 text-[14.5px] text-[#4C4F54] leading-relaxed">Apple Intelligence가 급한 메일을 맨 위로 올리고 미리보기를 요약으로 바꾸듯, 긴급 고정 칸과 “요약” 한 줄.</p>
+      </div>
+      <div class="board">
+        <p class="text-xs font-bold tracking-[.18em] text-[#63666B]">FROM SUPERHUMAN</p>
+        <p class="mt-2 text-[18px] font-bold leading-snug">할 일이 남은 것만 탭에</p>
+        <p class="mt-2 text-[14.5px] text-[#4C4F54] leading-relaxed">Split Inbox처럼 탭에는 아직 행동이 필요한 연락만. 처리하면 탭에서 빠지고 숫자가 줄어듭니다.</p>
+      </div>
+      <div class="board">
+        <p class="text-xs font-bold tracking-[.18em] text-[#63666B]">FROM LINEAR</p>
+        <p class="mt-2 text-[18px] font-bold leading-snug">덜 푸른 회색, 부드러운 선</p>
+        <p class="mt-2 text-[14.5px] text-[#4C4F54] leading-relaxed">모든 요소가 같은 무게를 갖지 않게. 차가운 회색을 따뜻한 회색으로, 구분선과 아이콘은 한 단계 연하게.</p>
+      </div>
+      <div class="board">
+        <p class="text-xs font-bold tracking-[.18em] text-[#63666B]">FROM TOSS</p>
+        <p class="mt-2 text-[18px] font-bold leading-snug">한 화면 한 판단, 짧은 말</p>
+        <p class="mt-2 text-[14.5px] text-[#4C4F54] leading-relaxed">상세 화면은 “언제까지 답할지” 하나만 띠로. 문구는 불필요한 말을 빼고 해요체 한 줄로.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-[#DCDCD8] text-sm text-[#8E9196] flex flex-col md:flex-row gap-2 justify-between keep">
+    <p>정적 초안 · 내용은 유저플로우_쿠션톡_261015 · 앱 정의서 6-7절 예시 문구</p>
+    <p>B2 · B를 다듬은 안</p>
+  </footer>
+</body>
+</html>

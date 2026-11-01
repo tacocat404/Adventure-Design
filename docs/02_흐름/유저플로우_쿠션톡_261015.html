@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 유저 플로우</title>
+  <meta name="description" content="[26.10.15] 쿠션톡 서비스 정의서를 바탕으로 학부모 · 서버 · 교사 · 관리자 · 학생의 흐름을 정리한 유저 플로우">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] },
+          colors: {
+            paper: '#f4f2ee',
+            ink: '#1d1c1a',
+            line: '#e5e1d8',
+            mute: '#8b867d',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: #f4f2ee; color: #1d1c1a; }
+    .keep { word-break: keep-all; }
+    .eyebrow { letter-spacing: .22em; }
+    .card { background: #fff; border: 1px solid #e8e4dc; }
+    .chip { background: #f1efea; }
+    .canvas { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .canvas::-webkit-scrollbar { height: 8px; }
+    .canvas::-webkit-scrollbar-thumb { background: #dcd7cd; border-radius: 99px; }
+    .canvas svg { display: block; height: auto; }
+    .canvas a:hover rect.cardbox { stroke: #1d1c1a; }
+    @keyframes rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: rise .7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; } .reveal.in { animation: none; } html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body class="min-h-[100dvh] font-sans antialiased">
+
+  <!-- 상단 바 -->
+  <nav class="sticky top-0 z-40 bg-paper/85 backdrop-blur border-b border-line">
+    <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="font-extrabold tracking-tight shrink-0">쿠션톡 <span class="text-mute font-medium">유저 플로우</span></a>
+      <div class="flex items-center gap-1 overflow-x-auto text-sm font-semibold">
+        <a href="#legend" class="hidden md:inline px-3 py-2 rounded-full hover:bg-white">블록</a>
+        <a href="#map" class="hidden md:inline px-3 py-2 rounded-full hover:bg-white">지도</a>
+        <a href="#flow-g" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">G</a>
+        <a href="#flow-a" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">A</a>
+        <a href="#flow-b" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">B</a>
+        <a href="#flow-c" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">C</a>
+        <a href="#flow-d" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">D</a>
+        <a href="#flow-e" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">E</a>
+        <a href="#flow-f" class="w-9 h-9 grid place-items-center rounded-full hover:bg-white">F</a>
+        <a href="#open" class="hidden md:inline px-3 py-2 rounded-full hover:bg-white">미정</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10">
+
+    <!-- 헤더 -->
+    <header class="pt-14 md:pt-20 pb-10 border-b-2 border-ink grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end keep">
+      <div>
+        <p class="eyebrow text-xs md:text-sm font-bold text-mute">USER FLOW · CUSHION TALK · 26.10.15 · 10.16 · 11.02 수정</p>
+        <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>유저 플로우</h1>
+      </div>
+      <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[34rem]">
+        학부모 메시지는 <b class="text-ink">AI가 먼저 읽고</b>, 교사에게는 <b class="text-ink">요청만</b> 닿습니다.
+        위협이면 학교가 넘겨받습니다. 서비스 정의서를 바탕으로 이 길을 <b class="text-ink">플로우 7개</b>로 나눠 그렸습니다.
+      </p>
+    </header>
+
+    <!-- 01 블록 -->
+    <section id="legend" class="pt-16">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">01</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">블록 8가지</span>
+        <span class="text-mute">모양 하나 = 뜻 하나 · 유저플로우_블록정의.md</span>
+      </h2>
+      <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 keep">
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:0">
+          <div class="w-24 h-20 rounded-xl bg-[#e4f1e9] grid place-items-center shrink-0"><svg width="66" height="32" viewBox="0 0 66 32"><rect x="2" y="2" width="62" height="28" rx="14" fill="#fff" stroke="#2f7a57" stroke-width="2.2"/></svg></div>
+          <div><p class="font-extrabold text-lg">시작 / 끝</p><p class="text-sm text-mute">둥근 사각형</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">앱 실행</span><span class="chip rounded-md px-2 py-0.5">답장 완료</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:1">
+          <div class="w-24 h-20 rounded-xl bg-[#e8eefb] grid place-items-center shrink-0"><svg width="66" height="40" viewBox="0 0 66 40"><rect x="2" y="2" width="62" height="36" rx="4" fill="#fff" stroke="#2f5fd0" stroke-width="2.2"/></svg></div>
+          <div><p class="font-extrabold text-lg">화면</p><p class="text-sm text-mute">사각형 · 시트도 화면</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">교사 메시지함 6-2</span><span class="chip rounded-md px-2 py-0.5">경고 (시트)</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:2">
+          <div class="w-24 h-20 rounded-xl bg-[#efe8fb] grid place-items-center shrink-0"><svg width="70" height="36" viewBox="0 0 70 36"><polygon points="14,2 68,2 56,34 2,34" fill="#fff" stroke="#7a4bd1" stroke-width="2.2"/></svg></div>
+          <div><p class="font-extrabold text-lg">사용자 입력</p><p class="text-sm text-mute">평행사변형 · 프론트엔드</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">메시지 쓰기</span><span class="chip rounded-md px-2 py-0.5">학년·반 선택</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:3">
+          <div class="w-24 h-20 rounded-xl bg-[#ecebe6] grid place-items-center shrink-0"><svg width="70" height="40" viewBox="0 0 70 40"><rect x="2" y="2" width="66" height="36" rx="3" fill="#fff" stroke="#57534e" stroke-width="2.2"/><line x1="11" y1="2" x2="11" y2="38" stroke="#57534e" stroke-width="2"/><line x1="59" y1="2" x2="59" y2="38" stroke="#57534e" stroke-width="2"/></svg></div>
+          <div><p class="font-extrabold text-lg">시스템 처리</p><p class="text-sm text-mute">양옆 세로줄 · 서버·AI</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">AI 분석</span><span class="chip rounded-md px-2 py-0.5">원문 저장</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:4">
+          <div class="w-24 h-20 rounded-xl bg-[#fbf0dc] grid place-items-center shrink-0"><svg width="70" height="44" viewBox="0 0 70 44"><polygon points="35,2 68,22 35,42 2,22" fill="#fff" stroke="#c58a1d" stroke-width="2.2"/></svg></div>
+          <div><p class="font-extrabold text-lg">분기</p><p class="text-sm text-mute">마름모 · ?로 끝남</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">위협?</span><span class="chip rounded-md px-2 py-0.5">원문 보기 눌렀나?</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:5">
+          <div class="w-24 h-20 rounded-xl bg-[#fdebf1] grid place-items-center shrink-0"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="#fff" stroke="#c8406b" stroke-width="2.2"/><text x="22" y="23" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="800" fill="#c8406b" font-family="Pretendard">A</text></svg></div>
+          <div><p class="font-extrabold text-lg">연결점</p><p class="text-sm text-mute">작은 원 · 다른 플로우로</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">B로 이동</span><span class="chip rounded-md px-2 py-0.5">C에서 들어옴</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:6">
+          <div class="w-24 h-20 rounded-xl bg-[#efede8] grid place-items-center shrink-0"><svg width="72" height="34" viewBox="0 0 72 34"><text x="32" y="10" text-anchor="middle" font-size="10" font-weight="700" fill="#3b3a37" font-family="Pretendard">클릭</text><line x1="4" y1="22" x2="60" y2="22" stroke="#3b3a37" stroke-width="2"/><polygon points="58,17 68,22 58,27" fill="#3b3a37"/></svg></div>
+          <div><p class="font-extrabold text-lg">실선 화살표</p><p class="text-sm text-mute">기본 흐름 · 위에 행동</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">보내기 클릭</span><span class="chip rounded-md px-2 py-0.5">예 / 아니오</span></p></div>
+        </div>
+        <div class="reveal card rounded-2xl p-5 flex gap-4 items-center" style="--i:7">
+          <div class="w-24 h-20 rounded-xl bg-[#fbe9e6] grid place-items-center shrink-0"><svg width="72" height="34" viewBox="0 0 72 34"><text x="32" y="10" text-anchor="middle" font-size="10" font-weight="700" fill="#cf3b2c" font-family="Pretendard">실패</text><line x1="4" y1="22" x2="60" y2="22" stroke="#cf3b2c" stroke-width="2" stroke-dasharray="5 4"/><polygon points="58,17 68,22 58,27" fill="#cf3b2c"/></svg></div>
+          <div><p class="font-extrabold text-lg">점선 화살표</p><p class="text-sm text-mute">되돌아가기 · 실패 · 예외</p><p class="mt-2 flex flex-wrap gap-1.5 text-[13px] font-semibold"><span class="chip rounded-md px-2 py-0.5">직접 고치기</span><span class="chip rounded-md px-2 py-0.5">5초 넘으면</span></p></div>
+        </div>
+      </div>
+      <p class="reveal mt-4 text-sm text-mute keep">블록 옆 회색 작은 글씨는 메모예요. <span class="text-[#b5651d] font-semibold">(미정)</span>이 붙은 메모는 아직 정하지 않은 것입니다.</p>
+    </section>
+
+    <!-- 02 전체 지도 -->
+    <section id="map" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">02</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">전체 지도</span>
+        <span class="text-mute">연결점 글자는 들어가는 플로우 · 카드를 누르면 이동</span>
+      </h2>
+      <div class="reveal card rounded-[28px] mt-7 p-4 md:p-8">
+        <div class="canvas" data-flow="map"></div>
+      </div>
+    </section>
+
+    <!-- 03 플로우 -->
+    <section class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">03</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">플로우</span>
+        <span class="text-mute">화면 블록의 숫자는 앱 정의서 화면 번호 · 좁은 화면에서는 좌우로 밀어서 보기</span>
+      </h2>
+      <div id="flows" class="mt-7 space-y-8"></div>
+    </section>
+
+    <!-- 04 해결 방안 -->
+    <section id="solutions" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">04</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">해결 방안이 들어간 자리</span>
+        <span class="text-mute">서비스 정의서 4번 → 플로우</span>
+      </h2>
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10 keep" id="solution-list"></div>
+    </section>
+
+    <!-- 05 화면 번호 -->
+    <section id="screens" class="pt-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">05</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">화면 번호</span>
+        <span class="text-mute">6-5 ~ 6-10은 새 화면이라 번호가 임시</span>
+      </h2>
+      <div class="reveal mt-7 card rounded-2xl overflow-x-auto">
+        <table class="w-full min-w-[34rem] text-[15px] keep">
+          <thead>
+            <tr class="border-b-2 border-ink text-left">
+              <th class="px-5 py-3.5 font-extrabold w-24">번호</th><th class="px-5 py-3.5 font-extrabold">화면</th><th class="px-5 py-3.5 font-extrabold">누가</th><th class="px-5 py-3.5 font-extrabold">상태</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-1</td><td class="px-5 py-3.5 font-semibold">학부모 작성</td><td class="px-5 py-3.5 text-[#5a564f]">학부모</td><td class="px-5 py-3.5 text-mute">앱 정의서에 있음</td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-2</td><td class="px-5 py-3.5 font-semibold">교사 메시지함</td><td class="px-5 py-3.5 text-[#5a564f]">교사</td><td class="px-5 py-3.5 text-mute">앱 정의서에 있음</td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-3</td><td class="px-5 py-3.5 font-semibold">교사 메시지 상세 <span class="font-normal text-mute">(긴급이면 원문 상세)</span></td><td class="px-5 py-3.5 text-[#5a564f]">교사</td><td class="px-5 py-3.5 text-mute">앱 정의서에 있음</td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-4</td><td class="px-5 py-3.5 font-semibold">관리자 알림</td><td class="px-5 py-3.5 text-[#5a564f]">관리자</td><td class="px-5 py-3.5 text-mute">앱 정의서에 있음</td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-5</td><td class="px-5 py-3.5 font-semibold">반 톡방 목록</td><td class="px-5 py-3.5 text-[#5a564f]">교사</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-6</td><td class="px-5 py-3.5 font-semibold">반 단체 톡방</td><td class="px-5 py-3.5 text-[#5a564f]">교사 · 학생</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-7</td><td class="px-5 py-3.5 font-semibold">톡방 참여</td><td class="px-5 py-3.5 text-[#5a564f]">학생</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-8</td><td class="px-5 py-3.5 font-semibold">로그인</td><td class="px-5 py-3.5 text-[#5a564f]">학부모 · 교사 · 관리자</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">11.02 새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-9</td><td class="px-5 py-3.5 font-semibold">학부모 가입 <span class="font-normal text-mute">(학교 이름 검색)</span></td><td class="px-5 py-3.5 text-[#5a564f]">학부모</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">11.02 새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-[#2f5fd0]">6-10</td><td class="px-5 py-3.5 font-semibold">선생님 목록</td><td class="px-5 py-3.5 text-[#5a564f]">학부모</td><td class="px-5 py-3.5"><span class="rounded-md px-2 py-0.5 text-[13px] font-semibold bg-[#fbf0dc] text-[#9a6614]">11.02 새 화면 · 번호 임시</span></td></tr>
+            <tr><td class="px-5 py-3.5 font-bold text-mute">시트</td><td class="px-5 py-3.5 font-semibold">경고 · 원문 · 위협 상세 · 참여 코드</td><td class="px-5 py-3.5 text-mute">—</td><td class="px-5 py-3.5 text-mute">화면 블록에 (시트) 표시</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 06 미정 -->
+    <section id="open" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">06</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">다음 회의에서 정할 것</span>
+        <span class="text-mute">정해지면 해당 플로우의 분기와 메모를 고침</span>
+      </h2>
+      <ol class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+      <p class="reveal mt-12 text-sm font-bold text-mute keep">26.10.16 · 11.02 정한 것 · 플로우 메모에 반영함</p>
+      <ol class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="decided-list"></ol>
+    </section>
+  </main>
+
+  <footer class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-line flex flex-col md:flex-row gap-2 justify-between text-sm text-mute keep">
+    <p>근거 — 서비스정의서_쿠션톡_261015.md · 앱정의서_쿠션톡_6-7절_261013.html</p>
+    <p>양식 — 유저플로우_양식.md · 유저플로우_블록정의.md</p>
+  </footer>
+
+  <script>
+  /* FlowKit v1 · 유저 플로우 SVG 렌더러
+     기준 문서: 문서/바이브코딩 협업표/디자인_형식서.md (4장)
+     쓰는 법: FlowKit.mount('#el', 'a', data) · 다 그린 뒤 콘솔에서 FlowKit.check() → [] 이면 겹침 없음 */
+  const FlowKit = (() => {
+    const DIM = { start: [116, 48], screen: [160, 58], input: [176, 52], system: [180, 58], decision: [150, 96], conn: [40, 40], card: [300, 84] };
+    const SK = 14; // 평행사변형 기울기
+    const COL = {
+      start: ['#e4f1e9', '#2f7a57'], screen: ['#e8eefb', '#2f5fd0'], input: ['#efe8fb', '#7a4bd1'],
+      system: ['#ecebe6', '#57534e'], decision: ['#fbf0dc', '#c58a1d'], conn: ['#fdebf1', '#c8406b'],
+    };
+    const INK = '#3b3a37', RED = '#cf3b2c', MUTE = '#8b867d', OPEN = '#b5651d';
+
+    const dim = (n) => [n.w || DIM[n.t][0], n.h || DIM[n.t][1]];
+    function anc(n, s) {
+      const [w, h] = dim(n), hw = w / 2, hh = h / 2, dx = n.t === 'input' ? SK / 2 : 0;
+      return s === 'l' ? [n.x - hw + dx, n.y] : s === 'r' ? [n.x + hw - dx, n.y] : s === 't' ? [n.x, n.y - hh] : [n.x, n.y + hh];
+    }
+    function route(a, as, b, bs, via) {
+      if (via) return [a, ...via, b];
+      if (a[0] === b[0] || a[1] === b[1]) return [a, b];
+      const H = (s) => s === 'l' || s === 'r';
+      if (H(as) && H(bs)) { const m = (a[0] + b[0]) / 2; return [a, [m, a[1]], [m, b[1]], b]; }
+      if (!H(as) && !H(bs)) { const m = (a[1] + b[1]) / 2; return [a, [a[0], m], [b[0], m], b]; }
+      return H(as) ? [a, [b[0], a[1]], b] : [a, [a[0], b[1]], b];
+    }
+    function longestMid(p) {
+      let best = 0, m = p[0];
+      for (let i = 1; i < p.length; i++) {
+        const L = Math.abs(p[i][0] - p[i - 1][0]) + Math.abs(p[i][1] - p[i - 1][1]);
+        if (L > best) { best = L; m = [(p[i][0] + p[i - 1][0]) / 2, (p[i][1] + p[i - 1][1]) / 2]; }
+      }
+      return m;
+    }
+    const tw = (s, fs) => [...s].reduce((w, c) => w + (/[ㄱ-힝“”·]/.test(c) ? fs : c === ' ' ? fs * 0.3 : fs * 0.6), 0);
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+    function pill(x, y, t, red) {
+      const w = tw(t, 13.5) + 18;
+      return `<rect class="fk-pill" x="${x - w / 2}" y="${y - 12}" width="${w}" height="24" rx="6" fill="${red ? '#fff' : '#f1efea'}"/>`
+        + `<text class="fk-pill-text" x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="13.5" font-weight="700" fill="${red ? RED : INK}">${esc(t)}</text>`;
+    }
+    function connBadge(x, y, letter) {
+      return `<circle class="fk-shape" data-t="conn" cx="${x}" cy="${y}" r="15" fill="#fff" stroke="${COL.conn[1]}" stroke-width="2"/>`
+        + `<text x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="800" fill="${COL.conn[1]}">${letter}</text>`;
+    }
+
+    function node(n) {
+      const [w, h] = dim(n), hw = w / 2, hh = h / 2, x = n.x, y = n.y;
+      if (n.t === 'card') {
+        const g = `<rect class="fk-shape cardbox" data-t="card" x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="18" fill="#fff" stroke="${n.warn ? '#e9b9c7' : '#dcd7cd'}" stroke-width="1.6"/>`
+          + `<circle cx="${x - hw + 42}" cy="${y}" r="21" fill="${COL.conn[0]}" stroke="${COL.conn[1]}" stroke-width="2"/>`
+          + `<text x="${x - hw + 42}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="800" fill="${COL.conn[1]}">${esc(n.l)}</text>`
+          + `<text x="${x - hw + 78}" y="${y - 9}" font-size="13" font-weight="600" fill="${MUTE}">${esc(n.who)}</text>`
+          + `<text x="${x - hw + 78}" y="${y + 15}" font-size="19" font-weight="800" fill="#1d1c1a">${esc(n.what)}</text>`;
+        return n.href ? `<a href="${n.href}">${g}</a>` : g;
+      }
+      const [f, s] = COL[n.t];
+      const A = `class="fk-shape" data-t="${n.t}" fill="${f}" stroke="${s}" stroke-width="2.2"`;
+      if (n.t === 'conn') {
+        return `<circle ${A} cx="${x}" cy="${y}" r="${hw}"/>`
+          + `<text x="${x}" y="${y + 0.5}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="800" fill="${s}">${esc(n.l)}</text>`;
+      }
+      let g = '';
+      if (n.t === 'start') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="${hh}"/>`;
+      if (n.t === 'screen') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="6"/>`;
+      if (n.t === 'input') g = `<polygon ${A} points="${x - hw + SK},${y - hh} ${x + hw},${y - hh} ${x + hw - SK},${y + hh} ${x - hw},${y + hh}"/>`;
+      if (n.t === 'system') g = `<rect ${A} x="${x - hw}" y="${y - hh}" width="${w}" height="${h}" rx="3"/>`
+        + `<line x1="${x - hw + 10}" y1="${y - hh}" x2="${x - hw + 10}" y2="${y + hh}" stroke="${s}" stroke-width="1.8"/>`
+        + `<line x1="${x + hw - 10}" y1="${y - hh}" x2="${x + hw - 10}" y2="${y + hh}" stroke="${s}" stroke-width="1.8"/>`;
+      if (n.t === 'decision') g = `<polygon ${A} points="${x},${y - hh} ${x + hw},${y} ${x},${y + hh} ${x - hw},${y}"/>`;
+      const lines = String(n.l).split('\n'), LH = 21, SH = n.s ? 17 : 0, total = lines.length * LH + SH;
+      let ty = y - total / 2 + LH / 2, t = '';
+      lines.forEach((ln) => { t += `<text class="fk-text" x="${x}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="700" fill="#1d1c1a">${esc(ln)}</text>`; ty += LH; });
+      if (n.s) t += `<text x="${x}" y="${ty - 1}" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="${n.t === 'system' ? MUTE : s}">${esc(n.s)}</text>`;
+      return g + t;
+    }
+
+    function memo(m) {
+      const a = m.a || 'start';
+      return String(m.t).split('\n').map((ln, i) =>
+        `<text class="fk-memo" x="${m.x}" y="${m.y + i * 20}" text-anchor="${a}" font-size="14" font-weight="${m.o ? 700 : 500}" fill="${m.o ? OPEN : MUTE}">${esc((m.o && i === 0 ? '(미정) ' : '') + ln)}</text>`
+      ).join('');
+    }
+
+    function render(id, d) {
+      const N = Object.fromEntries(d.nodes.map((n) => [n.id, n]));
+      let edges = '', labels = '';
+      d.edges.forEach((e) => {
+        const E = Array.isArray(e) ? { f: e[0], t: e[1], l: e[2] } : e;
+        const [fi, fs] = E.f.split('.'), [ti, ts] = E.t.split('.');
+        if (!N[fi] || !N[ti]) { console.warn('FlowKit: 없는 블록', id, E); return; }
+        const a = anc(N[fi], fs), b = anc(N[ti], ts), pts = route(a, fs, b, ts, E.via);
+        const red = !!E.dash;
+        edges += `<path class="fk-edge" d="M${pts.map((p) => p.join(',')).join(' L')}" fill="none" stroke="${red ? RED : INK}" stroke-width="1.8" stroke-linejoin="round"${red ? ' stroke-dasharray="6 5"' : ''} marker-end="url(#${red ? 'ar' : 'ak'}-${id})"/>`;
+        const [lx, ly] = E.lp || longestMid(pts);
+        if (E.l) labels += pill(lx, ly, E.l, red);
+        if (E.c) labels += connBadge(lx, ly, E.c);
+      });
+      const marker = (mid, c) => `<marker id="${mid}-${id}" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`;
+      const extra = (d.lines || []).map((l) => `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#e5e1d8" stroke-width="1.5"/>`).join('');
+      return `<svg data-flow="${id}" viewBox="0 0 ${d.W} ${d.H}" width="100%" style="min-width:${Math.round(d.W * (d.min || 0.68))}px" font-family="Pretendard, system-ui, sans-serif" role="img" aria-label="${esc(d.title || d.what || id)}">`
+        + `<defs>${marker('ak', INK)}${marker('ar', RED)}</defs>${extra}${edges}${d.nodes.map(node).join('')}${labels}${(d.memos || []).map(memo).join('')}</svg>`;
+    }
+
+    function mount(target, id, d) {
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      el.innerHTML = render(id, d);
+    }
+
+    // 겹침 점검: 메모·라벨·블록·선이 겹치거나 글자가 블록 밖으로 나가면 알려 준다
+    function check(root = document) {
+      const issues = [];
+      const ov = (a, b, p = 0) => a.x < b.x + b.width - p && b.x < a.x + a.width - p && a.y < b.y + b.height - p && b.y < a.y + a.height - p;
+      root.querySelectorAll('svg[data-flow]').forEach((svg) => {
+        const id = svg.dataset.flow, vb = svg.viewBox.baseVal;
+        const shapes = [...svg.querySelectorAll('.fk-shape')].map((el) => ({ el, b: el.getBBox() }));
+        const pills = [...svg.querySelectorAll('.fk-pill')].map((el) => ({ t: el.nextElementSibling.textContent, b: el.getBBox() }));
+        const memos = [...svg.querySelectorAll('.fk-memo')].map((el) => ({ t: el.textContent, b: el.getBBox() }));
+        const texts = [...svg.querySelectorAll('.fk-text')].map((el) => ({ t: el.textContent, b: el.getBBox() }));
+        const segs = [];
+        svg.querySelectorAll('.fk-edge').forEach((p) => {
+          const pts = p.getAttribute('d').slice(1).split(' L').map((s) => s.split(',').map(Number));
+          for (let i = 1; i < pts.length; i++) {
+            const [a, b] = [pts[i - 1], pts[i]];
+            segs.push({ x: Math.min(a[0], b[0]) - 1, y: Math.min(a[1], b[1]) - 1, width: Math.abs(a[0] - b[0]) + 2, height: Math.abs(a[1] - b[1]) + 2 });
+          }
+        });
+        memos.forEach((m, i) => {
+          if (m.b.x < 0 || m.b.y < 0 || m.b.x + m.b.width > vb.width || m.b.y + m.b.height > vb.height) issues.push(`${id} · 캔버스 밖 메모: ${m.t}`);
+          if (shapes.some((s) => ov(m.b, s.b))) issues.push(`${id} · 메모가 블록과 겹침: ${m.t}`);
+          if (segs.some((s) => ov(m.b, s))) issues.push(`${id} · 메모가 선과 겹침: ${m.t}`);
+          if (pills.some((p) => ov(m.b, p.b))) issues.push(`${id} · 메모가 라벨과 겹침: ${m.t}`);
+          memos.slice(i + 1).forEach((n) => { if (ov(m.b, n.b, 1)) issues.push(`${id} · 메모끼리 겹침: ${m.t} / ${n.t}`); });
+        });
+        pills.forEach((p) => { if (shapes.some((s) => ov(p.b, s.b, 1))) issues.push(`${id} · 라벨이 블록에 닿음: ${p.t} (블록 간격을 넓히기)`); });
+        texts.forEach((t) => {
+          const cx = t.b.x + t.b.width / 2, cy = t.b.y + t.b.height / 2;
+          const host = shapes.find((s) => s.b.x <= cx && cx <= s.b.x + s.b.width && s.b.y <= cy && cy <= s.b.y + s.b.height);
+          if (!host) return;
+          const k = host.el.dataset.t;
+          const lim = k === 'decision' ? host.b.width * 0.62 : k === 'input' ? host.b.width - SK * 2 - 6 : host.b.width - 24;
+          if (t.b.width > lim) issues.push(`${id} · 글자가 블록보다 김: ${t.t} (줄을 나누거나 w 키우기)`);
+        });
+      });
+      console[issues.length ? 'warn' : 'log']('FlowKit.check', issues.length ? issues : '겹침 없음');
+      return issues;
+    }
+
+    return { DIM, COL, render, mount, check };
+  })();
+  const { render, COL } = FlowKit;
+
+  // ───────── 데이터 ─────────
+  const MAP = {
+    W: 1180, H: 640, min: 0.62, title: '전체 지도',
+    lines: [[0, 158, 1180, 158], [0, 478, 1180, 478]],
+    nodes: [
+      { id: 'G', t: 'card', x: 170, y: 80, l: 'G', who: '학부모 · 교사 · 관리자', what: '로그인 · 가입', href: '#flow-g' },
+      { id: 'A', t: 'card', x: 170, y: 250, l: 'A', who: '학부모', what: '메시지 보내기', href: '#flow-a' },
+      { id: 'B', t: 'card', x: 590, y: 250, l: 'B', who: '서버', what: 'AI 분석', href: '#flow-b' },
+      { id: 'C', t: 'card', x: 1010, y: 250, l: 'C', who: '교사', what: '확인하고 답장', href: '#flow-c' },
+      { id: 'D', t: 'card', x: 590, y: 410, l: 'D', who: '관리자 · 교감 · 민원대응팀', what: '위협 처리', href: '#flow-d', warn: 1 },
+      { id: 'E', t: 'card', x: 170, y: 570, l: 'E', who: '교사', what: '반 톡방 만들기', href: '#flow-e' },
+      { id: 'F', t: 'card', x: 590, y: 570, l: 'F', who: '학생', what: '반 톡방 참여', href: '#flow-f' },
+    ],
+    edges: [
+      { f: 'G.b', t: 'A.t', c: 'A', lp: [170, 166] },
+      { f: 'A.r', t: 'B.l', c: 'B' }, { f: 'B.r', t: 'C.l', c: 'C' }, { f: 'B.b', t: 'D.t', c: 'D' }, { f: 'E.r', t: 'F.l', c: 'F' },
+    ],
+    memos: [
+      { x: 0, y: 22, t: '들어오기' },
+      { x: 350, y: 76, t: '아이디 · 비밀번호 · 학부모는 학교 이름 검색으로 가입' },
+      { x: 350, y: 96, t: '교사 · 관리자는 로그인 뒤 C · D · E로 · 학생은 로그인 없이 F로' },
+      { x: 0, y: 186, t: '메시지 한 통의 길' }, { x: 0, y: 506, t: '반 단체 톡방의 길' },
+      { x: 612, y: 335, t: '위협이면 (애매해도 위협)' },
+      { x: 1010, y: 316, t: '긴급은 원문 그대로 · 일반은 요약', a: 'middle' },
+      { x: 770, y: 574, t: '교사가 알려 준 참여 코드로 들어온다' },
+    ],
+  };
+
+  const FLOWS = [
+    {
+      id: 'g', letter: 'G', who: '학부모 · 교사 · 관리자', what: '로그인 · 가입',
+      goal: '어른 사용자가 아이디 · 비밀번호로 들어온다. 학부모는 가입할 때 학교를 고른다.',
+      screens: ['6-8', '6-9'],
+      notes: ['아이디 · 비밀번호는 학부모 · 교사 · 관리자만 쓴다. 학생은 참여 코드와 이름으로 들어온다 (F).', '학부모는 가입할 때 학교 이름을 검색해서 고른다.', '교사 · 관리자 계정은 학교가 만든다고 보고, 앱의 가입 화면은 학부모용만 둔다 (임시).'],
+      open: [],
+      W: 1460, H: 500,
+      nodes: [
+        { id: 'S', t: 'start', x: 70, y: 110, l: '앱 실행' },
+        { id: 'L', t: 'screen', x: 250, y: 110, l: '로그인', s: '6-8' },
+        { id: 'In', t: 'input', x: 460, y: 110, l: '아이디\n비밀번호 입력', h: 64 },
+        { id: 'V', t: 'system', x: 680, y: 110, l: '계정 확인' },
+        { id: 'Q', t: 'decision', x: 880, y: 110, l: '맞나?' },
+        { id: 'R', t: 'decision', x: 1090, y: 110, l: '누구?' },
+        { id: 'A', t: 'conn', x: 1330, y: 110, l: 'A' },
+        { id: 'Ct', t: 'screen', x: 1300, y: 290, l: '교사 메시지함', s: '6-2' },
+        { id: 'Dm', t: 'screen', x: 1300, y: 430, l: '관리자 알림', s: '6-4' },
+        { id: 'J', t: 'screen', x: 250, y: 290, l: '학부모 가입', s: '6-9' },
+        { id: 'Sch', t: 'input', x: 470, y: 290, l: '학교 이름\n검색 · 고르기', h: 64 },
+        { id: 'Acc', t: 'input', x: 690, y: 290, l: '이름 · 아이디\n비밀번호', h: 64 },
+        { id: 'Make', t: 'system', x: 900, y: 290, l: '계정 만들기' },
+        { id: 'A2', t: 'conn', x: 900, y: 410, l: 'A' },
+      ],
+      edges: [
+        ['S.r', 'L.l'], ['L.r', 'In.l'], ['In.r', 'V.l'], ['V.r', 'Q.l'], ['Q.r', 'R.l', '예'],
+        { f: 'Q.b', t: 'In.b', l: '아니오', dash: 1, via: [[880, 200], [460, 200]] },
+        ['R.r', 'A.l', '학부모'],
+        { f: 'R.b', t: 'Ct.l', l: '교사', lp: [1155, 290] },
+        { f: 'R.b', t: 'Dm.l', l: '관리자', lp: [1155, 430] },
+        { f: 'L.b', t: 'J.t', l: '처음이에요', dash: 1 },
+        ['J.r', 'Sch.l'], ['Sch.r', 'Acc.l'], ['Acc.r', 'Make.l'], ['Make.b', 'A2.t'],
+      ],
+      memos: [
+        { x: 1330, y: 152, t: '학부모 플로우로', a: 'middle' },
+        { x: 470, y: 346, t: '학교 이름으로 검색', a: 'middle' },
+        { x: 900, y: 456, t: '가입하면 바로 학부모 플로우로', a: 'middle' },
+        { x: 20, y: 430, t: '가입 화면은 학부모용만' },
+        { x: 20, y: 450, t: '교사 · 관리자 계정은 학교가 만듦 (임시)' },
+        { x: 20, y: 482, t: '학생은 로그인 없이 참여 코드와 이름으로 (F)' },
+      ],
+    },
+    {
+      id: 'a', letter: 'A', who: '학부모', what: '메시지 보내기',
+      goal: '학부모의 요청이 담임에게 빠짐없이 보내진다. 거친 표현을 썼다면 보내기 전에 한 번 돌아본다.',
+      screens: ['6-10', '6-1', '경고 (시트)'],
+      notes: ['선생님 목록은 학부모 학교의 반 · 담임이다. 처음 고를 때 자녀 이름을 적고, 다음부터는 바로 그 담임과의 대화로 간다.', '요청 유형(상담 · 결석·조퇴 · 자리·모둠 · 학습 · 생활 · 기타)은 꼭 고르고, 답장 기한은 고르지 않아도 된다.', '경고 문구: “이 표현은 교권 침해로 기록될 수 있어요”. 순한 문장을 하나 이상 제안한다.', '경고를 무시해도 보낼 수 있다. 요청은 하나도 빼지 않고, 표현은 서버(B)에서 한 번 더 거른다.', '경고를 무시하고 보낸 사실은 따로 기록하거나 교사·관리자에게 보여 주지 않는다. 공격적인 메시지를 그대로 보낸 것 자체가 경고를 무시한 것이고, 원문은 서버(B)에 받은 시간과 함께 남는다.', '보내기 전 검사가 5초 넘으면 검사 없이 보낸다.'],
+      open: [],
+      W: 1870, H: 640,
+      nodes: [
+        { id: 'S', t: 'conn', x: 40, y: 110, l: 'A' },
+        { id: 'T', t: 'screen', x: 175, y: 110, l: '선생님 목록', s: '6-10' },
+        { id: 'Pick', t: 'input', x: 385, y: 110, l: '담임 고르기', s: '처음이면 자녀 이름', h: 64 },
+        { id: 'A', t: 'screen', x: 585, y: 110, l: '학부모 작성', s: '6-1' },
+        { id: 'I', t: 'input', x: 795, y: 110, l: '메시지 쓰기', s: '유형 · 기한 고르기', w: 200, h: 64 },
+        { id: 'P', t: 'system', x: 1095, y: 110, l: '보내기 전\n표현 검사' },
+        { id: 'Q', t: 'decision', x: 1280, y: 110, l: '거친 표현\n있나?' },
+        { id: 'X', t: 'conn', x: 1790, y: 110, l: 'B' },
+        { id: 'W', t: 'screen', x: 1280, y: 265, l: '경고', s: '시트' },
+        { id: 'C', t: 'decision', x: 1280, y: 420, l: '어떻게\n보낼까?' },
+        { id: 'R', t: 'input', x: 1575, y: 420, l: '제안 문장 고르기' },
+      ],
+      edges: [
+        ['S.r', 'T.l'], ['T.r', 'Pick.l'], ['Pick.r', 'A.l'],
+        ['A.r', 'I.l'], ['I.r', 'P.l', '보내기 클릭'], ['P.r', 'Q.l'], ['Q.r', 'X.l', '아니오'], ['Q.b', 'W.t', '예'], ['W.b', 'C.t'],
+        { f: 'C.l', t: 'I.b', l: '직접 고치기', dash: 1, via: [[795, 420]] },
+        ['C.r', 'R.l', '제안 문장 쓰기'], { f: 'R.r', t: 'X.b', via: [[1790, 420]] },
+        { f: 'C.b', t: 'X.b', l: '그대로 보내기', via: [[1280, 575], [1790, 575]] },
+        { f: 'P.t', t: 'X.t', l: '5초 넘으면', dash: 1, via: [[1095, 28], [1790, 28]], lp: [1430, 28] },
+      ],
+      memos: [
+        { x: 175, y: 172, t: '학부모 학교의 반 · 담임', a: 'middle' },
+        { x: 1376, y: 260, t: '“이 표현은 교권 침해로 기록될 수 있어요”' },
+        { x: 1376, y: 280, t: '순한 문장을 하나 이상 제안' },
+        { x: 1560, y: 56, t: '검사 없이 보내고 B에서 다시 거름', a: 'middle' },
+        { x: 1816, y: 115, t: '서버로' },
+        { x: 1535, y: 607, t: '경고를 무시해도 요청은 그대로 보낸다 · 따로 기록하지 않음', a: 'middle' },
+      ],
+    },
+    {
+      id: 'b', letter: 'B', who: '서버', what: 'AI 분석',
+      goal: '메시지를 긴급 · 위협 · 일반으로 나누고, 공격적인 표현을 가린 요청 요약을 만든다.',
+      screens: ['없음 (화면 밖 처리)'],
+      notes: ['분석보다 저장이 먼저다. 원문은 받은 시간과 함께 남기고 지우지 않는다.', '분석이 5초 넘으면 1번 재시도. 또 실패하면 원문을 접은 채 ‘분석 실패’ 표시로 교사에게 보낸다.', '긴급 기준: 학교폭력 · 아동학대 · 안전. 요약하면 대응이 늦어질 수 있어 원문 그대로 보낸다.', '애매한 표현은 위협으로 분류한다. 놓치는 것보다 한 번 더 확인하는 게 안전하다.', '위협 메시지도 요청 요약은 담임에게 간다.', '위협 원문은 담임도 볼 수 있다. 상세 화면(6-3)의 [원문 보기]로 연다.'],
+      open: [],
+      W: 1500, H: 490,
+      nodes: [
+        { id: 'S', t: 'conn', x: 40, y: 110, l: 'B' },
+        { id: 'Save', t: 'system', x: 180, y: 110, l: '원문 저장', s: '받은 시간과 함께' },
+        { id: 'AI', t: 'system', x: 400, y: 110, l: 'AI 분석', s: '요청 뽑기 · 표현 분류' },
+        { id: 'OK', t: 'decision', x: 610, y: 110, l: '분석\n성공?' },
+        { id: 'U', t: 'decision', x: 820, y: 110, l: '긴급\n메시지?' },
+        { id: 'T', t: 'decision', x: 1045, y: 110, l: '위협?' },
+        { id: 'M', t: 'system', x: 1290, y: 110, l: '공격 표현 가림\n요청 요약 만들기' },
+        { id: 'C3', t: 'conn', x: 1440, y: 110, l: 'C' },
+        { id: 'Fail', t: 'system', x: 610, y: 275, l: '분석 실패\n표시 붙이기' },
+        { id: 'Top', t: 'system', x: 820, y: 275, l: '원문 그대로\n맨 위 고정' },
+        { id: 'Move', t: 'system', x: 1045, y: 275, l: '관리자에게 이관\n원문 보존' },
+        { id: 'C1', t: 'conn', x: 610, y: 400, l: 'C' },
+        { id: 'C2', t: 'conn', x: 820, y: 400, l: 'C' },
+        { id: 'D', t: 'conn', x: 1045, y: 400, l: 'D' },
+      ],
+      edges: [
+        ['S.r', 'Save.l'], ['Save.r', 'AI.l'], ['AI.r', 'OK.l'], ['OK.r', 'U.l', '예'], ['U.r', 'T.l', '아니오'], ['T.r', 'M.l', '아니오'], ['M.r', 'C3.l'],
+        { f: 'OK.b', t: 'Fail.t', l: '아니오', dash: 1 }, { f: 'Fail.b', t: 'C1.t', dash: 1 },
+        ['U.b', 'Top.t', '예'], ['Top.b', 'C2.t'],
+        ['T.b', 'Move.t', '예'], ['Move.b', 'D.t'], ['Move.r', 'M.b'],
+      ],
+      memos: [
+        { x: 180, y: 166, t: '분석보다 저장이 먼저 · 지우지 않음', a: 'middle' },
+        { x: 610, y: 44, t: '5초 넘으면 1번 재시도', a: 'middle' },
+        { x: 1045, y: 44, t: '애매하면 위협으로 분류', a: 'middle' },
+        { x: 1152, y: 302, t: '위협이어도 요약은 담임에게' },
+        { x: 610, y: 442, t: '교사로 · 원문 접음', a: 'middle' },
+        { x: 820, y: 442, t: '교사로 · 원문 그대로', a: 'middle' },
+        { x: 820, y: 466, t: '긴급: 학교폭력 · 아동학대 · 안전', a: 'middle' },
+        { x: 1045, y: 442, t: '관리자로', a: 'middle' },
+        { x: 1440, y: 152, t: '교사로', a: 'middle' },
+        { x: 1300, y: 404, t: '담임도 [원문 보기]로 원문을 볼 수 있음', a: 'middle' },
+      ],
+    },
+    {
+      id: 'c', letter: 'C', who: '교사', what: '확인하고 답장',
+      goal: '교사가 공격적인 표현을 보지 않고 요청만 확인해 답장한다.',
+      screens: ['6-2', '6-3', '원문 (시트)'],
+      notes: ['메시지함은 긴급이 맨 위에 고정되고, 그 아래 일반 메시지가 온다. 긴급은 담임이 답장하면 맨 위에서 내려간다.', '유형 · 기한은 학부모가 고른 값을 보여 준다 (AI가 뽑지 않음).', '위협 메시지에도 담임이 직접 답장할 수 있다.','상세 화면은 요청 요약이 먼저다. 가린 표현은 개수만 보여 준다. 예: “거친 표현 3곳 가림”', '위협 메시지는 상세 화면에 “학교로 넘겼어요” 표시가 붙는다. 원문은 [원문 보기]로 볼 수 있다.', '교사 답장은 AI 검사를 거치지 않고 그대로 학부모에게 간다.'],
+      open: [],
+      W: 1510, H: 525,
+      nodes: [
+        { id: 'S', t: 'conn', x: 40, y: 110, l: 'C' },
+        { id: 'N', t: 'system', x: 180, y: 110, l: '새 메시지 알림' },
+        { id: 'Box', t: 'screen', x: 380, y: 110, l: '교사 메시지함', s: '6-2' },
+        { id: 'Pick', t: 'input', x: 580, y: 110, l: '메시지 고르기' },
+        { id: 'U', t: 'decision', x: 790, y: 110, l: '긴급\n메시지?' },
+        { id: 'Raw', t: 'screen', x: 1010, y: 110, l: '긴급 원문 상세', s: '6-3' },
+        { id: 'Det', t: 'screen', x: 790, y: 290, l: '교사 메시지 상세', s: '6-3' },
+        { id: 'O', t: 'decision', x: 1010, y: 290, l: '원문 보기\n눌렀나?' },
+        { id: 'W', t: 'input', x: 1240, y: 290, l: '답장 쓰기' },
+        { id: 'Orig', t: 'screen', x: 1010, y: 450, l: '원문', s: '시트' },
+        { id: 'Send', t: 'system', x: 1240, y: 450, l: '답장을\n학부모에게 전달' },
+        { id: 'E', t: 'start', x: 1430, y: 450, l: '답장 완료' },
+      ],
+      edges: [
+        ['S.r', 'N.l'], ['N.r', 'Box.l'], ['Box.r', 'Pick.l'], ['Pick.r', 'U.l'],
+        ['U.r', 'Raw.l', '예'], ['U.b', 'Det.t', '아니오'], ['Raw.r', 'W.t'],
+        ['Det.r', 'O.l'], ['O.r', 'W.l', '아니오'], ['O.b', 'Orig.t', '예'],
+        { f: 'Orig.l', t: 'Det.b', l: '닫기', dash: 1 },
+        ['W.b', 'Send.t', '보내기 클릭'], ['Send.r', 'E.l'],
+      ],
+      memos: [
+        { x: 380, y: 166, t: '긴급은 답장할 때까지 맨 위', a: 'middle' },
+        { x: 696, y: 282, t: '요청 요약이 먼저 보임', a: 'end' },
+        { x: 696, y: 302, t: '가린 표현은 개수만 · “거친 표현 3곳 가림”', a: 'end' },
+        { x: 696, y: 322, t: '위협이면 “학교로 넘겼어요” 표시', a: 'end' },
+        { x: 1240, y: 507, t: '답장은 AI 검사 없이 전달', a: 'middle' },
+      ],
+    },
+    {
+      id: 'd', letter: 'D', who: '관리자 · 교감 · 민원대응팀', what: '위협 처리', warn: 1,
+      goal: '교사 혼자가 아니라 학교가 위협 메시지에 대응한다.',
+      screens: ['6-4', '위협 상세 (시트)'],
+      notes: ['위협 상세에는 원문, 받은 시간, AI가 위협으로 본 이유를 함께 보여 준다.', '대응 예: 학부모 면담, 교육청 보고, 수사기관 신고.', '애매해서 위협으로 분류된 메시지는 여기서 사람이 한 번 더 걸러 낸다.', '위협은 종류를 나누지 않고 “공격적 표현” 태그 하나로 보여 준다.', '대응 기록은 고치지 않고 덧붙이기만 한다. 원문 열람 기록은 관리자와 그 메시지의 담임이 볼 수 있다.'],
+      open: [],
+      W: 1520, H: 450,
+      nodes: [
+        { id: 'S', t: 'conn', x: 40, y: 110, l: 'D' },
+        { id: 'N', t: 'system', x: 180, y: 110, l: '위협 알림' },
+        { id: 'A', t: 'screen', x: 380, y: 110, l: '관리자 알림', s: '6-4' },
+        { id: 'Open', t: 'input', x: 580, y: 110, l: '위협 메시지 열기' },
+        { id: 'Det', t: 'screen', x: 790, y: 110, l: '위협 상세', s: '시트' },
+        { id: 'Q', t: 'decision', x: 1010, y: 110, l: '학교 대응\n필요?' },
+        { id: 'Rec', t: 'input', x: 1240, y: 110, l: '대응 기록 남기기' },
+        { id: 'Tell', t: 'system', x: 1240, y: 280, l: '담임에게\n처리 상황 알림' },
+        { id: 'E', t: 'start', x: 1430, y: 280, l: '학교 차원 처리', w: 136 },
+        { id: 'Back', t: 'system', x: 1010, y: 280, l: '일반 메시지로\n되돌림' },
+        { id: 'E2', t: 'start', x: 1010, y: 410, l: '끝' },
+      ],
+      edges: [
+        ['S.r', 'N.l'], ['N.r', 'A.l'], ['A.r', 'Open.l'], ['Open.r', 'Det.l'], ['Det.r', 'Q.l'],
+        ['Q.r', 'Rec.l', '예'], ['Rec.b', 'Tell.t'], ['Tell.r', 'E.l'],
+        { f: 'Q.b', t: 'Back.t', l: '아니오', dash: 1 }, { f: 'Back.b', t: 'E2.t', dash: 1 },
+      ],
+      memos: [
+        { x: 790, y: 166, t: '원문 · 받은 시간 · 위협으로 본 이유', a: 'middle' },
+        { x: 1240, y: 54, t: '예: 면담 · 교육청 보고 · 수사기관 신고', a: 'middle' },
+        { x: 904, y: 276, t: 'AI가 애매해서 위협으로 본 것을', a: 'end' },
+        { x: 904, y: 296, t: '사람이 한 번 더 걸러 낸다', a: 'end' },
+      ],
+    },
+    {
+      id: 'e', letter: 'E', who: '교사', what: '반 톡방 만들기',
+      goal: '교사가 개인 메신저 없이 앱 안에 반별 학생 단체 톡방(예: 1-3반)을 연다.',
+      screens: ['6-5', '6-6', '참여 코드 (시트)'],
+      notes: ['교사의 개인 메신저 계정은 학생에게 보이지 않는다.', '참여 코드는 반마다 하나.', '참여 코드는 발급하고 하루(24시간) 동안 쓸 수 있다. 시트에 코드와 남은 시간을 함께 보여 준다.', '재발급: 반 단체 톡방(6-6) 오른쪽 위 [참여 코드] 버튼 → 참여 코드 (시트) → [새 코드 받기]. 새 코드를 받으면 이전 코드는 바로 막히고, 이미 들어온 학생은 그대로 남는다.'],
+      open: [],
+      W: 1410, H: 780,
+      lines: [[0, 525, 1410, 525]],
+      nodes: [
+        { id: 'S', t: 'start', x: 70, y: 110, l: '앱 실행' },
+        { id: 'L', t: 'screen', x: 250, y: 110, l: '반 톡방 목록', s: '6-5' },
+        { id: 'Sel', t: 'input', x: 460, y: 110, l: '학년·반 선택' },
+        { id: 'Q', t: 'decision', x: 680, y: 110, l: '이미 있는\n반인가?' },
+        { id: 'Room', t: 'screen', x: 1120, y: 110, l: '반 단체 톡방', s: '6-6' },
+        { id: 'E', t: 'start', x: 1320, y: 110, l: '톡방 열림' },
+        { id: 'Make', t: 'system', x: 680, y: 280, l: '반 톡방 만들기\n참여 코드 발급' },
+        { id: 'Code', t: 'screen', x: 900, y: 280, l: '참여 코드', s: '시트' },
+        { id: 'Share', t: 'input', x: 900, y: 430, l: '학생에게\n코드 알리기' },
+        { id: 'F', t: 'conn', x: 1120, y: 430, l: 'F' },
+        { id: 'R2', t: 'screen', x: 250, y: 600, l: '반 단체 톡방', s: '6-6' },
+        { id: 'B2', t: 'input', x: 470, y: 600, l: '참여 코드 버튼' },
+        { id: 'C2', t: 'screen', x: 690, y: 600, l: '참여 코드', s: '시트' },
+        { id: 'N2', t: 'decision', x: 900, y: 600, l: '새 코드\n필요?' },
+        { id: 'Re', t: 'system', x: 1120, y: 600, l: '새 코드 발급\n이전 코드 막기' },
+        { id: 'F2', t: 'conn', x: 1290, y: 600, l: 'F' },
+        { id: 'Cl', t: 'start', x: 900, y: 730, l: '그대로 닫기' },
+      ],
+      edges: [
+        ['S.r', 'L.l'], ['L.r', 'Sel.l'], ['Sel.r', 'Q.l'], ['Q.r', 'Room.l', '예'], ['Room.r', 'E.l'],
+        ['Q.b', 'Make.t', '아니오'], ['Make.r', 'Code.l'], ['Code.r', 'Room.b'], ['Code.b', 'Share.t'], ['Share.r', 'F.l'],
+        ['R2.r', 'B2.l'], ['B2.r', 'C2.l'], ['C2.r', 'N2.l'], ['N2.r', 'Re.l', '예'], ['Re.r', 'F2.l'], ['N2.b', 'Cl.t', '아니오'],
+      ],
+      memos: [
+        { x: 1120, y: 54, t: '교사 개인 메신저는 학생에게 보이지 않음', a: 'middle' },
+        { x: 576, y: 284, t: '참여 코드는 반마다 하나', a: 'end' },
+        { x: 1120, y: 472, t: '학생 플로우로', a: 'middle' },
+        { x: 900, y: 494, t: '참여 코드는 하루(24시간) 동안 유효', a: 'middle' },
+        { x: 20, y: 552, t: '참여 코드 다시 보기 · 재발급' },
+        { x: 250, y: 656, t: '톡방 오른쪽 위 버튼', a: 'middle' },
+        { x: 690, y: 656, t: '코드 · 남은 시간 표시', a: 'middle' },
+        { x: 1120, y: 656, t: '이전 코드는 바로 막힘', a: 'middle' },
+        { x: 1290, y: 642, t: '학생에게 새 코드', a: 'middle' },
+      ],
+    },
+    {
+      id: 'f', letter: 'F', who: '학생', what: '반 톡방 참여',
+      goal: '학생이 참여 코드로 반 단체 톡방에 들어와 담임과 소통한다.',
+      screens: ['6-7', '6-6'],
+      notes: ['학생은 참여 코드와 이름만으로 들어온다. 학교 계정은 쓰지 않는다.', '틀린 코드와 만료된 코드는 둘 다 아니오로 간다. 만료면 “코드가 만료됐어요. 선생님께 새 코드를 받아 주세요”라고 알린다.', '학생 메시지는 AI 검사를 거치지 않는다.', '다른 기기에서도 참여 코드와 이름으로 다시 들어온다. 같은 반에 같은 이름이 있으면 그 학생으로 이어 준다.'],
+      open: [],
+      W: 1520, H: 285,
+      nodes: [
+        { id: 'S', t: 'conn', x: 40, y: 110, l: 'F' },
+        { id: 'J', t: 'screen', x: 190, y: 110, l: '톡방 참여', s: '6-7' },
+        { id: 'In', t: 'input', x: 400, y: 110, l: '참여 코드\n이름 입력' },
+        { id: 'V', t: 'system', x: 620, y: 110, l: '코드 확인' },
+        { id: 'Q', t: 'decision', x: 830, y: 110, l: '맞는\n코드?' },
+        { id: 'Room', t: 'screen', x: 1050, y: 110, l: '반 단체 톡방', s: '6-6' },
+        { id: 'M', t: 'input', x: 1260, y: 110, l: '메시지 쓰기' },
+        { id: 'E', t: 'start', x: 1450, y: 110, l: '담임과 대화' },
+      ],
+      edges: [
+        ['S.r', 'J.l'], ['J.r', 'In.l'], ['In.r', 'V.l'], ['V.r', 'Q.l'], ['Q.r', 'Room.l', '예'], ['Room.r', 'M.l'], ['M.r', 'E.l'],
+        { f: 'Q.b', t: 'In.b', l: '아니오 · 다시 입력', dash: 1, via: [[830, 240], [400, 240]] },
+      ],
+      memos: [
+        { x: 190, y: 172, t: '참여 코드 + 이름만 · 학교 계정 없음', a: 'middle' },
+        { x: 850, y: 205, t: '틀린 코드 · 만료된 코드' },
+        { x: 1260, y: 172, t: '학생 메시지는 AI 검사 없음', a: 'middle' },
+      ],
+    },
+  ];
+
+  const SOLUTIONS = [
+    ['B · C', 'AI 완충', '공격 표현 가림 · 요청 요약 만들기 → 교사 메시지 상세(6-3)에서 요약만 본다.'],
+    ['A', '보내기 전 경고', '보내기 전 표현 검사 → 경고 (시트). 순한 문장을 제안한다.'],
+    ['A · C', '내용은 그대로, 표현만 거름', '경고를 무시해도 그대로 보낼 수 있고, 교사는 원문 (시트)로 언제든 원문을 본다.'],
+    ['B · D', '위협 자동 이관', '관리자에게 이관 · 원문 보존. 관리자 알림(6-4)으로 넘어간다.'],
+    ['E · F', '앱 안 반 단체 톡방', '반 톡방 만들기 · 참여 코드 발급. 개인 메신저 계정을 공유하지 않는다.'],
+    ['B · C', '긴급 메시지 원문 우선', '원문 그대로 맨 위 고정 → 긴급 원문 상세. 요약하지 않는다.'],
+    ['B · D', '애매하면 위협으로', '위협? 분기에서 애매하면 예. 관리자가 일반 메시지로 되돌릴 수 있다.'],
+  ];
+
+  // ───────── 그리기 ─────────
+  document.querySelector('[data-flow="map"]').innerHTML = render('map', MAP);
+
+  document.getElementById('flows').innerHTML = FLOWS.map((f, i) => `
+    <article id="flow-${f.id}" class="reveal card rounded-[28px] p-5 md:p-8" style="--i:${i % 2}">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-6 lg:gap-12 keep">
+        <div class="flex gap-4 items-start">
+          <span class="w-12 h-12 rounded-full grid place-items-center shrink-0 text-xl font-black border-2" style="border-color:${COL.conn[1]};color:${COL.conn[1]};background:${COL.conn[0]}">${f.letter}</span>
+          <div>
+            <p class="text-sm font-semibold text-mute">${f.who}</p>
+            <h3 class="text-2xl md:text-[28px] font-black tracking-tight leading-tight">${f.what}</h3>
+            <p class="mt-3 text-[15px] text-[#4a4741] leading-relaxed"><b class="text-ink">목표</b> · ${f.goal}</p>
+            <p class="mt-3 flex flex-wrap gap-1.5 text-[13px] font-semibold">${f.screens.map((s) => `<span class="chip rounded-md px-2 py-0.5">${s}</span>`).join('')}</p>
+          </div>
+        </div>
+        <ul class="text-[13.5px] leading-relaxed space-y-1.5 lg:border-l lg:border-line lg:pl-8">
+          ${f.notes.map((n) => `<li class="text-[#7c776e] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>${n}</span></li>`).join('')}
+          ${f.open.map((n) => `<li class="text-[#b5651d] font-semibold flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b5651d] shrink-0"></span><span>(미정) ${n}</span></li>`).join('')}
+        </ul>
+      </div>
+      <div class="canvas mt-6 pt-6 border-t border-line">${render(f.id, f)}</div>
+    </article>`).join('');
+
+  document.getElementById('solution-list').innerHTML = SOLUTIONS.map((s, i) => `
+    <div class="reveal border-t-[3px] border-ink pt-5" style="--i:${i % 3}">
+      <p class="eyebrow text-xs font-bold text-mute">FLOW ${s[0]}</p>
+      <h3 class="mt-2 text-xl font-black tracking-tight">${s[1]}</h3>
+      <p class="mt-2 text-[15px] text-[#5a564f] leading-relaxed">${s[2]}</p>
+    </div>`).join('');
+
+  const OPENS = [
+    ['공통', '6-5 ~ 6-10 화면을 앱 정의서에 추가하고 번호 확정'],
+  ];
+  const DECIDED = [
+    ['A', '경고 무시 기록은 보여 주지 않는다', '공격적인 메시지를 그대로 보낸 것 자체가 경고를 무시한 것이다. 경고 무시 기록 블록을 뺐다.'],
+    ['B', '위협 원문은 담임도 본다', '상세 화면(6-3)의 [원문 보기]로 연다.'],
+    ['C', '교사 답장은 AI 검사 없음', '답장은 그대로 학부모에게 간다.'],
+    ['E', '참여 코드는 하루(24시간)', '6-6 [참여 코드] 버튼 → 시트 → [새 코드 받기]로 재발급. 이전 코드는 바로 막힌다.'],
+    ['F', '학생은 참여 코드 + 이름만', '학교 계정은 쓰지 않는다.'],
+    ['F', '학생 메시지는 AI 검사 없음', '반 단체 톡방 메시지는 그대로 보인다.'],
+    ['G', '어른은 아이디 · 비밀번호 (11.02)', '학부모 · 교사 · 관리자. 학부모는 가입할 때 학교 이름을 검색해 고른다.'],
+    ['A', '선생님 목록에서 담임 고르기 (11.02)', '처음 고를 때 자녀 이름을 적는다.'],
+    ['A', '유형 · 기한은 학부모가 고른다 (11.02)', '유형 6개: 상담 · 결석·조퇴 · 자리·모둠 · 학습 · 생활 · 기타. 기한은 고르지 않아도 된다.'],
+    ['C', '긴급은 답장하면 내려간다 (11.02)', '위협 메시지에도 담임이 직접 답장할 수 있다.'],
+    ['D', '위협 태그는 “공격적 표현” 하나 (11.02)', '대응 기록은 덧붙이기만. 원문은 지우지 않는다. 열람 기록은 관리자와 담임이 본다.'],
+    ['F', '다시 들어올 때도 코드 + 이름 (11.02)', '같은 반에 같은 이름이 있으면 그 학생으로 이어 준다.'],
+  ];
+  document.getElementById('decided-list').innerHTML = DECIDED.map((d, i) => `
+    <li class="reveal flex gap-4 items-start py-4 border-b border-line" style="--i:${i % 2}">
+      <span class="w-9 h-9 rounded-full grid place-items-center shrink-0 font-black border-2" style="border-color:${COL.conn[1]};color:${COL.conn[1]};background:${COL.conn[0]}">${d[0]}</span>
+      <span><span class="block text-[15px] font-semibold">${d[1]}</span><span class="block mt-0.5 text-[13.5px] text-[#7c776e]">${d[2]}</span></span>
+    </li>`).join('');
+  document.getElementById('open-list').innerHTML = OPENS.map((o, i) => `
+    <li class="reveal flex gap-4 items-center py-4 border-b border-line" style="--i:${i % 2}">
+      ${o[0].length === 1
+        ? `<span class="w-9 h-9 rounded-full grid place-items-center shrink-0 font-black border-2" style="border-color:${COL.conn[1]};color:${COL.conn[1]};background:${COL.conn[0]}">${o[0]}</span>`
+        : `<span class="w-9 h-9 grid place-items-center shrink-0 text-xs font-bold text-mute">${o[0]}</span>`}
+      <span class="text-[15px] font-semibold">${o[1]}</span>
+    </li>`).join('');
+
+  // 스크롤 등장
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠션톡 시안 E</title>
+  <meta name="description" content="쿠션톡 디자인 초안 E · 쿠션이 · 베개 캐릭터가 거친 말을 받아 주는 캐릭터 중심 디자인">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] } } } }
+  </script>
+  <style>
+    :root {
+      --bg: #EEF3FF; --card: #FFFFFF; --ink: #24264A; --sub: #6E7398; --edge: #DDE4FB; --edge-deep: #C9D3F5;
+      --sky: #6FB6FF; --sky-deep: #3D8BE8; --sky-soft: #E3F0FF;
+      --butter: #FFD45C; --butter-deep: #E8B32A; --butter-soft: #FFF5D6;
+      --mint: #5ED3B0; --mint-deep: #2FB38E; --mint-soft: #DDF7EF;
+      --coral: #FF7D6E; --coral-deep: #E25A4B; --coral-soft: #FFE9E6;
+    }
+    body { background: #E4EBFD; color: var(--ink); }
+    .keep { word-break: keep-all; }
+    .jua { font-family: 'Jua', 'Pretendard', sans-serif; font-weight: 400; }
+    iconify-icon { display: inline-block; vertical-align: middle; }
+
+    .phone { width: 395px; height: 820px; border-radius: 54px; background: #24264A; padding: 10px; box-shadow: 0 30px 60px -24px rgba(36, 38, 74, .4); flex: none; }
+    .screen { width: 375px; height: 800px; border-radius: 44px; overflow: hidden; position: relative; background: var(--bg); display: flex; flex-direction: column; font-size: 15px; line-height: 1.5; word-break: keep-all; }
+    .status { height: 50px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 34px; font-size: 15px; font-weight: 600; position: relative; }
+    .island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 20px; background: #000; }
+
+    /* E 컴포넌트: 눌리는 버튼 + 두꺼운 아래 테두리 */
+    .chunk { background: var(--card); border: 2px solid var(--edge); border-bottom-width: 5px; border-radius: 22px; }
+    .tile { border-radius: 20px; padding: 12px 12px 10px; border-bottom: 5px solid rgba(0,0,0,.12); }
+    .tag { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .tag-line { background: var(--bg); color: var(--sub); }
+    .tag-sky { background: var(--sky-soft); color: var(--sky-deep); }
+    .tag-mint { background: var(--mint-soft); color: #1E8A6B; }
+    .tag-coral { background: var(--coral); color: #fff; }
+    .btn3d { display: flex; align-items: center; justify-content: center; gap: 6px; height: 54px; border-radius: 18px; font-size: 16.5px; font-weight: 800; }
+    .btn-sky { background: var(--sky); color: #fff; box-shadow: 0 5px 0 var(--sky-deep); }
+    .btn-white { background: #fff; color: var(--ink); border: 2px solid var(--edge); box-shadow: 0 5px 0 var(--edge-deep); }
+    .sticker { display: inline-flex; align-items: center; gap: 3px; height: 26px; padding: 0 9px 0 3px; border-radius: 999px; background: var(--butter); color: var(--ink); font-size: 12px; font-weight: 800; vertical-align: middle; box-shadow: 0 2px 0 var(--butter-deep); transform: rotate(-2deg); }
+    .sticker svg { width: 20px; height: 20px; }
+    .tabbar { position: absolute; left: 14px; right: 14px; bottom: 20px; height: 70px; border-radius: 24px; background: #fff; border: 2px solid var(--edge); border-bottom-width: 5px; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; padding: 0 8px; }
+    .tab { height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 800; color: var(--sub); }
+    .tab.on { background: var(--sky-soft); color: var(--sky-deep); }
+    .say { position: relative; background: #fff; border: 2px solid var(--edge); border-bottom-width: 5px; border-radius: 20px; padding: 12px 14px; }
+    .say::before { content: ''; position: absolute; left: -9px; top: 22px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--edge); border-bottom: 2px solid var(--edge); transform: rotate(45deg); }
+    .say-butter { background: var(--butter-soft); border-color: #F3DD95; }
+    .say-butter::before { background: var(--butter-soft); border-color: #F3DD95; }
+    .radio { width: 22px; height: 22px; border-radius: 999px; border: 2.5px solid var(--edge-deep); flex: none; margin-top: 1px; }
+    .radio.on { border: 7px solid var(--sky); }
+    .wiggle { text-decoration: underline wavy var(--coral); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+    @media (max-width: 440px) { .phone { zoom: .86; } }
+    @media (max-width: 390px) { .phone { zoom: .8; } }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-[100dvh]">
+
+  <!-- 쿠션이 원본 (아래에서 <use>로 재사용) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="cushi" viewBox="0 0 120 100">
+        <path d="M16 20 Q60 6 104 20 Q116 50 104 80 Q60 94 16 80 Q4 50 16 20Z" fill="#FFD45C" stroke="#24264A" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M23 27 Q60 15 97 27 Q107 50 97 73 Q60 85 23 73 Q13 50 23 27Z" fill="none" stroke="#E8B32A" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M30 30 Q46 24 62 24" stroke="#FFF3C4" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="46" cy="50" rx="4.8" ry="6.4" fill="#24264A"/><ellipse cx="74" cy="50" rx="4.8" ry="6.4" fill="#24264A"/>
+        <circle cx="47.6" cy="47.6" r="1.6" fill="#fff"/><circle cx="75.6" cy="47.6" r="1.6" fill="#fff"/>
+        <ellipse cx="35" cy="62" rx="7" ry="4" fill="#FF9E8F" opacity=".75"/><ellipse cx="85" cy="62" rx="7" ry="4" fill="#FF9E8F" opacity=".75"/>
+        <path d="M54 61 Q60 68 66 61" stroke="#24264A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="cushi-face" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="18" fill="#FFF3C4" stroke="#24264A" stroke-width="2.5"/>
+        <circle cx="14" cy="18" r="2.4" fill="#24264A"/><circle cx="26" cy="18" r="2.4" fill="#24264A"/>
+        <path d="M15 25 Q20 29 25 25" stroke="#24264A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <header class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pt-12 md:pt-16 pb-8 keep">
+    <p class="text-xs md:text-sm font-bold tracking-[.2em] text-[#6E7398]">CUSHION TALK · DRAFT E · 26.10.16</p>
+    <div class="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-end">
+      <div class="flex items-end gap-5">
+        <div>
+          <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1]">시안 E<br><span class="jua text-[#3D8BE8] text-5xl md:text-7xl">쿠션이</span></h1>
+        </div>
+        <svg width="120" height="100" class="mb-1 hidden sm:block" aria-label="쿠션이 캐릭터"><use href="#cushi"/></svg>
+      </div>
+      <p class="text-[15px] md:text-base text-[#4E5378] leading-relaxed max-w-[40rem] lg:text-right">
+        베개 캐릭터 <b class="text-[#24264A]">‘쿠션이’</b>가 거친 말을 대신 받아 주고, 요청만 말로 전해 줍니다.
+        Duolingo처럼 캐릭터가 안내하고, 눌리는 느낌의 두툼한 버튼을 씁니다. 단, <b class="text-[#24264A]">긴급과 위협 화면에는 쿠션이가 나오지 않습니다</b>.
+      </p>
+    </div>
+    <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#EEF3FF"></div><p class="mt-2 text-sm font-bold">하늘빛 바탕</p><p class="text-xs text-[#6E7398]">#EEF3FF</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#24264A"></div><p class="mt-2 text-sm font-bold">남보라 글자</p><p class="text-xs text-[#6E7398]">#24264A</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#FFD45C;box-shadow:inset 0 -5px 0 #E8B32A"></div><p class="mt-2 text-sm font-bold">버터 · 쿠션이</p><p class="text-xs text-[#6E7398]">#FFD45C</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#6FB6FF;box-shadow:inset 0 -5px 0 #3D8BE8"></div><p class="mt-2 text-sm font-bold">하늘 · 행동</p><p class="text-xs text-[#6E7398]">#6FB6FF</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#5ED3B0;box-shadow:inset 0 -5px 0 #2FB38E"></div><p class="mt-2 text-sm font-bold">민트 · 그대로 전달</p><p class="text-xs text-[#6E7398]">#5ED3B0</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#FF7D6E;box-shadow:inset 0 -5px 0 #E25A4B"></div><p class="mt-2 text-sm font-bold">코랄 · 긴급</p><p class="text-xs text-[#6E7398]">#FF7D6E</p></div>
+      <div class="chunk p-3" style="border-radius:16px"><div class="h-12 rounded-xl" style="background:#FFFFFF;border:2px solid #DDE4FB;border-bottom-width:5px"></div><p class="mt-2 text-sm font-bold">두툼한 카드</p><p class="text-xs text-[#6E7398]">아래 5px</p></div>
+    </div>
+  </header>
+
+  <main class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 pb-12">
+    <div class="flex flex-wrap justify-center gap-x-9 gap-y-14">
+
+      <!-- ① 교사 메시지함 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:40</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex-1 overflow-hidden px-5 pb-28">
+            <div class="flex items-center justify-between pt-1">
+              <p class="jua text-[24px] text-[#3D8BE8]">쿠션톡</p>
+              <span class="text-[13px] font-bold text-[#6E7398]">3학년 2반 · 10월 13일</span>
+            </div>
+            <div class="mt-3 flex items-start gap-2">
+              <svg width="92" height="78" class="flex-none -ml-1" aria-label="쿠션이"><use href="#cushi"/></svg>
+              <div class="say flex-1 mt-1">
+                <p class="text-[15px] font-bold leading-snug">선생님, 밤사이 거친 말 <span class="text-[#E8B32A]">5개</span>를 제가 폭신하게 막아 뒀어요!</p>
+              </div>
+            </div>
+            <div class="mt-4 grid grid-cols-3 gap-2.5">
+              <div class="tile" style="background:var(--sky)"><p class="text-[12px] font-bold text-white/85">새 연락</p><p class="jua text-[28px] text-white leading-none mt-1">4</p></div>
+              <div class="tile" style="background:var(--butter)"><p class="text-[12px] font-bold text-[#7A5A08]">답장할 것</p><p class="jua text-[28px] leading-none mt-1">2</p></div>
+              <div class="tile" style="background:var(--mint)"><p class="text-[12px] font-bold text-white/90">학교가 처리</p><p class="jua text-[28px] text-white leading-none mt-1">1</p></div>
+            </div>
+
+            <div class="mt-5 rounded-[22px] p-4" style="background:var(--coral-soft);border:2px solid #FFC7BF;border-bottom-width:5px">
+              <div class="flex items-center gap-2"><span class="tag tag-coral"><iconify-icon icon="solar:bell-bing-bold" width="14"></iconify-icon>긴급 · 학교폭력</span><span class="ml-auto text-[12.5px] font-semibold text-[#B85547]">7:50</span></div>
+              <p class="mt-2 text-[15px] font-extrabold">하윤 보호자</p>
+              <p class="mt-0.5 text-[14px] text-[#5B3B37] leading-relaxed line-clamp-2">선생님, 하윤이가 쉬는 시간마다 같은 반 친구들한테 맞는다고 해요. 오늘 아침에도 팔에 멍이…</p>
+              <p class="mt-1.5 text-[12px] font-bold text-[#B85547]">긴급은 쿠션이가 손대지 않아요 · 원문 그대로</p>
+            </div>
+
+            <div class="mt-3 chunk p-4 flex gap-3">
+              <span class="w-11 h-11 rounded-full grid place-items-center flex-none jua text-[18px]" style="background:var(--sky-soft);color:var(--sky-deep)">민</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center"><p class="font-extrabold text-[15px]">민서 보호자</p><span class="ml-auto text-[12px] text-[#6E7398] font-semibold">어제 9:42</span></div>
+                <p class="mt-0.5 text-[14px] leading-snug">자리를 <b>내일까지</b> 바꿔 달라는 요청이에요.</p>
+                <div class="mt-2 flex gap-1.5"><span class="tag tag-line">자리·모둠</span><span class="sticker"><svg><use href="#cushi-face"/></svg>2곳 막음</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab on"><iconify-icon icon="solar:letter-bold" width="20"></iconify-icon>메시지함</div>
+            <div class="tab"><iconify-icon icon="solar:users-group-rounded-bold" width="20"></iconify-icon>반 톡방</div>
+            <div class="tab"><iconify-icon icon="solar:settings-bold" width="20"></iconify-icon>설정</div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#6E7398]">6-2 · 교사 메시지함</p>
+          <p class="mt-1 text-[15px] text-[#4E5378] leading-relaxed">아침 인사를 <b class="text-[#24264A]">쿠션이가 말로</b> 건넵니다. 숫자는 색 타일 세 개, 긴급 카드에는 캐릭터 없이 원문만. 가린 곳은 쿠션이 얼굴 스티커로 표시.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ② 교사 메시지 상세 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>8:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-3 px-4 pb-3">
+            <span class="w-11 h-11 rounded-2xl grid place-items-center bg-white" style="border:2px solid var(--edge);border-bottom-width:4px"><iconify-icon icon="solar:alt-arrow-left-linear" width="22"></iconify-icon></span>
+            <span class="w-11 h-11 rounded-full grid place-items-center jua text-[18px]" style="background:var(--sky-soft);color:var(--sky-deep)">민</span>
+            <div class="flex-1 min-w-0"><p class="font-extrabold text-[16px] leading-tight">민서 보호자</p><p class="text-[12.5px] text-[#6E7398] font-semibold">3학년 2반 · 어제 오후 9:42</p></div>
+          </div>
+
+          <div class="flex-1 overflow-hidden px-4 pt-2 flex flex-col gap-3">
+            <div class="flex items-start gap-2">
+              <svg width="62" height="52" class="flex-none mt-2" aria-label="쿠션이"><use href="#cushi"/></svg>
+              <div class="say say-butter flex-1">
+                <p class="text-[12.5px] font-extrabold text-[#B08414]">쿠션이가 읽어 봤어요</p>
+                <p class="mt-1 text-[16px] font-extrabold leading-snug">짝과 맞지 않아 매일 우는 아이의 자리를 <span class="text-[#3D8BE8]">내일까지</span> 바꿔 달라는 요청이에요!</p>
+                <div class="mt-2.5 flex gap-1.5"><span class="tag" style="background:#fff;color:#7A5A08"><iconify-icon icon="solar:calendar-bold" width="13"></iconify-icon>내일까지</span><span class="tag" style="background:#fff;color:#7A5A08">자리·모둠</span></div>
+              </div>
+            </div>
+
+            <p class="self-center mt-1 text-[12px] font-bold text-[#6E7398] bg-white rounded-full px-3 py-1" style="border:2px solid var(--edge)">원래 보낸 말</p>
+            <div class="chunk p-4 text-[14.5px] leading-[1.9]" style="border-radius:22px 22px 22px 8px">
+              선생님, <span class="sticker"><svg><use href="#cushi-face"/></svg>가림</span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="sticker" style="transform:rotate(2deg)"><svg><use href="#cushi-face"/></svg>가림</span> 내일까지 자리 바꿔 주세요.
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[12.5px] font-semibold text-[#6E7398]">거친 표현 2곳에 쿠션이가 붙어 있어요</span>
+              <span class="ml-auto btn3d btn-white" style="height:36px;font-size:13px;padding:0 12px;border-radius:12px;box-shadow:0 3px 0 var(--edge-deep)"><iconify-icon icon="solar:eye-bold" width="15"></iconify-icon>원문 보기</span>
+            </div>
+          </div>
+
+          <div class="px-4 pb-8 pt-3">
+            <div class="flex items-center gap-2 bg-white p-1.5 pl-4 rounded-[22px]" style="border:2px solid var(--edge);border-bottom-width:5px">
+              <p class="flex-1 text-[15px] text-[#9EA3C4] font-medium">답장을 적어 주세요</p>
+              <span class="w-11 h-11 rounded-2xl grid place-items-center text-white" style="background:var(--sky);box-shadow:0 4px 0 var(--sky-deep)"><iconify-icon icon="solar:plain-3-bold" width="20"></iconify-icon></span>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#6E7398]">6-3 · 교사 메시지 상세</p>
+          <p class="mt-1 text-[15px] text-[#4E5378] leading-relaxed">요약을 <b class="text-[#24264A]">쿠션이의 말풍선</b>으로 전합니다. 원문에서 거친 부분 위에는 쿠션이 스티커가 붙어 있고, 떼어 보려면 원문 보기를 누릅니다.</p>
+        </figcaption>
+      </figure>
+
+      <!-- ③ 학부모 작성 · 경고 -->
+      <figure class="flex flex-col items-center gap-5">
+        <div class="phone"><div class="screen">
+          <div class="status"><span>9:42</span><span class="island"></span><span class="flex gap-1.5 items-center"><iconify-icon icon="solar:wi-fi-router-minimalistic-bold" width="16"></iconify-icon><iconify-icon icon="solar:battery-full-minimalistic-bold" width="22"></iconify-icon></span></div>
+          <div class="flex items-center gap-3 px-4 pb-3">
+            <span class="w-11 h-11 rounded-2xl grid place-items-center bg-white" style="border:2px solid var(--edge);border-bottom-width:4px"><iconify-icon icon="solar:alt-arrow-left-linear" width="22"></iconify-icon></span>
+            <div class="flex-1 min-w-0"><p class="font-extrabold text-[16px] leading-tight">3학년 2반 담임 선생님</p><p class="text-[12.5px] text-[#6E7398] font-semibold">학교 공식 창구 · 쿠션이가 먼저 읽어요</p></div>
+          </div>
+          <div class="flex-1 px-4 pt-2">
+            <div class="chunk p-3.5 max-w-[86%] text-[14.5px]" style="border-radius:22px 22px 22px 8px">안녕하세요, 민서 보호자님. 3학년 2반 담임입니다. 궁금한 점은 이 창구로 편하게 남겨 주세요.</div>
+          </div>
+
+          <div class="absolute inset-0" style="background:rgba(36,38,74,.35)"></div>
+          <div class="absolute left-0 right-0 bottom-0 rounded-t-[34px] px-5 pt-14 pb-8 bg-white" style="border-top:2px solid var(--edge)">
+            <!-- 팻말 든 쿠션이 -->
+            <div class="absolute left-1/2 -translate-x-1/2 -top-[74px] flex flex-col items-center">
+              <div class="jua text-[20px] px-4 py-1.5 rounded-xl bg-white" style="border:2.5px solid #24264A;box-shadow:0 4px 0 #24264A;transform:rotate(-3deg)">잠깐만요!</div>
+              <svg width="20" height="14" viewBox="0 0 20 14" class="-mt-0.5"><path d="M4 0 L4 14 M16 0 L16 14" stroke="#24264A" stroke-width="3" stroke-linecap="round"/></svg>
+              <svg width="104" height="86" class="-mt-1" aria-label="팻말을 든 쿠션이"><use href="#cushi"/></svg>
+            </div>
+            <p class="text-center text-[18px] font-extrabold leading-snug mt-6">이 표현은 교권 침해로 기록될 수 있어요</p>
+            <p class="text-center text-[13.5px] text-[#6E7398] mt-0.5 font-medium">쿠션이가 부드럽게 바꿔 봤어요. 골라 주세요!</p>
+            <div class="mt-3 rounded-[18px] p-3 text-[13.5px] leading-[1.75] text-[#4E5378]" style="background:var(--bg)">
+              선생님, <span class="wiggle">애들 하나 제대로 못 보세요?</span> 우리 민서가 짝이랑 안 맞아서 매일 울면서 집에 와요. <span class="wiggle">그러고도 선생님 소리 듣고 싶으세요?</span>…
+            </div>
+            <div class="mt-3 grid gap-2">
+              <div class="flex gap-3 rounded-[18px] p-3.5 bg-white" style="border:2.5px solid var(--sky);border-bottom-width:5px">
+                <span class="radio on"></span>
+                <p class="text-[14px] leading-relaxed font-semibold">선생님, 민서가 짝이랑 잘 맞지 않아서 요즘 매일 울면서 집에 와요. 내일까지 자리를 바꿔 주실 수 있을까요?</p>
+              </div>
+              <div class="flex gap-3 rounded-[18px] p-3.5 bg-white" style="border:2px solid var(--edge);border-bottom-width:5px">
+                <span class="radio"></span>
+                <p class="text-[14px] leading-relaxed text-[#4E5378]">민서 자리 문제로 연락드려요. 짝과 맞지 않아 많이 힘들어해요. 내일까지 바꿔 주시면 좋겠어요.</p>
+              </div>
+            </div>
+            <div class="mt-3 flex gap-1.5 items-center"><span class="tag tag-mint"><iconify-icon icon="solar:check-circle-bold" width="13"></iconify-icon>자리 바꾸기</span><span class="tag tag-mint"><iconify-icon icon="solar:check-circle-bold" width="13"></iconify-icon>내일까지</span><span class="text-[12.5px] text-[#6E7398] font-semibold">그대로 전해져요</span></div>
+            <div class="mt-4 btn3d btn-sky">바꾼 문장으로 보내기</div>
+            <div class="mt-3 grid grid-cols-2 gap-2.5">
+              <div class="btn3d btn-white" style="height:48px;font-size:15px">직접 고치기</div>
+              <div class="btn3d" style="height:48px;font-size:15px;color:#6E7398;font-weight:700">그대로 보내기</div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption class="text-center keep max-w-[395px]">
+          <p class="text-[13px] font-bold tracking-[.14em] text-[#6E7398]">6-1 · 학부모 작성 · 경고 시트</p>
+          <p class="mt-1 text-[15px] text-[#4E5378] leading-relaxed">쿠션이가 <b class="text-[#24264A]">“잠깐만요!” 팻말</b>을 들고 시트 위로 올라옵니다. 사람이 아니라 캐릭터가 말리니까 덜 꾸중처럼 들립니다.</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <section class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 keep">
+      <div class="chunk p-6">
+        <p class="text-xs font-bold tracking-[.18em] text-[#6E7398]">REFERENCE</p>
+        <h3 class="mt-2 text-xl font-extrabold">캐릭터가 안내하는 앱</h3>
+        <p class="mt-2 text-[15px] text-[#4E5378] leading-relaxed">Duolingo의 Duo처럼 캐릭터가 인사·안내·경고를 맡고, ClassDojo 몬스터처럼 학교 앱다운 친근함. 색은 뜻 하나씩(하늘=행동, 민트=전달, 코랄=긴급).</p>
+      </div>
+      <div class="chunk p-6">
+        <p class="text-xs font-bold tracking-[.18em] text-[#6E7398]">COMPONENT</p>
+        <h3 class="mt-2 text-xl font-extrabold">눌리는 버튼</h3>
+        <p class="mt-2 text-[15px] text-[#4E5378] leading-relaxed">버튼 아래 같은 색의 진한 띠를 깔아, 누르면 내려앉는 느낌. 카드도 아래 테두리를 두껍게 해서 손에 잡히는 화면을 만듭니다.</p>
+      </div>
+      <div class="chunk p-6">
+        <p class="text-xs font-bold tracking-[.18em] text-[#6E7398]">RULE</p>
+        <h3 class="mt-2 text-xl font-extrabold">쿠션이가 빠지는 순간</h3>
+        <p class="mt-2 text-[15px] text-[#4E5378] leading-relaxed">학교폭력 · 아동학대 · 안전 같은 긴급 메시지와 위협 상세에는 캐릭터를 쓰지 않습니다. 가벼워 보이면 안 되는 화면이기 때문입니다.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 py-8 border-t border-[#D3DCF7] text-sm text-[#6E7398] flex flex-col md:flex-row gap-2 justify-between keep">
+    <p>정적 초안 · 내용은 유저플로우_쿠션톡_261015 · 앱 정의서 6-7절 예시 문구</p>
+    <p>시안 D · E · F 중 하나</p>
+  </footer>
+</body>
+</html>
