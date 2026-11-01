@@ -6,7 +6,7 @@
 
 ![쿠션톡 화면 · 교사 메시지함, 메시지 상세, 학부모 보내기 전 경고](docs/images/screens_e2.png)
 
-> 지금은 **설계 단계**예요. 위 화면은 확정 디자인 시안(E2)이고, 기획 · 화면 · DB · API 문서까지 마쳤어요. 개발은 이제 시작해요. ([진행 상황](#진행-상황))
+> 지금은 **앱 초안** 단계예요. 위 화면은 확정 디자인 시안(E2)이고, 앱 초안도 이 시안대로 돌아가요. AI는 아직 키워드 규칙이라 학습 모델로 바꿀 차례예요. ([진행 상황](#진행-상황) · [실행하기](#실행하기))
 
 ---
 
@@ -86,10 +86,39 @@ flowchart LR
 - [x] 디자인 시안 E2 확정 · 와이어프레임 26장 · 컴포넌트 명세 (10.16 → 11.02)
 - [x] DB 설계 확정 (11.02)
 - [x] API 명세 초안 (11.02)
+- [x] 앱 초안 (11.02): API 28개 · 화면(로그인 · 학부모 · 교사 · 관리자 · 반 톡방) · 키워드 규칙 AI
 - [ ] Todo 분담표
-- [ ] 백엔드: DB · API · AI 분석
-- [ ] 프론트: 공통 부품 → 화면
-- [ ] 연결 · 시연
+- [ ] AI: 키워드 규칙 → 학습한 로컬 모델(판단) + API LLM(작성)
+- [ ] 화면 다듬기 · 연결 · 시연
+
+## 실행하기
+
+처음 한 번만 설치해요.
+
+```bash
+cd backend && python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
+```
+
+```bash
+cd frontend && npm install
+```
+
+서버 두 개를 각각 켜요. 브라우저는 http://localhost:5173 으로 열어요 (휴대폰 폭으로 보면 좋아요).
+
+```bash
+cd backend && .venv/Scripts/python -m uvicorn app.api.main:app --reload
+```
+
+```bash
+cd frontend && npm run dev
+```
+
+- 처음 켜면 `backend/cushion.db`가 생기고 예시 데이터가 들어가요. 처음부터 다시 하려면 이 파일을 지우면 돼요.
+- 예시 계정은 비밀번호가 모두 `pass1234`예요: 교사 `teacher1`(김하늘, 3학년 2반) · 관리자 `admin1` · 학부모 `parent1`(민서) · `parent2`(하윤) · `parent3`(서연)
+- 학생은 교사 화면 → 반 톡방 → 참여 코드로 들어가요.
+- API 문서는 서버를 켠 뒤 http://localhost:8000/docs 에서 볼 수 있어요.
+- 흐름 검사: `cd backend && .venv/Scripts/python test_flow.py` · AI 규칙 검사: `.venv/Scripts/python app/ai/analyzer.py`
+- macOS · Linux에서는 `.venv/Scripts/python` 대신 `.venv/bin/python`을 써요.
 
 ## 문서
 
