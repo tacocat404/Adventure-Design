@@ -48,13 +48,20 @@ conv = c.get(f"/api/parent/classes/{cid}/conversation", headers=parent).json()["
 assert conv[-1]["kind"] == "reply"
 assert c.get(f"/api/teacher/messages/{mid}", headers=admin).status_code == 403
 
+# 요청이 있는 위협은 학교 필터와 답장할 것 둘 다에, 요청 없는 위협은 학교에만
+tid = c.post("/api/parent/messages", json={"class_id": cid, "text": "내일 찾아갈 거예요. 채점 기준을 알려 주세요.", "msg_type": "study"}, headers=parent).json()["id"]
+todo_ids = [i["id"] for i in c.get("/api/teacher/inbox", headers=teacher).json()["items"]]
+school_ids = [i["id"] for i in c.get("/api/teacher/inbox?filter=school", headers=teacher).json()["items"]]
+assert tid in todo_ids and tid in school_ids, (todo_ids, school_ids)
+assert all(i not in todo_ids for i in school_ids if i != tid)  # 예시의 “각오하고 계세요”는 요청이 없어 학교에만
+
 # 긴급은 답장하면 맨 위에서 내려감
 urg = box["urgent"][0]["id"]
 c.post(f"/api/teacher/messages/{urg}/replies", json={"body": "바로 확인할게요."}, headers=teacher)
 assert not c.get("/api/teacher/inbox", headers=teacher).json()["urgent"]
 
 # D: 위협 사건 → 증거(지문 확인) → 대응 기록 → 담임 알림
-case = c.get("/api/admin/cases", headers=admin).json()["cases"][0]
+case = c.get("/api/admin/cases", headers=admin).json()["cases"][-1]  # 가장 오래된 것 = 예시 “각오하고 계세요”
 ev = c.get(f"/api/admin/cases/{case['id']}", headers=admin).json()
 assert ev["hash_ok"] and "각오" in ev["original_text"]
 assert c.post(f"/api/admin/cases/{case['id']}/actions", json={"action_type": "meeting", "memo": "면담"}, headers=admin).json()["case_status"] == "handled"

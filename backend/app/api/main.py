@@ -402,7 +402,7 @@ def send_message(b: NewMessage, bg: BackgroundTasks, u=Depends(current)):
 
 # ───────── C 교사 ─────────
 INBOX_SQL = """SELECT m.id, m.category, m.analysis_status, m.msg_type, m.due_date, m.received_at, m.teacher_state, m.original_text,
-               a.summary, a.masked_count, a.urgent_type, cm.child_name, tc.status case_status
+               a.summary, a.requests, a.masked_count, a.urgent_type, cm.child_name, tc.status case_status
                FROM messages m LEFT JOIN analyses a ON a.message_id = m.id
                LEFT JOIN class_members cm ON cm.user_id = m.parent_id AND cm.class_id = m.class_id
                LEFT JOIN threat_cases tc ON tc.message_id = m.id
@@ -423,7 +423,8 @@ def inbox(filter: Literal["todo", "notice", "school"] = "todo", u=Depends(curren
     ms = rows(INBOX_SQL, u["id"])
     open_ = [m for m in ms if m["teacher_state"] != "replied"]
     groups = {
-        "todo": [m for m in open_ if m["category"] in (None, "normal")],
+        # 위협이어도 요청이 있으면 담임이 답할 일 (위협 요약은 담임에게도 감 · 11.02 담임 답장 가능). 학교 필터에도 그대로 남음
+        "todo": [m for m in open_ if m["category"] in (None, "normal") or (m["category"] == "threat" and json.loads(m["requests"] or "[]"))],
         "notice": [],  # ponytail: 알림 필터 규칙이 미정(명세 07절)이라 지금은 0개
         "school": [m for m in ms if m["category"] == "threat"],
     }
