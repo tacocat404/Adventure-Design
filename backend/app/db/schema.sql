@@ -104,6 +104,7 @@ CREATE TABLE analyses (
   masked_count   INTEGER NOT NULL DEFAULT 0,
   masked_spans   TEXT NOT NULL DEFAULT '[]',  -- JSON [{start, end}]
   threat_reason  TEXT,
+  request_summary TEXT,   -- 교사에게 보이는 정당한 요청 한 문장 (공격적 표현은 뺌)
   attempts       INTEGER NOT NULL CHECK (attempts BETWEEN 1 AND 2),
   model          TEXT NOT NULL,
   analyzed_at    TEXT NOT NULL

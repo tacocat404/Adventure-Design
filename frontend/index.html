@@ -66,7 +66,13 @@
       </symbol>
     </defs>
   </svg>
-  <div id="root"></div>
+  <!-- 넓은 화면(PC)에서는 휴대폰 틀 안에 앱처럼 보인다. 좁은 화면에서는 틀이 없다 (styles.css 맨 아래) -->
+  <div id="phone">
+    <div class="sbar"><span>9:41</span></div>
+    <div class="isl"></div>
+    <div id="root"></div>
+    <div class="hbar"></div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

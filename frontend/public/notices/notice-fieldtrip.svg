@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 980" width="720" height="980" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+<rect width="720" height="980" fill="#fff"/>
+<rect x="24" y="24" width="672" height="132" fill="none" stroke="#222" stroke-width="2"/>
+<line x1="184" y1="24" x2="184" y2="156" stroke="#222" stroke-width="2"/>
+<line x1="520" y1="24" x2="520" y2="156" stroke="#222" stroke-width="2"/>
+<line x1="520" y1="90" x2="696" y2="90" stroke="#222" stroke-width="2"/>
+<circle cx="104" cy="90" r="40" fill="#E8F2FD" stroke="#4A92DE" stroke-width="3"/>
+<path d="M84 100l20-30 20 30z" fill="#4A92DE"/><circle cx="104" cy="66" r="9" fill="#FFD872"/>
+<text x="352" y="76" text-anchor="middle" font-size="22" fill="#4A92DE" font-weight="700">함께 만드는 행복한 학교</text>
+<text x="352" y="124" text-anchor="middle" font-size="50" font-weight="700" fill="#111" letter-spacing="14">가정통신</text>
+<text x="608" y="64" text-anchor="middle" font-size="18" fill="#222" font-weight="700">담당부서</text>
+<text x="608" y="132" text-anchor="middle" font-size="20" fill="#222">3학년 2반</text>
+<text x="104" y="150" text-anchor="middle" font-size="14" fill="#222">해오름초등학교</text>
+<rect x="24" y="176" width="672" height="64" fill="#D8EFE6" stroke="#222" stroke-width="2"/>
+<text x="360" y="218" text-anchor="middle" font-size="30" font-weight="700" fill="#111">2학기 현장체험학습 안내</text>
+<text x="40" y="288" font-size="19" fill="#222">학부모님께</text>
+<text x="40" y="324" font-size="17" fill="#333">가을이 깊어 가는 요즘, 아이들이 교실 밖에서 배우고 느낄 수 있도록</text>
+<text x="40" y="352" font-size="17" fill="#333">3학년 2반 현장체험학습을 아래와 같이 실시하오니 안내해 드립니다.</text>
+<text x="40" y="408" font-size="19" font-weight="700" fill="#111">- 아 래 -</text>
+<rect x="40" y="432" width="640" height="282" fill="#FAFAFA" stroke="#999" stroke-width="1.5"/>
+<line x1="170" y1="432" x2="170" y2="714" stroke="#999"/>
+<line x1="40" y1="480" x2="680" y2="480" stroke="#999"/><line x1="40" y1="528" x2="680" y2="528" stroke="#999"/>
+<line x1="40" y1="576" x2="680" y2="576" stroke="#999"/><line x1="40" y1="624" x2="680" y2="624" stroke="#999"/><line x1="40" y1="670" x2="680" y2="670" stroke="#999"/>
+<text x="105" y="463" text-anchor="middle" font-size="17" font-weight="700" fill="#111">일 시</text><text x="190" y="463" font-size="17" fill="#222">2026. 11. 20.(금) 09:00 ~ 15:00</text>
+<text x="105" y="511" text-anchor="middle" font-size="17" font-weight="700" fill="#111">장 소</text><text x="190" y="511" font-size="17" fill="#222">국립중앙박물관 (서울 용산구)</text>
+<text x="105" y="559" text-anchor="middle" font-size="17" font-weight="700" fill="#111">이동 방법</text><text x="190" y="559" font-size="17" fill="#222">전세버스 (08:40 교문 앞 출발)</text>
+<text x="105" y="607" text-anchor="middle" font-size="17" font-weight="700" fill="#111">준 비 물</text><text x="190" y="607" font-size="17" fill="#222">도시락, 물, 필기도구, 편한 운동화</text>
+<text x="105" y="653" text-anchor="middle" font-size="17" font-weight="700" fill="#111">참가비</text><text x="190" y="653" font-size="17" fill="#222">없음 (학교 예산 지원)</text>
+<text x="105" y="699" text-anchor="middle" font-size="17" font-weight="700" fill="#111">회신</text><text x="190" y="699" font-size="17" fill="#222">11. 13.(금)까지 참가 동의서 제출</text>
+<text x="40" y="760" font-size="16" fill="#333">※ 우천 시 일정이 변경될 수 있으며, 변경 시 앱 알림장으로 안내합니다.</text>
+<text x="40" y="788" font-size="16" fill="#333">※ 가족과 함께하는 체험학습은 앱 [신청] 탭에서 신청서를 제출해 주세요.</text>
+<text x="360" y="868" text-anchor="middle" font-size="22" fill="#111">2026년 11월 4일</text>
+<text x="360" y="916" text-anchor="middle" font-size="30" font-weight="700" fill="#111" letter-spacing="6">해오름초등학교장</text>
+<circle cx="560" cy="904" r="30" fill="none" stroke="#D0332B" stroke-width="4"/><text x="560" y="912" text-anchor="middle" font-size="20" fill="#D0332B" font-weight="700">직인</text>
+</svg>

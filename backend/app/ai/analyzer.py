@@ -24,12 +24,13 @@ ROUGH = ["제대로 못", "그러고도", "자격", "무능", "한심", "미친"
          "멍청", "바보", "쓰레기", "정신 차", "돌았", "월급 받", "씨발", "시발", "ㅅㅂ", "병신", "ㅂㅅ"]
 # 위협 (애매해도 위협)
 THREAT = ["찾아가", "찾아갈", "각오", "가만 안 두", "가만두지", "가만 있지 않", "두고 보",
-          "어디 사는지", "어디 사시는지", "죽여", "고소", "신고하겠", "신고할"]
+          "어디 사는지", "어디 사시는지", "죽여", "고소", "신고하겠", "신고할", "가만히 안", "가만 안", "SNS에 올", "인터넷에 올", "퍼뜨리"]
 # 긴급: 학교폭력 · 아동학대 · 안전
 URGENT = {
     "child_abuse": ["학대", "집에서 맞", "굶"],
     "school_violence": ["맞는다", "맞았", "때리", "때렸", "폭행", "괴롭", "왕따", "따돌"],
-    "safety": ["다쳤", "위험", "무너", "화재", "자해", "자살", "실종"],
+    "safety": ["다쳤", "위험", "무너", "화재", "자해", "자살", "실종", "죽고 싶", "죽고싶", "죽을 것 같", "죽어 버리", "죽어버리", "살기 싫", "살고 싶지 않",
+               "사라지고 싶", "극단적", "목숨", "스스로 해치", "손목", "유서"],
 }
 REQUEST = ["주세요", "해 주", "부탁", "알려", "싶어요", "할까요", "있을까요", "바랍니다", "주실"]
 
@@ -48,7 +49,8 @@ def _clauses(text):
 
 
 def _hits(s, words):
-    return any(w in s for w in words)
+    flat = re.sub(r"\s+", "", s)  # 띄어쓰기가 달라도 잡는다 (죽고싶다 · 죽고 싶다)
+    return any(w in s or w.replace(" ", "") in flat for w in words)
 
 
 # ───────── 판단: 로컬 모델 ─────────
@@ -112,7 +114,9 @@ SUMMARY_SYS = """너는 학교 소통 앱 '쿠션톡'의 분류 · 요약 도우
 2) summary: 담임이 할 일을 해요체 한 문장으로. 요청이 있으면 "~해 달라는 요청이에요.", 없으면 "~라는 내용이에요."로 끝내. 위협이면 무엇을 하겠다는지 담담하게 적어.
 - [가림N]은 모욕 표현을 가려 둔 자리야. 요약에 넣지 마. [이름N]은 사람 이름이야. 그대로 써.
 - 요청은 하나도 빼지 말고, 메시지에 없는 내용은 지어내지 마.
-JSON만 출력해: {"category": "urgent|threat|normal", "urgent_type": "school_violence|child_abuse|safety|null", "reason": "urgent · threat로 본 이유 한 문장 (normal이면 null)", "summary": "...", "requests": ["짧은 요청", ...]}"""
+3) request_summary: 담임이 정당하게 처리할 수 있는 요청만 해요체 한 문장으로 (예: 자리 변경 · 상담 · 준비물 문의 · 숙제 양 조정). 사과 · 무릎 꿇기 같은 굴종 요구, 성적 · 평가를 바꾸라는 압박, 찾아오겠다 · 신고하겠다는 협박은 요청이 아니야 — 절대 넣지 마. 정당한 요청이 하나도 없으면 null.
+4) requests: 위의 정당한 요청만 짧게 (없으면 []).
+JSON만 출력해: {"category": "urgent|threat|normal", "urgent_type": "school_violence|child_abuse|safety|null", "reason": "urgent · threat로 본 이유 한 문장 (normal이면 null)", "summary": "...", "request_summary": "... 또는 null", "requests": ["짧은 요청", ...]}"""
 
 SOFTEN_SYS = """학부모가 담임에게 보내려는 메시지를 예의 바르게 고쳐 줘.
 - [가림N]은 거친 표현이 있던 자리야. 빼고 써.
@@ -129,7 +133,7 @@ def writer_name():
 def _llm(system, user, tries=2, timeout=LLM_TIMEOUT):
     if not writer_name():
         return None
-    body = {"model": ENV["CNU_MODEL"], "max_tokens": 400, "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
+    body = {"model": ENV["CNU_MODEL"], "max_tokens": 1500, "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
     req = urllib.request.Request(ENV.get("CNU_BASE_URL", "").rstrip("/") + "/chat/completions/", data=json.dumps(body).encode(),
                                  headers={"Authorization": "Bearer " + ENV["CNU_API_KEY"], "Content-Type": "application/json"})
     for _ in range(tries):
@@ -202,17 +206,19 @@ SEVERITY = {"normal": 0, "threat": 1, "urgent": 2}
 
 def analyze(original_text: str, names=(), use_api=True) -> dict:
     urgent_type = next((t for t, ws in URGENT.items() if _hits(original_text, ws)), None)
-    threat_words = [w for w in THREAT if w in original_text]
+    threat_words = [w for w in THREAT if _hits(original_text, [w])]
     category = "urgent" if urgent_type else "threat" if threat_words else "normal"
     reason = ", ".join(f"‘{w}’" for w in threat_words) + " 같은 위협 표현이 들어 있어요." if threat_words else None
     spans, api_spans, requests, rest = _judge(original_text)
     summary = " ".join(requests or rest[-1:]) or "거친 표현만 있어 요약할 요청이 없어요. 원문 보기로 확인해 주세요."
     writer = None
+    request_summary = " ".join(requests) or None  # 키워드만 돌 때: 거친 구절이 아닌 요청 구절
     # API도 분류를 판단한다: 키워드만으로는 위협 재현율 0.40 (ml/results.md). 더 심각한 쪽을 따른다 — 놓치는 것보다 한 번 더.
     hidden, pairs = _hide(original_text, api_spans, names)
     r = _llm(SUMMARY_SYS, hidden) if use_api else None
     if r and r.get("summary"):
-        summary, requests, writer = _show(r["summary"], pairs), [_show(x, pairs) for x in r.get("requests") or []] or requests, writer_name()
+        summary, requests, writer = _show(r["summary"], pairs), [_show(x, pairs) for x in r.get("requests") or []], writer_name()
+        request_summary = _show(r["request_summary"], pairs) if r.get("request_summary") else None  # 교사에게 보이는 건 이 문장뿐
         api_cat = r.get("category") if r.get("category") in SEVERITY else "normal"
         if SEVERITY[api_cat] > SEVERITY[category]:
             category, reason = api_cat, _show(r.get("reason") or "", pairs) or reason
@@ -224,6 +230,7 @@ def analyze(original_text: str, names=(), use_api=True) -> dict:
         "urgent_type": urgent_type if category == "urgent" else None,
         "summary": summary,
         "requests": requests,
+        "request_summary": request_summary,
         "masked_spans": spans,
         "threat_reason": reason if category == "threat" else None,
         "model": judge_name() + (f"/{writer}" if writer else ""),
