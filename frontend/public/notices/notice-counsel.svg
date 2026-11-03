@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 980" width="720" height="980" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif">
+<rect width="720" height="980" fill="#fff"/>
+<rect x="24" y="24" width="672" height="132" fill="none" stroke="#222" stroke-width="2"/>
+<line x1="184" y1="24" x2="184" y2="156" stroke="#222" stroke-width="2"/>
+<line x1="520" y1="24" x2="520" y2="156" stroke="#222" stroke-width="2"/>
+<line x1="520" y1="90" x2="696" y2="90" stroke="#222" stroke-width="2"/>
+<circle cx="104" cy="90" r="40" fill="#E8F2FD" stroke="#4A92DE" stroke-width="3"/>
+<path d="M84 100l20-30 20 30z" fill="#4A92DE"/><circle cx="104" cy="66" r="9" fill="#FFD872"/>
+<text x="352" y="76" text-anchor="middle" font-size="22" fill="#4A92DE" font-weight="700">함께 만드는 행복한 학교</text>
+<text x="352" y="124" text-anchor="middle" font-size="50" font-weight="700" fill="#111" letter-spacing="14">가정통신</text>
+<text x="608" y="64" text-anchor="middle" font-size="18" fill="#222" font-weight="700">담당부서</text>
+<text x="608" y="132" text-anchor="middle" font-size="20" fill="#222">교무부</text>
+<text x="104" y="150" text-anchor="middle" font-size="14" fill="#222">해오름초등학교</text>
+<rect x="24" y="176" width="672" height="64" fill="#FFF3B0" stroke="#222" stroke-width="2"/>
+<text x="360" y="218" text-anchor="middle" font-size="30" font-weight="700" fill="#111">2학기 학부모 상담주간 신청 안내</text>
+<text x="40" y="288" font-size="19" fill="#222">존경하는 학부모님께</text>
+<text x="40" y="324" font-size="17" fill="#333">가정에 건강과 평안이 가득하시기를 기원합니다. 우리 학교에서는 아이들의</text>
+<text x="40" y="352" font-size="17" fill="#333">학교생활과 학습 이야기를 나누고자 2학기 학부모 상담주간을 운영합니다.</text>
+<text x="40" y="380" font-size="17" fill="#333">바쁘시더라도 시간을 내어 참여해 주시면 감사하겠습니다.</text>
+<text x="40" y="436" font-size="19" font-weight="700" fill="#111">- 아 래 -</text>
+<rect x="40" y="460" width="640" height="236" fill="#FAFAFA" stroke="#999" stroke-width="1.5"/>
+<line x1="170" y1="460" x2="170" y2="696" stroke="#999"/>
+<line x1="40" y1="508" x2="680" y2="508" stroke="#999"/><line x1="40" y1="556" x2="680" y2="556" stroke="#999"/>
+<line x1="40" y1="604" x2="680" y2="604" stroke="#999"/><line x1="40" y1="650" x2="680" y2="650" stroke="#999"/>
+<text x="105" y="491" text-anchor="middle" font-size="17" font-weight="700" fill="#111">상담 기간</text><text x="190" y="491" font-size="17" fill="#222">2026. 11. 9.(월) ~ 11. 11.(수) 3일간</text>
+<text x="105" y="539" text-anchor="middle" font-size="17" font-weight="700" fill="#111">상담 시간</text><text x="190" y="539" font-size="17" fill="#222">14:00 ~ 18:30 (한 가정당 30분)</text>
+<text x="105" y="587" text-anchor="middle" font-size="17" font-weight="700" fill="#111">상담 방법</text><text x="190" y="587" font-size="17" fill="#222">대면 상담 (3학년 2반 교실)</text>
+<text x="105" y="633" text-anchor="middle" font-size="17" font-weight="700" fill="#111">신청 방법</text><text x="190" y="633" font-size="17" fill="#222">쿠션톡 앱 [상담 예약] 선착순 신청</text>
+<text x="105" y="679" text-anchor="middle" font-size="17" font-weight="700" fill="#111">신청 기간</text><text x="190" y="679" font-size="17" fill="#222">11. 4.(수) ~ 11. 7.(금)</text>
+<text x="40" y="740" font-size="16" fill="#333">※ 신청은 선착순이며, 한 가정당 한 번 신청할 수 있습니다.</text>
+<text x="40" y="768" font-size="16" fill="#333">※ 일정 변경은 앱에서 예약을 취소한 뒤 다시 신청해 주세요.</text>
+<text x="360" y="860" text-anchor="middle" font-size="22" fill="#111">2026년 11월 4일</text>
+<text x="360" y="912" text-anchor="middle" font-size="30" font-weight="700" fill="#111" letter-spacing="6">해오름초등학교장</text>
+<circle cx="560" cy="900" r="30" fill="none" stroke="#D0332B" stroke-width="4"/><text x="560" y="908" text-anchor="middle" font-size="20" fill="#D0332B" font-weight="700">직인</text>
+</svg>

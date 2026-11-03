@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>쿠션톡 API 명세</title>
-  <meta name="description" content="[26.11.02] 쿠션톡 API 명세 · FastAPI 엔드포인트 28개, 요청·응답 JSON, 오류 코드, AI 분석 계약, 화면별 API">
+  <meta name="description" content="[26.11.02] 쿠션톡 API 명세 · FastAPI 엔드포인트 32개, 요청·응답 JSON, 오류 코드, AI 분석 계약, 화면별 API">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
   <script>
@@ -81,7 +81,7 @@
         <h1 class="mt-5 text-5xl md:text-7xl font-black tracking-tight leading-[1.08]">쿠션톡<br>API 명세</h1>
       </div>
       <p class="text-[15px] md:text-base text-[#5a564f] leading-relaxed lg:text-right max-w-[36rem]">
-        와이어프레임 26장과 DB 설계(테이블 13개)를 이어 주는 <b class="text-ink">API <span id="api-count">28</span>개</b>를 정했습니다.
+        와이어프레임 26장과 DB 설계(테이블 13개)를 이어 주는 <b class="text-ink">API <span id="api-count">32</span>개</b>를 정했습니다.
         프론트는 이 문서의 요청 · 응답 모양만 보고 화면을 만들고, 백엔드는 이 모양대로 돌려줍니다.
         서버는 저장소 README대로 <b class="text-ink">Python FastAPI</b>, 주소는 모두 <code class="k">/api</code>로 시작합니다.
       </p>
@@ -197,7 +197,7 @@ Content-Type: application/json</pre></div>
   // ───────── 01 공통 규칙 ─────────
   const RULES = [
     ['주소', '모두 /api 아래, JSON으로', '요청과 응답 몸통은 JSON(UTF-8)입니다. 개발 중 주소는 http://localhost:8000/api, 문서는 FastAPI가 만드는 /docs에서도 볼 수 있습니다.', 'st-done'],
-    ['로그인', '토큰 하나로 사람을 알아봄', '로그인(G) · 학생 참여(F)에 성공하면 token을 받습니다. 그 뒤 모든 요청 머리에 Bearer 토큰을 붙이고, 서버는 토큰으로 users.role을 보고 권한을 판단합니다. 토큰 기한은 14일 (임시).', 'st-done'],
+    ['로그인', '토큰 하나로 사람을 알아봄', '소셜 로그인(G) · 학생 참여(F)에 성공하면 token을 받습니다. 그 뒤 모든 요청 머리에 Bearer 토큰을 붙이고, 서버는 토큰으로 users.role을 보고 권한을 판단합니다. 토큰 기한은 14일 (임시).', 'st-done'],
     ['시간', 'UTC ISO 글자', 'DB와 같이 2026-10-12T12:58:14Z 모양으로 주고받습니다. “어제 오후 9:58” 같은 표시는 프론트가 바꿉니다.', 'st-done'],
     ['원문', '원문 글자는 필요한 API에서만', '학부모 원문(original_text)은 ‘원문’이 이름에 들어간 API와 긴급 상세에서만 내려갑니다. 내려줄 때마다 서버가 original_views에 한 줄 남깁니다. 다른 API는 가린 형태(segments)만 줍니다.', 'st-hold'],
     ['새 소식', '실시간 연결 없이 다시 묻기', '웹소켓은 쓰지 않습니다 (임시). 메시지함 · 알림 · 톡방은 화면이 열려 있는 동안 10초마다 다시 부릅니다. 톡방은 after_id로 새 것만 받습니다.', 'st-temp'],
@@ -235,21 +235,21 @@ Content-Type: application/json</pre></div>
   const MSG_ITEM = { id: 41, child_name: '민서', category: 'normal', analysis_status: 'done', summary: '자리를 내일까지 바꿔 달라는 요청이에요.', msg_type: 'seating', due_date: '2026-10-14', masked_count: 2, received_at: '2026-10-12T12:42:00Z', teacher_state: 'new' };
   const API = [
     // G 로그인 · 가입
-    { id: 'G-1', g: 'auth', m: 'POST', p: '/api/auth/login', who: '어른', scr: 'G1', own: '백엔드 B', sum: '아이디 · 비밀번호로 로그인',
-      req: { login_id: 'minseo_mom', password: '********' },
+    { id: 'G-1', g: 'auth', m: 'POST', p: '/api/auth/social', who: '누구나', scr: 'G1', own: '백엔드 B', sum: '소셜 로그인 (카카오 · 네이버 · 구글)',
+      req: { provider: 'kakao', token: '(제공자에게서 받은 접근 토큰)' },
       res: { token: 'eyJhbGciOi…', user: { id: 7, role: 'parent', name: '박지영', school_id: 1 } },
-      err: ['WRONG_CREDENTIALS', 'VALIDATION'], db: ['users', '—'],
-      notes: ['학생은 이 API를 쓰지 않습니다 (login_id가 없음). 학생은 F-1 반 톡방 참여.', 'role에 따라 프론트가 첫 화면을 고릅니다: parent → A0, teacher → C1, admin → D1.'] },
+      err: ['SOCIAL_FAILED', 'PENDING_APPROVAL', 'VALIDATION'], db: ['users', '—'],
+      notes: ['서버가 접근 토큰으로 제공자의 프로필 주소를 불러 사용자 번호를 확인합니다. 우리 앱은 비밀번호를 받지 않습니다.', '이미 가입한 사람이면 token과 user를 줍니다. 처음 온 사람이면 { needs_signup: true, name, ticket }을 주고, G-3으로 이어집니다. ticket은 30분 안에 써야 합니다.', '선생님 · 교직원이 승인 전이면 PENDING_APPROVAL(403).', '개발 중에는 token을 "demo:이름"으로 보내는 데모 로그인이 됩니다 (CUSHION_DEMO_LOGIN=on, 기본 켬). 실제 연결은 카카오 · 네이버 · 구글 개발자 앱 키를 받은 뒤에 시험할 수 있습니다.', 'role에 따라 프론트가 첫 화면을 고릅니다: parent → A0, teacher → C1, admin → D1.'] },
     { id: 'G-2', g: 'auth', m: 'GET', p: '/api/schools?q=해오름', who: '누구나', scr: 'G2', own: '백엔드 B', sum: '학교 이름 검색 (로그인 전)',
       req: null,
       res: { schools: [{ id: 1, name: '해오름초등학교' }, { id: 2, name: '해오름중학교' }] },
       err: ['VALIDATION'], db: ['schools', '—'],
-      notes: ['q는 두 글자 이상. 이름에 q가 들어간 학교를 최대 20개.', '토큰 없이 부를 수 있는 API는 G-1 · G-2 · G-3 · F-1 넷뿐입니다.'] },
-    { id: 'G-3', g: 'auth', m: 'POST', p: '/api/auth/signup', who: '누구나', scr: 'G2', own: '백엔드 B', sum: '학부모 가입',
-      req: { school_id: 1, name: '박지영', login_id: 'minseo_mom', password: '********' },
-      res: { token: 'eyJhbGciOi…', user: { id: 7, role: 'parent', name: '박지영', school_id: 1 } },
-      err: ['LOGIN_ID_TAKEN', 'NOT_FOUND', 'VALIDATION'], db: ['schools', 'users'], status: 201,
-      notes: ['가입은 학부모만. 교사 · 관리자 계정은 학교가 만듭니다 (임시: 처음엔 SQL로 넣기).', '비밀번호는 8자 이상. 서버는 bcrypt 해시만 저장합니다.'] },
+      notes: ['q는 두 글자 이상. 이름에 q가 들어간 학교를 최대 20개.', '토큰 없이 부를 수 있는 API는 G-1 · G-2 · G-3 · G-6 · F-1뿐입니다.'] },
+    { id: 'G-3', g: 'auth', m: 'POST', p: '/api/auth/social/signup', who: '누구나', scr: 'G2', own: '백엔드 B', sum: '처음이면 학교 · 역할 정해 가입',
+      req: { ticket: '(G-1이 준 ticket)', role: 'teacher', school_id: 1, name: '김하늘' },
+      res: { pending: true }, status: 201,
+      err: ['UNAUTHORIZED', 'NOT_FOUND', 'ALREADY_JOINED', 'VALIDATION'], db: ['schools', 'users'],
+      notes: ['role: parent · teacher · admin. 학부모는 바로 쓸 수 있어서 { token, user }를 줍니다.', '선생님(teacher) · 교직원(admin)은 status = pending으로 들어가고 { pending: true }만 줍니다. 같은 학교 관리자가 승인(D-5)하면 G-1로 로그인됩니다.', '학교 · 역할을 잘못 고른 분은 관리자가 거절(D-6)하면 다시 가입할 수 있습니다.'] },
     { id: 'G-4', g: 'auth', m: 'GET', p: '/api/me', who: '모두', scr: '앱 시작', own: '백엔드 B', sum: '토큰 주인 확인',
       req: null,
       res: { user: { id: 7, role: 'parent', name: '박지영', school_id: 1, school_name: '해오름초등학교' } },
@@ -259,6 +259,16 @@ Content-Type: application/json</pre></div>
       req: null, res: null, status: 204,
       err: ['UNAUTHORIZED'], db: ['—', '—'],
       notes: ['서버가 토큰을 막는 목록에 넣습니다. 프론트는 저장해 둔 토큰을 지웁니다.'] },
+
+    { id: 'G-6', g: 'auth', m: 'POST', p: '/api/auth/login', who: '누구나', scr: '개발용', own: '백엔드 B', sum: '테스트 계정 로그인 (아이디 · 비밀번호)',
+      req: { login_id: 'teacher1', password: '********' },
+      res: { token: 'eyJhbGciOi…', user: { id: 2, role: 'teacher', name: '김하늘', school_id: 1 } },
+      err: ['WRONG_CREDENTIALS', 'VALIDATION'], db: ['users', '—'],
+      notes: ['개발 · 시연용. 처음 켤 때 넣는 예시 계정(비밀번호 pass1234)만 쓰고, 소셜 계정에는 비밀번호가 없습니다.', '시작 화면의 “개발용 테스트 계정” 링크는 GET /api/config의 demo_login이 true일 때만 보입니다.'] },
+    { id: 'G-7', g: 'auth', m: 'GET', p: '/api/config', who: '누구나', scr: '앱 시작', own: '백엔드 B', sum: '로그인 설정 (데모 로그인 여부)',
+      req: null, res: { demo_login: true, providers: ['kakao', 'naver', 'google'] },
+      err: [], db: ['—', '—'],
+      notes: ['demo_login이 true면 소셜 버튼이 이름만 넣는 데모 로그인 시트를 엽니다. false면 진짜 소셜 로그인만 됩니다.'] },
 
     // A 학부모
     { id: 'A-1', g: 'parent', m: 'GET', p: '/api/parent/teachers', who: '학부모', scr: 'A0', own: '백엔드 B', sum: '선생님 목록 (우리 학교 반 · 담임)',
@@ -341,6 +351,16 @@ Content-Type: application/json</pre></div>
       res: { case_status: 'returned', message_category: 'normal' },
       err: ['NOT_FOUND', 'FORBIDDEN', 'ALREADY_CLOSED'], db: ['threat_cases', 'threat_cases · case_actions · messages · notifications'],
       notes: ['한 번에: status = returned, case_actions에 return_normal 한 줄, messages.category = normal, 담임에게 case_update 알림.', 'analyses.ai_category는 그대로 남습니다 (AI가 처음 본 분류).'] },
+
+    { id: 'D-5', g: 'admin', m: 'GET', p: '/api/admin/members', who: '관리자', scr: 'D4', own: '풀스택', sum: '가입 승인을 기다리는 사람',
+      req: null,
+      res: { pending: [{ id: 12, role: 'teacher', name: '박서준', provider: 'kakao', created_at: '2026-11-03T14:38:00Z' }] },
+      err: ['FORBIDDEN'], db: ['users', '—'],
+      notes: ['우리 학교에 pending으로 가입한 선생님 · 교직원만. 목록은 D1 필터 “가입 승인”에 보이고 숫자가 붙습니다.'] },
+    { id: 'D-6', g: 'admin', m: 'POST', p: '/api/admin/members/{id}/approve', who: '관리자', scr: 'D4', own: '풀스택', sum: '가입 승인 (거절은 /reject)',
+      req: null, res: { id: 12, status: 'active' },
+      err: ['NOT_FOUND', 'FORBIDDEN'], db: ['users', 'users'],
+      notes: ['status = active로 바꿉니다. 그때부터 G-1로 로그인됩니다.', '거절은 POST /api/admin/members/{id}/reject. 아직 아무 기록이 없는 계정이라 행을 지웁니다 (응답 status: "rejected").'] },
 
     // E · F 반 톡방
     { id: 'E-1', g: 'room', m: 'GET', p: '/api/teacher/rooms', who: '교사', scr: 'E1', own: '백엔드 B', sum: '내 반 톡방 목록',
@@ -452,7 +472,9 @@ Content-Type: application/json</pre></div>
     ['WRONG_CREDENTIALS', 401, '아이디나 비밀번호가 틀림', '아이디 또는 비밀번호가 맞지 않아요.'],
     ['FORBIDDEN', 403, '역할이 맞지 않거나 내 반 · 내 학교 것이 아님', '볼 수 없는 내용이에요.'],
     ['NOT_FOUND', 404, '해당 번호의 메시지 · 사건 · 반 · 학교가 없음', '찾을 수 없어요.'],
-    ['LOGIN_ID_TAKEN', 409, '가입할 때 아이디가 이미 있음', '이미 쓰고 있는 아이디예요.'],
+    ['SOCIAL_FAILED', 401, '제공자 토큰을 확인하지 못함 (만료 · 잘못된 토큰)', '로그인을 확인하지 못했어요. 다시 해 주세요.'],
+    ['PENDING_APPROVAL', 403, '선생님 · 교직원이 관리자 승인 전에 로그인', '학교 관리자가 승인하면 쓸 수 있어요.'],
+    ['ALREADY_JOINED', 409, '이미 가입한 소셜 계정으로 다시 가입', '이미 가입한 계정이에요. 로그인해 주세요.'],
     ['ALREADY_LINKED', 409, '이미 이은 담임을 다시 이으려 함', '(그대로 대화로 이동)'],
     ['NOT_LINKED', 403, '잇지 않은 반에 보내거나 대화를 보려 함', '선생님 목록에서 먼저 선생님을 골라 주세요.'],
     ['CLASS_TAKEN', 409, '다른 교사가 이미 맡은 학년 · 반', '이미 다른 선생님이 연 반이에요.'],
@@ -498,8 +520,8 @@ Content-Type: application/json</pre></div>
 
   // ───────── 06 화면 → API ─────────
   const SCR = [
-    ['G1', '로그인 · 입력', 'G-1', '앱을 열 때 저장된 토큰이 있으면 G-4로 확인하고 건너뜀.'],
-    ['G2', '학부모 가입 · 학교 검색', 'G-2 · G-3', '두 글자부터 검색. 가입하면 바로 A0.'],
+    ['G1', '시작 · 소셜 로그인', 'G-7 · G-1', '앱을 열 때 저장된 토큰이 있으면 G-4로 확인하고 건너뜀. 개발 중엔 데모 로그인 시트(이름만).'],
+    ['G2', '학교 확인 (처음 가입)', 'G-2 · G-3', '두 글자부터 검색. 학부모는 가입하면 바로 A0, 선생님 · 교직원은 승인 대기 화면.'],
     ['A0', '선생님 목록', 'A-1 · A-2', 'others에서 고르면 A-2 (자녀 이름 시트) 뒤에 A1.'],
     ['A1', '학부모 작성 · 처음', 'A-3', '유형 목록(6개)은 프론트에 고정. 서버에서 받지 않음.'],
     ['A2', '보내기 전 검사 중', 'A-4', '5초 넘으면 A-5로 바로.'],
@@ -513,6 +535,7 @@ Content-Type: application/json</pre></div>
     ['C7', '상세 · 위협', 'C-2 · C-3 · C-4', '[원문 보기] = C-3 (teacher_sheet). case.status로 띠 문구.'],
     ['C8', '상세 · 분석 실패', 'C-2 · C-3 · C-4', '[펼치기] = C-3 (failed_expand).'],
     ['D1 · D3', '관리자 알림', 'D-1', 'status = new · handled.'],
+    ['D4', '가입 승인 (D1의 필터)', 'D-5 · D-6', '승인 · 거절. 승인하면 그 선생님이 G-1로 로그인됨.'],
     ['D2', '위협 상세 · 대응 기록', 'D-2 · D-3 · D-4', '[기록 저장] = D-3, [일반 메시지로 되돌리기] = D-4.'],
     ['E1', '반 톡방 목록', 'E-1 · E-2', '[열기] = E-2.'],
     ['E2', '참여 코드 · 처음', 'E-2 응답', '따로 부르지 않음.'],
@@ -528,7 +551,7 @@ Content-Type: application/json</pre></div>
   // ───────── 07 미정 ─────────
   const OPENS = [
     ['C', '메시지함 “알림” 필터에 무엇이 들어가나. 임시: 답장이 필요 없는 메시지 (분류 규칙 미정이라 지금은 0개).'],
-    ['G', '교사 · 관리자 계정을 누가 어떻게 만드나. 임시: 처음엔 SQL로 넣고, 관리자 화면은 나중에.'],
+    ['G', '(11.03 정함) 교사 · 관리자 계정: 소셜 가입 뒤 같은 학교 관리자가 승인. 학교의 첫 관리자만 DB에 직접 넣음.'],
     ['G', '학교 검색 결과의 지역 줄(“서울 마포구”). 와이어에는 있는데 schools에 칸이 없음 → 필요하면 schools.region 추가.'],
     ['공통', '실시간 알림 방식. 임시: 10초마다 다시 묻기. 나중에 웹소켓 · 푸시를 쓸지.'],
     ['D', '원문 열람 기록(N-3)을 보여 줄 화면. 지금은 API만 있음.'],

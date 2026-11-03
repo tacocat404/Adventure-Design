@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하이클래스 반영 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<style>
+:root { --bg:#F1F4FC; --surface:#fff; --ink:#262849; --sub:#6B7096; --faint:#9CA1C2; --edge:#DFE5F7;
+  --sky:#7AB8F5; --sky-deep:#4A92DE; --sky-soft:#E6F1FD; --butter:#FFD872; --butter-deep:#E9B83B; --butter-soft:#FFF6DC;
+  --mint:#6FD0B2; --mint-deep:#23876A; --mint-soft:#E1F6EF; --coral:#F2806F; --coral-deep:#D9604E; --coral-soft:#FDEBE8; --slate:#7383A3; --slate-soft:#EBEFF7; }
+* { box-sizing:border-box; margin:0; }
+body { background:#E6ECFA; color:var(--ink); font-family:Pretendard,-apple-system,system-ui,sans-serif; word-break:keep-all; padding:32px 16px 64px; }
+h1 { text-align:center; font-size:24px; font-weight:800; }
+.lead { text-align:center; color:var(--sub); font-size:14px; margin:6px auto 0; max-width:640px; line-height:1.55; }
+h2 { font-size:19px; font-weight:800; margin:48px auto 4px; max-width:1100px; display:flex; align-items:center; gap:8px; }
+h2 .p { font-size:12px; padding:3px 9px; border-radius:99px; background:var(--ink); color:#fff; }
+.note { max-width:1100px; margin:0 auto 22px; color:var(--sub); font-size:14px; line-height:1.55; }
+.row { display:flex; flex-wrap:wrap; gap:34px; justify-content:center; }
+figure { display:flex; flex-direction:column; align-items:center; gap:12px; }
+figcaption { text-align:center; font-size:13.5px; color:var(--sub); max-width:300px; line-height:1.5; }
+figcaption b { display:block; color:var(--ink); font-size:15px; margin-bottom:2px; }
+
+.phone { width:340px; height:660px; border:11px solid #15172B; border-radius:48px; background:var(--bg); overflow:hidden; position:relative; box-shadow:0 24px 50px rgba(38,40,73,.25); display:flex; flex-direction:column; }
+.phone::before { content:""; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:86px; height:24px; border-radius:16px; background:#15172B; z-index:3; }
+.sb { height:40px; padding:10px 26px 0; font-size:13px; font-weight:800; flex:none; display:flex; justify-content:space-between; }
+.scr { flex:1; overflow:hidden; padding:4px 14px 12px; display:flex; flex-direction:column; gap:10px; }
+.white { background:#fff; }
+.hd { display:flex; align-items:center; gap:8px; padding:2px 0 4px; }
+.hd b { font-size:17px; font-weight:800; flex:1; }
+.hd .bk { font-size:22px; font-weight:700; width:28px; }
+.jua { font-family:'Jua',sans-serif; font-weight:400; }
+.cap { font-size:12px; color:var(--sub); font-weight:600; }
+.sec { font-size:13px; font-weight:800; color:var(--sub); margin-top:2px; }
+.row2 { display:flex; align-items:center; gap:8px; }
+.g1 { flex:1; min-width:0; }
+
+/* 제안 카드: 얇은 선, 아래선 두껍게 하지 않음 */
+.card { background:#fff; border:1px solid var(--edge); border-radius:18px; padding:12px 14px; }
+.card.urgent { background:var(--coral-soft); border:2px solid #F6C6BD; border-bottom-width:4px; }
+.card.pin { background:var(--sky-soft); border-color:transparent; }
+.card p { font-size:13.5px; line-height:1.45; }
+.card .tt { font-size:14.5px; font-weight:800; margin:6px 0 2px; }
+
+/* 칩 체계 */
+.chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+.c-sky { background:#E3EEFC; color:#3B78C4; } .c-green { background:#DDF5E5; color:#1F8A4C; }
+.c-coral { background:#FDE3DF; color:#C9473A; } .c-ink { background:var(--ink); color:#fff; }
+.c-line { background:var(--bg); color:var(--sub); } .c-butter { background:var(--butter-soft); color:#9A7414; }
+.c-slate { background:var(--slate-soft); color:var(--slate); }
+.chips { display:flex; gap:5px; flex-wrap:wrap; }
+
+/* 탭 */
+.tabs { display:flex; gap:16px; border-bottom:1px solid var(--edge); padding:0 2px; font-size:14px; font-weight:700; color:var(--faint); overflow:hidden; }
+.tabs span { padding:8px 0; white-space:nowrap; } .tabs .on { color:var(--ink); border-bottom:2.5px solid var(--ink); }
+.pillbtn { background:var(--sky-deep); color:#fff; font-size:12.5px; font-weight:800; padding:7px 12px; border-radius:99px; white-space:nowrap; }
+
+/* 하단 탭바 */
+.tabbar { flex:none; display:flex; background:#fff; border-top:1px solid var(--edge); padding:7px 6px 20px; }
+.tabbar div { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10.5px; font-weight:700; color:var(--faint); position:relative; }
+.tabbar div.on { color:var(--sky-deep); } .tabbar svg { width:24px; height:24px; }
+.tabbar i { position:absolute; top:-2px; right:22%; background:var(--coral); color:#fff; font-style:normal; font-size:10px; min-width:16px; height:16px; border-radius:9px; display:grid; place-items:center; }
+
+/* 폼 */
+.f { display:flex; flex-direction:column; gap:4px; }
+.f label { font-size:12.5px; font-weight:700; color:var(--sub); display:flex; justify-content:space-between; }
+.f label em { color:var(--coral-deep); font-style:normal; }
+.inp { background:#fff; border:1.5px solid var(--edge); border-radius:14px; padding:10px 14px; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
+.inp.blue { color:var(--sky-deep); border-color:var(--sky); }
+.seg { display:flex; gap:6px; flex-wrap:wrap; }
+.seg span { padding:7px 13px; border-radius:99px; border:1.5px solid var(--edge); background:#fff; font-size:13px; font-weight:700; color:var(--sub); }
+.seg .on { background:var(--sky-deep); border-color:var(--sky-deep); color:#fff; }
+.hint { background:#fff; border-radius:12px; padding:9px 12px; font-size:12.5px; color:var(--sub); }
+.cta { background:var(--sky-deep); color:#fff; font-weight:800; font-size:15px; text-align:center; padding:13px; border-radius:16px; }
+.cta.ghost { background:#fff; color:var(--sky-deep); border:1.5px solid var(--sky); }
+.radio { display:flex; align-items:center; gap:10px; padding:9px 4px; font-size:14px; font-weight:600; }
+.radio::before { content:""; width:18px; height:18px; border-radius:50%; border:2px solid var(--edge); flex:none; }
+.radio.on::before { border-color:var(--sky-deep); background:radial-gradient(var(--sky-deep) 45%, transparent 50%); }
+
+/* 홈 퀵버튼 */
+.quick { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.quick div { background:#fff; border:1px solid var(--edge); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; font-weight:800; }
+.quick .ic { width:36px; height:36px; border-radius:12px; display:grid; place-items:center; } .quick svg { width:20px; height:20px; }
+.ic.s { background:var(--sky-soft); color:var(--sky-deep); } .ic.b { background:var(--butter-soft); color:#A9861F; }
+.ic.m { background:var(--mint-soft); color:var(--mint-deep); } .ic.c { background:var(--coral-soft); color:var(--coral-deep); }
+.stat { display:flex; gap:8px; } .stat div { flex:1; background:#fff; border-radius:16px; padding:10px 12px; border:1px solid var(--edge); }
+.stat b { display:block; font-size:22px; font-family:'Jua'; font-weight:400; } .stat small { font-size:11.5px; color:var(--sub); font-weight:700; }
+.tt-row { display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; border-bottom:1px solid var(--bg); } .tt-row:last-child { border:0; }
+.tt-row span:first-child { color:var(--faint); font-weight:700; width:24px; }
+.say { background:#fff; border-radius:18px 18px 18px 5px; padding:10px 14px; font-size:14.5px; font-weight:700; line-height:1.4; }
+.mascot { width:54px; height:54px; border-radius:50%; background:var(--butter); display:grid; place-items:center; font-size:26px; flex:none; }
+
+/* 비교 패널 */
+.cmp { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; max-width:1100px; margin:0 auto; }
+.cmp > div { background:var(--bg); border-radius:24px; padding:18px; width:340px; display:flex; flex-direction:column; gap:10px; }
+.cmp h3 { font-size:14px; font-weight:800; } .cmp .old { background:#fff; border:2px solid var(--edge); border-bottom-width:5px; border-radius:22px; padding:14px 16px; }
+.tok { display:flex; gap:6px; flex-wrap:wrap; } .tok span { width:34px; height:34px; border-radius:10px; }
+.onb { flex:1; background:linear-gradient(#DCEEFF,#C9D8FF); display:flex; flex-direction:column; align-items:center; padding:28px 18px 0; gap:6px; text-align:center; }
+.onb .ico { width:46px; height:46px; border-radius:16px; background:#5BC0FF; display:grid; place-items:center; color:#fff; margin-bottom:8px; } .onb h4 { font-size:24px; font-weight:800; color:#1E3A8A; }
+.onb p { font-size:14px; color:#5A6A9A; font-weight:600; line-height:1.45; }
+.onb .mini { margin-top:22px; width:100%; flex:1; background:#fff; border-radius:28px 28px 0 0; padding:14px; text-align:left; display:flex; flex-direction:column; gap:8px; box-shadow:0 0 0 6px rgba(255,255,255,.5); }
+.dots { display:flex; gap:5px; justify-content:center; padding:10px 0 4px; } .dots i { width:6px; height:6px; border-radius:50%; background:#B9C6EA; } .dots i.on { background:var(--sky-deep); width:18px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c0-3.5 2.7-5.5 6-5.5s6 2 6 5.5M15.5 14.2c3 0 5.5 1.6 5.5 4.8"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 12.5l3 3 5-6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-news" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2zM16 9h4v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></symbol>
+</svg>
+
+<h1>하이클래스 반영 시안</h1>
+<p class="lead">쿠션톡 E2 색·쿠션이는 그대로 두고, 하이클래스에서 가져올 <b>구조</b>(출결 폼 · 공지 피드 · 양식 · 설문 · 하단 탭바 · 칩)를 화면으로 옮겼어요. 휴대폰 안은 모두 학부모 · 교사 화면이고, 관리자 화면은 바꾸지 않아요.</p>
+
+<!-- ───────── 0. 부품 -->
+<h2>0. 바뀌는 부품</h2>
+<p class="note">두꺼운 아래 보더 카드를 <b>긴급 · 위협 카드에만</b> 남기고, 나머지는 얇은 선 카드로 바꿔요. 하이클래스처럼 칩 색으로 종류를 구분해요. 눈에 띄는 건 "긴급"뿐이게 만들려는 거예요.</p>
+<div class="cmp">
+  <div><h3>지금 (E2)</h3>
+    <div class="old"><div class="row2"><b style="font-size:14px">민서 보호자 · 상담</b><span class="cap" style="margin-left:auto">10분 전</span></div><p style="font-size:13.5px;margin-top:4px">다음 주 상담 가능한 시간을 알려 주세요.</p></div>
+    <div class="old"><div class="row2"><b style="font-size:14px">하윤 보호자 · 결석</b></div><p style="font-size:13.5px;margin-top:4px">감기로 오늘 못 갑니다.</p></div>
+    <p class="cap">모든 카드가 같은 무게라 급한 것이 안 보여요.</p></div>
+  <div><h3>제안</h3>
+    <div class="card"><div class="row2"><b style="font-size:14px">민서 보호자</b><span class="chip c-sky">상담</span><span class="cap" style="margin-left:auto">10분 전</span></div><p style="margin-top:4px">다음 주 상담 가능한 시간을 알려 주세요.</p></div>
+    <div class="card"><div class="row2"><b style="font-size:14px">하윤 보호자</b><span class="chip c-butter">결석</span><span class="chip c-line">질병</span></div><p style="margin-top:4px">1/15 · 감기로 등교하지 못해요.</p></div>
+    <div class="card urgent"><div class="row2"><span class="chip c-coral" style="background:var(--coral);color:#fff">긴급 · 안전</span></div><p style="margin-top:4px;font-weight:700">원문 그대로 맨 위</p></div>
+    <p class="cap">얇은 카드 + 유형 칩. 두꺼운 선은 긴급만.</p></div>
+  <div><h3>칩 · 색 규칙</h3>
+    <div class="card"><div class="chips"><span class="chip c-sky">상담 · 공지</span><span class="chip c-butter">결석 · 조퇴</span><span class="chip c-green">진행중</span><span class="chip c-ink">D-7</span><span class="chip c-coral">필수</span><span class="chip c-line">단일선택 · 질병</span><span class="chip c-slate">위협 대응</span></div></div>
+    <div class="tok"><span style="background:var(--sky-deep)"></span><span style="background:var(--butter)"></span><span style="background:var(--mint)"></span><span style="background:var(--coral)"></span><span style="background:var(--slate)"></span><span style="background:var(--ink)"></span></div>
+    <p class="cap">색 토큰은 E2 그대로예요. 파랑 = 일반 · 노랑 = 출결 · 초록 = 진행 · 코랄 = 긴급과 필수 · 회청 = 위협.</p></div>
+</div>
+
+<!-- ───────── 1. 홈 -->
+<h2><span class="p">P0</span>1. 학부모 홈 — 두 가지 안</h2>
+<p class="note">출결 알리기를 첫 화면에서 바로 누를 수 있게 하는 게 목표예요. <b>A는 버튼 중심</b>(하이클래스 스토어 이미지 느낌), <b>B는 피드 중심</b>(하이클래스 학급운영 느낌)이에요. 하단 탭바는 둘 다 같아요.</p>
+<div class="row">
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr">
+      <div class="row2"><span class="jua" style="font-size:24px;color:var(--sky-deep)">쿠션톡</span><span class="cap" style="margin-left:auto">3학년 2반 · 김하늘 선생님</span></div>
+      <div class="row2"><div class="mascot">🙂</div><div class="say">서준수 어머님, 오늘도 안녕하세요!</div></div>
+      <div class="quick">
+        <div><span class="ic s"><svg><use href="#i-msg"/></svg></span>선생님께 연락</div>
+        <div><span class="ic b"><svg><use href="#i-check"/></svg></span>출결 알리기</div>
+        <div><span class="ic m"><svg><use href="#i-doc"/></svg></span>양식 신청</div>
+        <div><span class="ic c"><svg><use href="#i-chart"/></svg></span>설문 응답<span class="chip c-ink" style="width:fit-content">D-7</span></div>
+      </div>
+      <p class="sec">오늘</p>
+      <div class="card"><div class="row2"><b style="font-size:13.5px">1월 15일 목요일</b><span class="chip c-line" style="margin-left:auto">시간표 · 급식</span></div>
+        <div class="tt-row" style="margin-top:6px"><span>1</span><span>영어</span><span>2 도덕</span><span>3 주제</span></div>
+        <p class="cap" style="margin-top:4px">급식 차수수밥 · 편육양파무침 · 보쌈김치</p></div>
+    </div>
+    <div class="tabbar"><div class="on"><svg><use href="#i-home"/></svg>홈</div><div><svg><use href="#i-msg"/></svg>연락</div><div><svg><use href="#i-news"/></svg>학교소식<i>2</i></div><div><svg><use href="#i-chat"/></svg>반 톡방</div><div><svg><use href="#i-user"/></svg>내 정보</div></div>
+  </div>
+  <figcaption><b>A · 버튼 허브</b>무엇을 할지 먼저 고르는 홈. 네 가지 할 일이 크게 보여요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="row2"><span style="font-size:20px">‹</span>
+        <div class="g1"><b style="font-size:16px">3학년 2반</b><div class="cap">하이중학교 · 김하늘 선생님</div></div><span class="pillbtn">출결 알리기</span></div>
+      <div class="tabs"><span class="on">최근</span><span>학급공지</span><span>설문 <b style="color:var(--coral)">·</b></span><span>톡방</span></div>
+      <div class="card pin"><div class="row2"><b style="font-size:13px" class="g1">진로 연계 체험 안내</b><span class="chip c-ink">고정</span></div><p class="cap" style="margin-top:2px">내일 1월 8일은 서울 시내 주요 대학을 방문해요…</p></div>
+      <div class="card"><div class="row2"><span class="chip c-sky">가정통신문</span><span class="cap" style="margin-left:auto">26.03.05</span></div>
+        <p class="tt">3~4월 서울 학부모 마음 상담 프로그램</p><p class="cap">첨부파일 1개</p></div>
+      <div class="card"><div class="row2"><span class="chip c-sky">설문</span><span class="chip c-green">진행중</span><span class="chip c-ink">D-7</span></div>
+        <p class="tt">신입생 체육복 만족도 조사</p><p class="cap">회신 기간 03.07~03.10</p></div>
+      <div class="card"><div class="row2"><span class="chip c-line">급식</span></div><p class="tt">오늘의 급식 · 차수수밥</p></div>
+    </div>
+    <div class="tabbar"><div><svg><use href="#i-home"/></svg>홈</div><div><svg><use href="#i-msg"/></svg>연락</div><div class="on"><svg><use href="#i-news"/></svg>학교소식</div><div><svg><use href="#i-chat"/></svg>반 톡방</div><div><svg><use href="#i-user"/></svg>내 정보</div></div>
+  </div>
+  <figcaption><b>B · 피드 중심</b>들어오면 소식부터. 출결 알리기는 헤더 버튼으로 항상 보여요.</figcaption>
+</figure>
+</div>
+
+<!-- ───────── 2. 출결 -->
+<h2><span class="p">P0</span>2. 출결 알리기 — 학부모 폼 → 교사 화면</h2>
+<p class="note">자유 글쓰기를 없애고 <b>폼으로 보내요</b>. 사유 칸만 글이라서, 거친 표현 경고는 사유 칸에만 걸면 돼요. 교사는 결석 연락을 "읽는" 대신 한 줄로 "확인"해요.</p>
+<div class="row">
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:9px">
+      <div class="hd"><span class="bk">‹</span><b>출결 알리기</b></div>
+      <div class="f"><label>학생명</label><div class="inp">서준수</div></div>
+      <div class="f"><label>출결 구분</label><div class="seg"><span>지각</span><span class="on">결석</span><span>조퇴</span><span>결과</span></div></div>
+      <div class="hint">결석 사유서를 제출해 주세요. → <b style="color:var(--sky-deep)">양식 신청으로</b></div>
+      <div class="f"><label>출결일 <span class="chip c-sky">날짜 추가</span></label><div class="inp blue">1월 15일 목요일 (오늘) <span>📅</span></div></div>
+      <div class="f"><label>상세 구분</label><div class="seg"><span class="on">질병</span><span>미인정</span><span>기타</span><span>출석인정</span></div></div>
+      <div class="f"><label>사유 <em>3/100</em></label><div class="inp" style="align-items:flex-start;height:70px;font-weight:500;color:var(--sub)">감기로 오늘 등교 못하게 되었습니다.</div></div>
+      <div class="cta" style="margin-top:auto">선생님께 알리기</div>
+    </div>
+  </div>
+  <figcaption><b>학부모 · 출결 알리기</b>구분 · 날짜 · 상세구분은 고르기만. 글은 사유 한 칸.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="row2"><span class="jua" style="font-size:24px;color:var(--sky-deep)">쿠션톡</span><span class="cap" style="margin-left:auto">1월 15일</span></div>
+      <div class="stat"><div><b style="color:var(--coral-deep)">1</b><small>긴급</small></div><div><b>3</b><small>답장할 것</small></div><div><b style="color:#A9861F">3</b><small>오늘 출결</small></div></div>
+      <div class="tabs"><span class="on">답장할 것</span><span>출결</span><span>알림</span><span>학교</span></div>
+      <div class="card urgent"><span class="chip" style="background:var(--coral);color:#fff">긴급 · 안전</span><p style="font-weight:700;margin-top:5px">원문 그대로 · 하은 보호자</p><p class="cap">학교 오는 길에 모르는 사람이…</p></div>
+      <div class="card"><div class="row2"><b style="font-size:14px">서준수</b><span class="chip c-butter">결석</span><span class="chip c-line">질병</span><span class="cap" style="margin-left:auto">11:18</span></div><p style="margin-top:3px">1/15 · 감기로 등교하지 못해요.</p><div class="row2" style="margin-top:6px"><span class="chip c-green">확인함</span></div></div>
+      <div class="card"><div class="row2"><b style="font-size:14px">하윤</b><span class="chip c-butter">조퇴</span><span class="chip c-line">기타</span></div><p style="margin-top:3px">1/15 · 14:00 병원 진료</p></div>
+      <div class="card"><div class="row2"><b style="font-size:14px">지호 보호자</b><span class="chip c-sky">상담</span><span class="chip c-ink">D-3</span></div><p style="margin-top:3px">상담 희망 시간을 알려 달라는 요청이에요. <span style="background:var(--butter);border-radius:99px;padding:1px 8px;font-size:11.5px;font-weight:800">2곳 막음</span></p></div>
+    </div>
+    <div class="tabbar"><div class="on"><svg><use href="#i-msg"/></svg>메시지함</div><div><svg><use href="#i-check"/></svg>출결</div><div><svg><use href="#i-news"/></svg>공지</div><div><svg><use href="#i-chat"/></svg>반 톡방</div><div><svg><use href="#i-user"/></svg>설정</div></div>
+  </div>
+  <figcaption><b>교사 · 메시지함</b>상단 숫자 3칸, 출결 탭. 출결은 칩 한 줄로 읽혀요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="hd"><span class="bk">‹</span><b>오늘의 출결</b><span class="cap">1월 15일 목</span></div>
+      <div class="stat"><div><b>2</b><small>결석</small></div><div><b>1</b><small>조퇴</small></div><div><b>0</b><small>지각</small></div></div>
+      <p class="sec">결석 2</p>
+      <div class="card"><div class="row2"><div class="g1"><b style="font-size:14.5px">서준수</b><p class="cap">질병 · 감기로 등교하지 못해요</p></div><span class="chip c-green">확인함</span></div></div>
+      <div class="card"><div class="row2"><div class="g1"><b style="font-size:14.5px">이하은</b><p class="cap">출석인정 · 대회 참가</p></div><span class="chip c-coral">확인 전</span></div></div>
+      <p class="sec">조퇴 1</p>
+      <div class="card"><div class="row2"><div class="g1"><b style="font-size:14.5px">박지호</b><p class="cap">기타 · 14:00 병원</p></div><span class="chip c-coral">확인 전</span></div></div>
+      <div class="cta ghost" style="margin-top:auto">모두 확인하기</div>
+    </div>
+  </div>
+  <figcaption><b>교사 · 오늘의 출결</b>출결부 쓰기 전에 한 화면에서 훑어봐요. 새로 생기는 화면이에요.</figcaption>
+</figure>
+</div>
+
+<!-- ───────── 3. 학교소식 -->
+<h2><span class="p">P1</span>3. 학교소식(공지) · 양식 신청</h2>
+<p class="note">쿠션톡에 없던 <b>교사 → 학부모</b> 방향이에요. 공지는 AI를 거치지 않아요. 양식은 출결의 "사유서 제출" 링크와 이어져요.</p>
+<div class="row">
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="hd"><span class="bk">‹</span><b>학교소식</b></div>
+      <div class="tabs"><span class="on">전체</span><span>가정통신문</span><span>급식</span><span>학교공지</span></div>
+      <div class="card"><div class="row2"><div class="mascot" style="width:34px;height:34px;font-size:15px;background:var(--sky-soft)">Hi</div><div class="g1"><b style="font-size:13.5px">하이중학교</b><p class="cap">26.03.05 목요일</p></div><span class="cap">⋮</span></div>
+        <div style="margin:8px 0 2px"><span class="chip c-sky">가정통신문</span></div><p class="tt" style="margin-top:2px">3~4월 서울 학부모 마음 상담 프로그램</p>
+        <div style="height:64px;border:1px solid var(--edge);border-radius:8px;margin-top:6px;display:grid;place-items:center;font-size:12px;color:var(--faint)">첨부 미리보기</div>
+        <div class="row2" style="margin-top:8px;font-size:12.5px;font-weight:700;color:var(--sub)"><span>📎 첨부파일 1개</span><span style="margin-left:auto">☆ 스크랩</span></div></div>
+      <div class="card"><div class="row2"><div class="mascot" style="width:34px;height:34px;font-size:15px;background:var(--sky-soft)">Hi</div><div class="g1"><b style="font-size:13.5px">하이중학교</b><p class="cap">26.03.03 화요일</p></div></div>
+        <div style="margin:8px 0 2px"><span class="chip c-green">공지사항</span></div><p class="tt" style="margin-top:2px">2026 학생회 정부회장 선거 공고</p></div>
+    </div>
+    <div class="tabbar"><div><svg><use href="#i-home"/></svg>홈</div><div><svg><use href="#i-msg"/></svg>연락</div><div class="on"><svg><use href="#i-news"/></svg>학교소식</div><div><svg><use href="#i-chat"/></svg>반 톡방</div><div><svg><use href="#i-user"/></svg>내 정보</div></div>
+  </div>
+  <figcaption><b>학부모 · 학교소식 피드</b>탭으로 거르기, 첨부 개수, 스크랩.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="hd"><span class="bk">‹</span><b>체험학습 신청서</b></div>
+      <div class="f"><label>신청기간 <em>*</em></label><p class="cap" style="margin-bottom:2px">1일 또는 반일 기준으로 쓸 수 있어요.</p>
+        <div class="row2"><div class="inp blue g1" style="justify-content:center">2026.03.15</div>~<div class="inp blue g1" style="justify-content:center">2026.03.16</div></div></div>
+      <div class="f"><label>학습형태 <em>*</em></label><div class="inp">가족여행 <span>⌄</span></div></div>
+      <div class="f"><label>체험장소 <em>*</em> <span style="font-weight:600;color:var(--faint)">3/30</span></label><div class="inp">제주도</div></div>
+      <div class="f"><label>숙박장소 <span style="font-weight:600;color:var(--faint)">5/30</span></label><div class="inp">서귀포시내</div></div>
+      <div class="f"><label>체험목적 <em>*</em> <span style="font-weight:600;color:var(--faint)">22/30</span></label><div class="inp" style="height:58px;align-items:flex-start;font-weight:500">제주지역 박물관 및 역사 유적지 탐방을 위해</div></div>
+      <div class="cta" style="margin-top:auto">제출하기</div>
+    </div>
+  </div>
+  <figcaption><b>학부모 · 양식 신청서</b>필수 별표, 글자수, 날짜 칩. 체험학습 1종부터 시작해요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:9px">
+      <div class="hd"><span class="bk">‹</span><b>공지 올리기</b></div>
+      <div class="f"><label>종류</label><div class="seg"><span class="on">가정통신문</span><span>학급공지</span><span>알림</span></div></div>
+      <div class="f"><label>제목</label><div class="inp">진로 연계 체험 안내</div></div>
+      <div class="f"><label>내용</label><div class="inp" style="height:90px;align-items:flex-start;font-weight:500;color:var(--sub)">내일 1월 8일은 진로 연계 체험으로 서울 시내 주요 대학을 방문합니다…</div></div>
+      <div class="f"><label>첨부</label><div class="inp" style="color:var(--sub)">＋ 파일 · 사진 추가</div></div>
+      <div class="row2" style="font-size:13.5px;font-weight:700"><span class="chip c-ink">고정</span> 반 맨 위에 고정하기</div>
+      <div class="hint">공지는 쿠션이를 거치지 않고 그대로 나가요.</div>
+      <div class="cta" style="margin-top:auto">올리기</div>
+    </div>
+  </div>
+  <figcaption><b>교사 · 공지 올리기</b>종류, 제목, 내용, 첨부, 고정. 끝.</figcaption>
+</figure>
+</div>
+
+<!-- ───────── 4. 설문 / 반 톡방 -->
+<h2><span class="p">P2</span>4. 설문 응답 · 반 톡방 탭 · 시간표 · 온보딩</h2>
+<p class="note">대회 이후로 미뤄 둔 화면까지 한 번에 그렸어요. 구조는 위 화면들과 같은 부품(칩, 폼, 탭)만 써서 새로 만들 게 거의 없어요.</p>
+<div class="row">
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="hd"><span class="bk">‹</span><b>가정통신문</b></div>
+      <div class="chips"><span class="chip c-sky">설문</span><span class="chip c-green">진행중</span><span class="chip c-ink">D-7</span></div>
+      <b style="font-size:18px;font-weight:800">신입생 체육복 만족도 조사</b><p class="cap">하이중학교 · 발행일 2026.03.05 11:18</p>
+      <div class="card" style="border:0"><p>본교 체육복에 대한 의견을 수렴하고자 해요. 솔직하게 답해 주세요.</p></div>
+      <p class="sec">회신 기간 26.03.07~03.10</p>
+      <div class="card" style="background:var(--bg);border:0"><div class="chips"><span class="chip c-coral">필수</span><span class="chip c-sky">단일선택</span></div>
+        <p class="tt">체육복 가격 대비 질에 만족한다.</p>
+        <div class="radio">매우만족 (10점)</div><div class="radio on">만족 (8점)</div><div class="radio">보통 (6점)</div><div class="radio">불만 (4점)</div></div>
+    </div>
+  </div>
+  <figcaption><b>설문 응답</b>필수 · 단일선택 칩, 라디오. 응답 결과는 교사만 봐요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:8px">
+      <div class="hd"><span class="bk">‹</span><b>3학년 2반</b><span class="pillbtn">참여 코드</span></div>
+      <div class="tabs"><span>최근</span><span>학급공지</span><span class="on">톡방</span><span>앨범</span><span>과제 <b style="color:var(--coral)">·</b></span></div>
+      <div class="card pin"><div class="row2"><b style="font-size:13px" class="g1">일반고 배정학교 발표 안내</b><span class="chip c-ink">고정</span></div></div>
+      <div class="card"><div class="row2"><b style="font-size:13.5px" class="g1">김하늘 선생님</b><span class="cap">11:02</span></div><p style="margin-top:3px">내일은 반드시 교복(또는 체육복)을 입고 와 주세요.</p></div>
+      <div class="card"><div class="row2"><b style="font-size:13.5px" class="g1">서준수</b><span class="cap">11:05</span></div><p style="margin-top:3px">네! 알겠습니다 🙂</p></div>
+      <div class="hint" style="margin-top:auto">이 방은 쿠션이를 거치지 않아요 · 선생님 개인 계정은 보이지 않아요</div>
+    </div>
+    <div class="tabbar"><div><svg><use href="#i-msg"/></svg>메시지함</div><div><svg><use href="#i-check"/></svg>출결</div><div><svg><use href="#i-news"/></svg>공지</div><div class="on"><svg><use href="#i-chat"/></svg>반 톡방</div><div><svg><use href="#i-user"/></svg>설정</div></div>
+  </div>
+  <figcaption><b>교사 · 반 톡방 탭 확장</b>채팅만 있던 방에 공지, 앨범, 과제 탭을 더해요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb"><span>11:23</span><span>●●●</span></div>
+    <div class="scr" style="gap:6px;padding-top:2px">
+      <div class="hd"><span class="bk">‹</span><b>시간표 · 급식</b></div>
+      <div class="row2" style="font-size:13px;font-weight:800;color:var(--sky-deep)"><span>‹</span><span class="g1" style="text-align:center">5월 8일 ~ 12일</span><span>›</span></div>
+      <div class="card" style="padding:8px 10px"><div class="tt-row" style="font-weight:800"><span></span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span></div>
+        <div class="tt-row"><span>1</span><span>영어</span><span>도덕</span><span>미술</span><span>수학</span><span>과학</span></div>
+        <div class="tt-row"><span>2</span><span>도덕</span><span>한문</span><span>문매</span><span>음악</span><span>국어</span></div>
+        <div class="tt-row"><span>3</span><span>주제</span><span>한문</span><span>동사</span><span>문학</span><span>수1</span></div>
+        <div class="tt-row"><span>4</span><span>일1</span><span>경제</span><span>통사</span><span>수학</span><span>통과</span></div></div>
+      <div class="card"><b style="font-size:13.5px">오늘의 급식</b><div style="display:flex;gap:10px;margin-top:6px"><div style="width:64px;height:64px;border-radius:10px;background:var(--butter-soft);flex:none"></div><p class="cap" style="line-height:1.6">차수수밥 · 편육양파무침<br>모듬햄부대찌개 · 워터젤리<br>아삭이고추무침 · 보쌈김치</p></div></div>
+      <div class="hint">알레르기 정보는 급식 사진 아래에 번호로 표시돼요.</div>
+    </div>
+  </div>
+  <figcaption><b>시간표 · 급식</b>학교 공개 데이터(나이스)를 읽어 와서 보여 줘요.</figcaption>
+</figure>
+
+<figure>
+  <div class="phone"><div class="sb" style="background:#DCEEFF"><span>11:23</span><span>●●●</span></div>
+    <div class="onb"><div class="ico"><svg width="26" height="26"><use href="#i-msg"/></svg></div>
+      <h4>거친 말은 쿠션이가</h4><p>요청은 하나도 빼지 않고<br>선생님께 전해 드려요</p>
+      <div class="mini"><div class="row2"><span class="chip c-sky">상담</span><span class="chip c-ink">D-3</span></div>
+        <p style="font-size:14px;font-weight:800">상담 희망 시간을 알려 달라는 요청이에요.</p>
+        <span style="background:var(--butter);border-radius:99px;padding:3px 10px;font-size:12px;font-weight:800;width:fit-content">2곳 막음</span>
+        <p class="cap">원문은 선생님이 원할 때만 열려요.</p></div></div>
+    <div class="dots" style="background:#C9D8FF"><i class="on"></i><i></i><i></i><i></i></div>
+  </div>
+  <figcaption><b>온보딩 4장</b>하이클래스 스토어 이미지처럼 "기능 하나 + 화면 하나". 쿠션톡 핵심 4가지(완충 · 경고 · 위협 이관 · 반 톡방)로 채워요.</figcaption>
+</figure>
+</div>
+
+<p class="note" style="margin-top:44px;text-align:center">시안 중 <b>홈 A/B</b>만 고르면 돼요. 나머지는 정해진 구조대로 만들어요.</p>
+</body>
+</html>

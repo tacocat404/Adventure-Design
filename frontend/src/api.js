@@ -50,7 +50,12 @@ export const ERR = {
   WRONG_CREDENTIALS: '아이디 또는 비밀번호가 맞지 않아요.',
   FORBIDDEN: '볼 수 없는 내용이에요.',
   NOT_FOUND: '찾을 수 없어요.',
-  LOGIN_ID_TAKEN: '이미 쓰고 있는 아이디예요.',
+  SOCIAL_FAILED: '로그인을 확인하지 못했어요. 다시 해 주세요.',
+  PENDING_APPROVAL: '학교 관리자가 승인하면 쓸 수 있어요.',
+  ALREADY_JOINED: '이미 가입한 계정이에요. 로그인해 주세요.',
+  ID_TAKEN: '이미 있는 아이디예요.',
+  SLOT_TAKEN: '방금 다른 분이 예약했어요. 다른 시간을 골라 주세요.',
+  ALREADY_BOOKED: '이미 예약한 상담이 있어요. 취소한 뒤 다시 예약해 주세요.',
   NOT_LINKED: '선생님 목록에서 먼저 선생님을 골라 주세요.',
   CLASS_TAKEN: '이미 다른 선생님이 연 반이에요.',
   ALREADY_CLOSED: '이미 처리된 알림이에요.',
@@ -78,3 +83,10 @@ export function dday(due) {
 }
 
 export const dueText = (due) => due ? new Date(due).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) : '정하지 않음'
+
+export const ATT_KIND = { late: '지각', absent: '결석', early: '조퇴', result: '결과' }
+export const ATT_DETAIL = ['질병', '미인정', '기타', '출석인정']
+export const NOTICE_KIND = { circular: '가정통신문', class: '학급공지', notice: '공지사항' }
+export const LEARN_TYPES = ['가족여행', '친지방문', '견학·체험', '기타']
+export const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10) // 오늘 (내 시간대)
+export const dateText = (iso) => iso ? new Date(iso).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }) : ''

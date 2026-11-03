@@ -1,0 +1,91 @@
+/* 녹이는 스타일 (11.04 시안): 둥근 모서리는 그대로 두고 테두리 · 구분선을 없애 옅은 면으로 바탕에 녹인다.
+   마음에 안 들면 main.jsx의 `import './melt.css'` 한 줄만 지우면 이전 모양으로 돌아간다. */
+:root { --soft: #F3F6FC; --soft-2: #E9EFFA; }
+
+/* 카드 · 버튼 · 입력: 선 대신 면 */
+.chunk, .chunk.failed { border: 0; background: var(--soft); border-radius: 18px; }
+.chunk.pin { background: var(--sky-soft); }
+.chunk.urgent { border: 0; border-radius: 18px; padding: 14px 16px; }
+.chunk.threat { border: 0; border-radius: 18px; padding: 14px 16px; }
+.quick button { border: 0; background: var(--soft); border-radius: 18px; }
+.nbtns button { border: 0; background: var(--soft); border-radius: 16px; box-shadow: none; }
+.nbtns button.on { background: var(--sky-soft); color: var(--sky-deep); box-shadow: none; }
+.shead .nbtns button, .shead .nbtns button.on { box-shadow: none; }
+.stat > * { border: 0; background: var(--soft); }
+.field, .sel, textarea.field, .compose .in { border: 0; background: var(--soft); border-radius: 14px; }
+.field:focus, .sel:focus, .compose textarea:focus { box-shadow: 0 0 0 2px var(--sky); }
+.compose .in { border-radius: 22px; }
+.compose { border-top: 0; }
+.seg button { border: 0; background: var(--soft); }
+.seg button.on { background: var(--sky-deep); }
+.slot { border: 0; background: var(--soft); border-radius: 14px; }
+.slot.on { background: var(--sky-soft); color: var(--sky-deep); }
+.slot.x { background: transparent; }
+.back { border: 0; background: var(--soft); }
+.choice { border: 0; background: var(--soft); }
+.choice.on { background: var(--sky-soft); }
+.soc.plain { border: 0; background: var(--soft); }
+.hint { background: var(--soft); }
+.rowarea { border: 0; background: var(--soft); border-radius: 14px; width: 100%; margin: 0; }
+.readbtn { width: 100%; margin: 0; border-radius: 14px; }
+.sheet { border-top: 0; border-radius: 26px 26px 0 0; }
+.tag { border-radius: 8px; }
+.chip, .pk { border-radius: 8px; }
+
+/* 목록: 가는 선 대신 옅은 면의 줄 (줄 사이는 간격) */
+.ls { margin: 0; gap: 6px; }
+.li { background: var(--soft); border: 0; border-radius: 14px; }
+.li.urg { border-left: 0; background: var(--coral-soft); }
+.sheet .ls .li { background: transparent; border-radius: 0; }
+.sheet .ls { gap: 0; }
+.band { background: transparent; margin: 12px 0 4px; padding: 0 4px; color: #8A8FAE; }
+.kv2 { border-bottom: 0; }
+.tt-row { border-bottom: 0; }
+.chunk .tt-row { border: 0; }
+
+/* 탭 · 하단 바: 선 없이 그림자만 */
+.utabs { border-bottom: 0; }
+.tabbar { border-top: 0; box-shadow: 0 -8px 20px rgba(38, 40, 73, .06); }
+.bar2 { gap: 8px; padding: 8px 14px 22px; border-top: 0; box-shadow: 0 -8px 20px rgba(38, 40, 73, .06); }
+.bar2 button { border-radius: 14px; background: var(--soft); padding: 14px 0; }
+.bar2 button + button { border-left: 0; }
+.bar2 .p { background: var(--sky-deep); color: #fff; }
+.bar2 button:disabled { opacity: .5; }
+
+/* 게시물(가정통신문): 학교 · 날짜 · 분류 · 제목 · 이미지 · 첨부 · 스크랩 */
+.post { background: #fff; padding: 4px 0 8px; display: flex; flex-direction: column; gap: 8px; border-bottom: 10px solid var(--soft); margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+.phead { display: flex; align-items: center; gap: 10px; padding-top: 10px; }
+.pav { width: 38px; height: 38px; border-radius: 50%; background: var(--sky-soft); color: var(--sky-deep); display: grid; place-items: center; font-family: 'Jua', sans-serif; font-size: 16px; flex: none; }
+.phead b { display: block; font-size: 14px; font-weight: 700; }
+.phead small { display: block; font-size: 12px; color: var(--faint); font-weight: 600; }
+.pbody { display: flex; flex-direction: column; gap: 3px; text-align: left; width: 100%; }
+.pk { font-size: 12.5px; font-weight: 800; color: var(--sky-deep); }
+.pk.k-notice { color: #23876A; }
+.ptitle { font-size: 16px; font-weight: 800; line-height: 1.4; }
+.ptext { font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #4F547D; margin-top: 4px; }
+.pimg { display: block; width: 100%; max-height: 230px; overflow: hidden; border-radius: 12px; background: var(--soft); position: relative; }
+.pimg img { display: block; width: 100%; object-fit: cover; object-position: top; }
+.pimg::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: linear-gradient(transparent, rgba(255, 255, 255, .9)); }
+.pfoot { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--sub); }
+.pfoot span, .pfoot button { display: inline-flex; align-items: center; gap: 5px; }
+.imgview { position: fixed; inset: 0; z-index: 60; background: rgba(15, 17, 40, .88); display: grid; place-items: center; overflow: auto; padding: 16px; }
+.imgview img { width: 100%; max-width: 560px; border-radius: 6px; background: #fff; }
+@media (min-width: 600px) and (min-height: 560px) { .imgview { position: absolute; } }
+
+/* 쿠션이 말풍선: 테두리 없이 면으로 */
+.say, .say.butter { border: 0; background: var(--soft); border-radius: 18px; }
+.say.butter { background: var(--butter-soft); }
+.say::before, .say.butter::before { border: 0; background: var(--soft); }
+.say.butter::before { background: var(--butter-soft); }
+.bub, .bub.me { border: 0; }
+.bub { background: var(--soft); }
+.bub.me { background: var(--sky-soft); }
+.room .bub { background: #F2F5FB; }
+.room .bub.me { background: var(--sky-deep); }
+
+/* 알림장: 줄 사이에 흰 틈 없이 하나의 회색 덩어리, 항목마다 체크 */
+.ls.nblist { gap: 0; background: var(--soft); border-radius: 18px; overflow: hidden; }
+.nblist .li { background: transparent; border-radius: 0; padding: 13px 14px; }
+.cb { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #BCC6E2; flex: none; display: grid; place-items: center; color: #fff; }
+.cb.on { background: var(--sky-deep); border-color: var(--sky-deep); }
+.txt.done { color: var(--faint); text-decoration: line-through; }

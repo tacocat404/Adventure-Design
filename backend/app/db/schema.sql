@@ -14,10 +14,14 @@ CREATE TABLE users (
   role           TEXT NOT NULL CHECK (role IN ('parent','teacher','admin','student')),
   name           TEXT NOT NULL,
   school_id      INTEGER NOT NULL REFERENCES schools(id),
-  login_id       TEXT UNIQUE,            -- 학생은 NULL (코드와 이름으로 참여)
-  password_hash  TEXT,                   -- 해시만 저장 · 학생은 NULL
+  login_id       TEXT UNIQUE,            -- 테스트 계정용. 소셜 계정 · 학생은 NULL
+  password_hash  TEXT,                   -- 해시만 저장 · 소셜 계정 · 학생은 NULL
+  provider       TEXT CHECK (provider IN ('kakao','naver','google')),  -- 소셜 로그인 (11.03)
+  provider_uid   TEXT,                   -- 제공자가 준 사용자 번호
+  status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','pending')),  -- 선생님 · 교직원은 학교 관리자 승인 전 pending
   created_at     TEXT NOT NULL,
-  CHECK (role = 'student' OR (login_id IS NOT NULL AND password_hash IS NOT NULL))
+  UNIQUE (provider, provider_uid),
+  CHECK (role = 'student' OR provider IS NOT NULL OR (login_id IS NOT NULL AND password_hash IS NOT NULL))
 );
 CREATE INDEX school_search ON schools(name);   -- 학부모 가입: 학교 이름 검색
 
@@ -100,6 +104,7 @@ CREATE TABLE analyses (
   masked_count   INTEGER NOT NULL DEFAULT 0,
   masked_spans   TEXT NOT NULL DEFAULT '[]',  -- JSON [{start, end}]
   threat_reason  TEXT,
+  request_summary TEXT,   -- 교사에게 보이는 정당한 요청 한 문장 (공격적 표현은 뺌)
   attempts       INTEGER NOT NULL CHECK (attempts BETWEEN 1 AND 2),
   model          TEXT NOT NULL,
   analyzed_at    TEXT NOT NULL

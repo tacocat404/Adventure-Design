@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교사 화면 개편 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<style>
+:root { --bg:#F1F4FC; --surface:#fff; --ink:#262849; --sub:#6B7096; --faint:#9CA1C2; --edge:#DFE5F7;
+  --sky:#7AB8F5; --sky-deep:#4A92DE; --sky-soft:#E6F1FD; --butter:#FFD872; --butter-deep:#E9B83B; --butter-soft:#FFF6DC;
+  --mint:#6FD0B2; --mint-deep:#23876A; --mint-soft:#E1F6EF; --coral:#F2806F; --coral-deep:#D9604E; --coral-soft:#FDEBE8; --slate:#7383A3; --slate-soft:#EBEFF7; }
+* { box-sizing:border-box; margin:0; }
+body { background:#E6ECFA; color:var(--ink); font-family:Pretendard,-apple-system,system-ui,sans-serif; word-break:keep-all; padding:32px 16px 64px; }
+h1 { text-align:center; font-size:24px; font-weight:800; }
+.lead { text-align:center; color:var(--sub); font-size:14px; margin:6px auto 0; max-width:640px; line-height:1.55; }
+h2 { font-size:19px; font-weight:800; margin:48px auto 4px; max-width:1100px; display:flex; align-items:center; gap:8px; }
+h2 .p { font-size:12px; padding:3px 9px; border-radius:99px; background:var(--ink); color:#fff; }
+.note { max-width:1100px; margin:0 auto 22px; color:var(--sub); font-size:14px; line-height:1.55; }
+.row { display:flex; flex-wrap:wrap; gap:34px; justify-content:center; }
+figure { display:flex; flex-direction:column; align-items:center; gap:12px; }
+figcaption { text-align:center; font-size:13.5px; color:var(--sub); max-width:300px; line-height:1.5; }
+figcaption b { display:block; color:var(--ink); font-size:15px; margin-bottom:2px; }
+
+.phone { width:340px; height:660px; border:11px solid #15172B; border-radius:48px; background:var(--bg); overflow:hidden; position:relative; box-shadow:0 24px 50px rgba(38,40,73,.25); display:flex; flex-direction:column; }
+.phone::before { content:""; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:86px; height:24px; border-radius:16px; background:#15172B; z-index:3; }
+.sb { height:40px; padding:10px 26px 0; font-size:13px; font-weight:800; flex:none; display:flex; justify-content:space-between; }
+.scr { flex:1; overflow:hidden; padding:4px 14px 12px; display:flex; flex-direction:column; gap:10px; }
+.white { background:#fff; }
+.hd { display:flex; align-items:center; gap:8px; padding:2px 0 4px; }
+.hd b { font-size:17px; font-weight:800; flex:1; }
+.hd .bk { font-size:22px; font-weight:700; width:28px; }
+.jua { font-family:'Jua',sans-serif; font-weight:400; }
+.cap { font-size:12px; color:var(--sub); font-weight:600; }
+.sec { font-size:13px; font-weight:800; color:var(--sub); margin-top:2px; }
+.row2 { display:flex; align-items:center; gap:8px; }
+.g1 { flex:1; min-width:0; }
+
+/* 제안 카드: 얇은 선, 아래선 두껍게 하지 않음 */
+.card { background:#fff; border:1px solid var(--edge); border-radius:18px; padding:12px 14px; }
+.card.urgent { background:var(--coral-soft); border:2px solid #F6C6BD; border-bottom-width:4px; }
+.card.pin { background:var(--sky-soft); border-color:transparent; }
+.card p { font-size:13.5px; line-height:1.45; }
+.card .tt { font-size:14.5px; font-weight:800; margin:6px 0 2px; }
+
+/* 칩 체계 */
+.chip { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; font-size:11.5px; font-weight:700; white-space:nowrap; }
+.c-sky { background:#E3EEFC; color:#3B78C4; } .c-green { background:#DDF5E5; color:#1F8A4C; }
+.c-coral { background:#FDE3DF; color:#C9473A; } .c-ink { background:var(--ink); color:#fff; }
+.c-line { background:var(--bg); color:var(--sub); } .c-butter { background:var(--butter-soft); color:#9A7414; }
+.c-slate { background:var(--slate-soft); color:var(--slate); }
+.chips { display:flex; gap:5px; flex-wrap:wrap; }
+
+/* 탭 */
+.tabs { display:flex; gap:16px; border-bottom:1px solid var(--edge); padding:0 2px; font-size:14px; font-weight:700; color:var(--faint); overflow:hidden; }
+.tabs span { padding:8px 0; white-space:nowrap; } .tabs .on { color:var(--ink); border-bottom:2.5px solid var(--ink); }
+.pillbtn { background:var(--sky-deep); color:#fff; font-size:12.5px; font-weight:800; padding:7px 12px; border-radius:99px; white-space:nowrap; }
+
+/* 하단 탭바 */
+.tabbar { flex:none; display:flex; background:#fff; border-top:1px solid var(--edge); padding:7px 6px 20px; }
+.tabbar div { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10.5px; font-weight:700; color:var(--faint); position:relative; }
+.tabbar div.on { color:var(--sky-deep); } .tabbar svg { width:24px; height:24px; }
+.tabbar i { position:absolute; top:-2px; right:22%; background:var(--coral); color:#fff; font-style:normal; font-size:10px; min-width:16px; height:16px; border-radius:9px; display:grid; place-items:center; }
+
+/* 폼 */
+.f { display:flex; flex-direction:column; gap:4px; }
+.f label { font-size:12.5px; font-weight:700; color:var(--sub); display:flex; justify-content:space-between; }
+.f label em { color:var(--coral-deep); font-style:normal; }
+.inp { background:#fff; border:1.5px solid var(--edge); border-radius:14px; padding:10px 14px; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
+.inp.blue { color:var(--sky-deep); border-color:var(--sky); }
+.seg { display:flex; gap:6px; flex-wrap:wrap; }
+.seg span { padding:7px 13px; border-radius:99px; border:1.5px solid var(--edge); background:#fff; font-size:13px; font-weight:700; color:var(--sub); }
+.seg .on { background:var(--sky-deep); border-color:var(--sky-deep); color:#fff; }
+.hint { background:#fff; border-radius:12px; padding:9px 12px; font-size:12.5px; color:var(--sub); }
+.cta { background:var(--sky-deep); color:#fff; font-weight:800; font-size:15px; text-align:center; padding:13px; border-radius:16px; }
+.cta.ghost { background:#fff; color:var(--sky-deep); border:1.5px solid var(--sky); }
+.radio { display:flex; align-items:center; gap:10px; padding:9px 4px; font-size:14px; font-weight:600; }
+.radio::before { content:""; width:18px; height:18px; border-radius:50%; border:2px solid var(--edge); flex:none; }
+.radio.on::before { border-color:var(--sky-deep); background:radial-gradient(var(--sky-deep) 45%, transparent 50%); }
+
+/* 홈 퀵버튼 */
+.quick { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.quick div { background:#fff; border:1px solid var(--edge); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; font-weight:800; }
+.quick .ic { width:36px; height:36px; border-radius:12px; display:grid; place-items:center; } .quick svg { width:20px; height:20px; }
+.ic.s { background:var(--sky-soft); color:var(--sky-deep); } .ic.b { background:var(--butter-soft); color:#A9861F; }
+.ic.m { background:var(--mint-soft); color:var(--mint-deep); } .ic.c { background:var(--coral-soft); color:var(--coral-deep); }
+.stat { display:flex; gap:8px; } .stat div { flex:1; background:#fff; border-radius:16px; padding:10px 12px; border:1px solid var(--edge); }
+.stat b { display:block; font-size:22px; font-family:'Jua'; font-weight:400; } .stat small { font-size:11.5px; color:var(--sub); font-weight:700; }
+.tt-row { display:flex; justify-content:space-between; font-size:12.5px; padding:5px 0; border-bottom:1px solid var(--bg); } .tt-row:last-child { border:0; }
+.tt-row span:first-child { color:var(--faint); font-weight:700; width:24px; }
+.say { background:#fff; border-radius:18px 18px 18px 5px; padding:10px 14px; font-size:14.5px; font-weight:700; line-height:1.4; }
+.mascot { width:54px; height:54px; border-radius:50%; background:var(--butter); display:grid; place-items:center; font-size:26px; flex:none; }
+
+/* 비교 패널 */
+.cmp { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; max-width:1100px; margin:0 auto; }
+.cmp > div { background:var(--bg); border-radius:24px; padding:18px; width:340px; display:flex; flex-direction:column; gap:10px; }
+.cmp h3 { font-size:14px; font-weight:800; } .cmp .old { background:#fff; border:2px solid var(--edge); border-bottom-width:5px; border-radius:22px; padding:14px 16px; }
+.tok { display:flex; gap:6px; flex-wrap:wrap; } .tok span { width:34px; height:34px; border-radius:10px; }
+.onb { flex:1; background:linear-gradient(#DCEEFF,#C9D8FF); display:flex; flex-direction:column; align-items:center; padding:28px 18px 0; gap:6px; text-align:center; }
+.onb .ico { width:46px; height:46px; border-radius:16px; background:#5BC0FF; display:grid; place-items:center; color:#fff; margin-bottom:8px; } .onb h4 { font-size:24px; font-weight:800; color:#1E3A8A; }
+.onb p { font-size:14px; color:#5A6A9A; font-weight:600; line-height:1.45; }
+.onb .mini { margin-top:22px; width:100%; flex:1; background:#fff; border-radius:28px 28px 0 0; padding:14px; text-align:left; display:flex; flex-direction:column; gap:8px; box-shadow:0 0 0 6px rgba(255,255,255,.5); }
+.dots { display:flex; gap:5px; justify-content:center; padding:10px 0 4px; } .dots i { width:6px; height:6px; border-radius:50%; background:#B9C6EA; } .dots i.on { background:var(--sky-deep); width:18px; border-radius:4px; }
+
+.mini{font-size:12px;color:var(--sub);font-weight:600}
+.arrow{align-self:center;font-size:30px;color:var(--faint)}
+.bad{outline:2px dashed var(--coral);outline-offset:-3px}
+svg.i{width:20px;height:20px;flex:none}
+/* 개편안: 납작한 목록 · 사각 · 선 아이콘 */
+.flat .chip{border-radius:3px}
+.flat .scr{padding:4px 0 0;gap:0}
+.flat .ttl{display:flex;align-items:baseline;justify-content:space-between;padding:6px 16px 10px}
+.flat .ttl b{font-family:'Jua',sans-serif;font-weight:400;font-size:22px;color:var(--sky-deep)}
+.flat .ttl span{font-size:12px;color:var(--sub);font-weight:700}
+.note-line{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);font-weight:600;padding:0 16px 10px}
+.sect{font-size:12.5px;font-weight:800;color:var(--sub);display:flex;justify-content:space-between;padding:12px 16px 6px}
+.list{background:#fff;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
+.li{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bg)}
+.li:last-child{border-bottom:0}
+.li .g{flex:1;min-width:0}
+.li b{font-size:14.5px;font-weight:800}
+.li p{font-size:13px;color:var(--sub);margin-top:2px;line-height:1.4}
+.li .go{color:var(--faint);font-size:18px}
+.li.urg{border-left:4px solid var(--coral);background:#fff}
+.li.urg b{color:var(--ink)}.li.urg p{color:var(--coral-deep);font-weight:600}
+.li .n{font-family:'Jua',sans-serif;font-size:17px;color:var(--ink)}
+.flat .tabbar{border-radius:0}
+/* 숫자 버튼 (학부모 홈 버튼과 같은 모양) */
+.nbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 4px}
+.nbtns div{background:#fff;border:1px solid var(--edge);border-radius:8px;padding:11px 10px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;font-weight:800}
+.nbtns .t{display:flex;align-items:center;justify-content:space-between}
+.nbtns .on{border-color:var(--sky-deep);box-shadow:inset 0 0 0 1px var(--sky-deep)}
+.nbtns .n{font-family:'Jua',sans-serif;font-weight:400;font-size:17px;color:var(--ink)}
+.qs{width:32px;height:32px;border-radius:6px;display:grid;place-items:center}
+.qs.b{background:var(--butter-soft);color:#A9861F}.qs.s{background:var(--sky-soft);color:var(--sky-deep)}.qs.c{background:var(--coral-soft);color:var(--coral-deep)}.qs.m{background:var(--mint-soft);color:#23876A}
+/* 하단 바 */
+.bar2{display:flex;border-top:1px solid var(--edge);background:#fff;margin-top:auto}
+.bar2 div{flex:1;text-align:center;padding:15px 0 24px;font-size:15px;font-weight:800}
+.bar2 div+div{border-left:1px solid var(--edge)}
+.bar2 .p{background:var(--sky-deep);color:#fff;border-left:0}
+/* 보내기 시트: 목록형 */
+.sheetbg{position:absolute;inset:0;background:rgba(38,40,73,.35);display:flex;align-items:flex-end}
+.sheetp{background:#fff;border-radius:12px 12px 0 0;width:100%;padding:0 0 74px}
+.sheetp h5{font-size:15px;font-weight:800;padding:16px 16px 10px;border-bottom:1px solid var(--edge)}
+.fab{position:absolute;right:16px;bottom:78px;width:52px;height:52px;border-radius:10px;background:var(--sky-deep);color:#fff;display:grid;place-items:center;box-shadow:0 4px 10px rgba(74,146,222,.4)}
+.fab svg{width:26px;height:26px}
+.kv{display:flex;gap:8px;font-size:13.5px;padding:10px 16px;border-bottom:1px solid var(--bg)}.kv span{width:48px;color:var(--faint);font-weight:700}
+.empty2{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:0 24px}
+.empty2 .ring{width:64px;height:64px;border-radius:8px;background:var(--sky-soft);color:var(--sky-deep);display:grid;place-items:center}
+.empty2 .ring svg{width:32px;height:32px}
+.sub{padding:0 16px 8px;font-size:12px;color:var(--sub);font-weight:600}
+</style>
+</head>
+<body>
+
+
+<h1>교사 화면 개편 시안</h1>
+<p class="lead">교사가 하루에 여는 화면을 <b>하나(오늘)</b>로 만들고, 공지·설문·반 톡방은 <b>보내기</b>로 분리해요. 둥근 카드 대신 <b>납작한 목록</b>, 이모지 대신 <b>선 아이콘</b>을 써요.</p>
+<h2>1. 지금 → 개편</h2>
+<p class="note">같은 날 같은 데이터(긴급 1, 답장 2, 결석 2·조퇴 1, 체험학습 1)예요. 점선은 난잡한 곳이에요.</p>
+<div class="row"><figure><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr" style="gap:7px;padding:4px 14px">
+ <div class="row2"><span class="jua" style="font-size:22px;color:var(--sky-deep)">쿠션톡</span><span class="cap" style="margin-left:auto">11월 4일</span></div>
+ <div class="card bad"><p style="font-weight:700">밤사이 거친 말 3개를 폭신하게 막아 뒀어요!</p></div>
+ <div class="card bad row2"><b style="font-size:13.5px">오늘 출결 3건</b><span class="cap" style="margin-left:auto">확인 전 3건 ›</span></div>
+ <div class="row2 bad" style="gap:6px;padding:4px"><span class="chip c-sky">2 답장할 것</span><span class="chip c-line">0 알림</span><span class="chip c-line">1 학교</span></div>
+ <div class="card urgent"><span class="chip" style="background:var(--coral);color:#fff">긴급 · 학교폭력</span><p style="font-weight:800;margin-top:5px">하윤 보호자 · 원문 그대로</p></div>
+ <p class="sec">답장할 것</p>
+ <div class="card"><b style="font-size:14px">민서 보호자</b> <span class="chip c-sky">자리</span><p class="cap">내일까지 자리 바꿔 주세요.</p></div>
+ <div class="card"><b style="font-size:14px">서연 보호자</b> <span class="chip c-sky">상담</span></div></div><div class="tabbar"><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>메시지함</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>출결<i>3</i></div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2zM16 9h4v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></svg>공지<i>1</i></div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>반 톡방</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>지금</b>탭 5개, 배지 2곳. 둥근 카드가 연달아 쌓이고 출결 · 체험학습 · 공지는 다른 탭에 있어요.</figcaption></figure><div class="arrow">→</div><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl"><b>오늘</b><span>11월 4일 수요일</span></div>
+ <div class="note-line"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg>밤사이 거친 말 3곳을 막았어요</div>
+ <div class="list"><div class="li urg"><div class="g"><span class="chip" style="background:var(--coral);color:#fff">긴급 · 학교폭력</span><b style="display:block;margin-top:5px">하윤 보호자 · 원문 그대로</b><p>쉬는 시간마다 맞는다고 해요. 오늘 아침에도…</p></div></div></div>
+ <div class="list" style="margin-top:8px"><div class="li"><div class="g"><b>출결</b></div><span class="mini">결석 2 · 조퇴 1</span><span class="go">›</span></div></div>
+ <div class="sect"><span>답장할 것</span><span>2</span></div>
+ <div class="list"><div class="li"><div class="g"><div style="display:flex;align-items:center;gap:6px"><b>민서 보호자</b><span class="chip c-sky">자리</span><span class="chip c-ink">D-1</span></div><p>자리를 바꿔 달라는 요청이에요.<span class="chip c-butter" style="margin-left:4px">2곳 막음</span></p></div></div>
+ <div class="li"><div class="g"><div style="display:flex;align-items:center;gap:6px"><b>서연 보호자</b><span class="chip c-sky">상담</span></div><p>다음 주 상담 시간을 잡아 달라는 요청이에요.</p></div></div></div>
+ <div class="sect"><span>승인할 것</span><span>1</span></div>
+ <div class="list"><div class="li"><div class="g"><div style="display:flex;align-items:center;gap:6px"><b>민서 · 체험학습</b><span class="chip c-green">신청</span></div><p>3/15~3/16 · 제주도</p></div><span class="go">›</span></div></div></div><div class="tabbar"><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>오늘<i>4</i></div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg>보내기</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>개편 · 오늘</b>처리할 것만 목록으로. 긴급은 왼쪽 빨간 선, 나머지는 같은 무게의 줄. 배지는 여기 하나.</figcaption></figure></div>
+<h2>2. 오늘 화면의 상태 · 하위 화면</h2>
+<div class="row"><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl"><b>오늘</b><span>11월 5일 목요일</span></div>
+ <div class="empty2"><span class="ring"><svg class="i" style="width:32px;height:32px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12.5l3 3 5-6"/></svg></span><b style="font-size:17px">오늘은 쉬어도 돼요</b><p class="cap">처리할 연락이 없어요.<br>새 연락이 오면 쿠션이가 먼저 읽고 알려 드려요.</p></div>
+ <div class="note-line" style="justify-content:center;padding-bottom:14px"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg>어제는 거친 말 3곳을 막았어요</div></div><div class="tabbar"><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>오늘</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg>보내기</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>빈 상태</b>배너 · 필터 · 0건 요약이 모두 없어요.</figcaption></figure><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><span style="font-size:22px;color:var(--ink)">‹</span><b style="color:var(--ink);font-family:Pretendard;font-weight:800;font-size:17px">출결</b></span><span>11월 4일</span></div>
+ <div class="nbtns">
+  <div class="on"><span class="qs b"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 9l6 6M15 9l-6 6"/></svg></span><span class="t">결석<span class="n">2</span></span></div>
+  <div><span class="qs s"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9"/></svg></span><span class="t">조퇴<span class="n">1</span></span></div>
+  <div><span class="qs c"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"/></svg></span><span class="t">지각<span class="n">0</span></span></div></div>
+ <div class="sect"><span>결석</span><span>2</span></div>
+ <div class="list"><div class="li"><div class="g"><div style="display:flex;align-items:center;gap:6px"><b>민서</b><span class="chip c-butter">결석</span><span class="chip c-line">질병</span></div><p>감기로 등교하지 못해요</p></div></div><div class="li"><div class="g"><div style="display:flex;align-items:center;gap:6px"><b>하은</b><span class="chip c-butter">결석</span><span class="chip c-line">출석인정</span></div><p>대회 참가</p></div></div></div>
+ <p class="sub" style="margin-top:auto;text-align:center;padding-bottom:20px">이 화면을 열면 모두 읽음으로 처리돼요</p></div></div><figcaption><b>출결 열기</b>숫자 버튼은 학부모 홈 버튼과 같은 모양(아이콘 + 이름, 숫자는 옆). 건별 확인 버튼 없음.</figcaption></figure><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><span style="font-size:22px;color:var(--ink)">‹</span><b style="color:var(--ink);font-family:Pretendard;font-weight:800;font-size:17px">체험학습 신청서</b></span><span></span></div>
+ <div class="li" style="background:#fff;border-top:1px solid var(--edge)"><b style="font-size:18px" class="g">민서</b><span class="chip c-green">신청</span></div>
+ <div class="list" style="border-top:0"><div class="kv"><span>기간</span><b>3/15 ~ 3/16 (2일)</b></div><div class="kv"><span>형태</span><b>가족여행</b></div><div class="kv"><span>장소</span><b>제주도</b></div><div class="kv"><span>숙박</span><b>서귀포시내</b></div><div class="kv"><span>목적</span><b>박물관 및 역사 유적지 탐방</b></div></div>
+ <div class="sect"><span>학부모에게 남길 말 (선택)</span></div>
+ <div class="list"><div class="li" style="color:var(--faint);min-height:64px;align-items:flex-start">결과 보고서 제출 안내 등</div></div></div>
+ <div class="bar2"><div>반려</div><div class="p">승인</div></div></div><figcaption><b>체험학습 승인</b>꽉 찬 사각 하단 바. 반려(흰색) / 승인(파랑).</figcaption></figure></div>
+<h2>3. 보내기 · 설정</h2>
+<div class="row"><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl"><b>보내기</b><span></span></div>
+ <div class="utabs" style="padding:0 16px;background:#fff;border-top:1px solid var(--edge)"><button class="on" style="padding:10px 0">공지</button><button style="padding:10px 0">설문</button><button style="padding:10px 0">반 톡방</button></div>
+ <div class="list" style="border-top:0">
+  <div class="li" style="background:var(--sky-soft)"><div class="g"><div style="display:flex;gap:6px;align-items:center"><span class="chip c-ink">고정</span><b>진로 연계 체험 안내</b></div><p>학급공지 · 오늘</p></div></div>
+  <div class="li"><div class="g"><span class="chip c-sky">가정통신문</span><b style="display:block;margin-top:4px">3~4월 서울 학부모 마음 상담 프로그램</b><p>어제</p></div></div>
+  <div class="li"><div class="g"><span class="chip c-green">공지사항</span><b style="display:block;margin-top:4px">2026 학생회 정부회장 선거 공고</b><p>이틀 전</p></div></div></div>
+ <div class="fab"><svg class="i" style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div></div><div class="tabbar"><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>오늘</div><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg>보내기</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>보내기 · 공지</b>상단 탭으로 공지 / 설문 / 반 톡방. 만들기는 ＋ 하나.</figcaption></figure><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr" style="opacity:.4"><div class="ttl"><b>보내기</b><span></span></div></div>
+<div class="sheetbg"><div class="sheetp"><h5>무엇을 보낼까요?</h5>
+ <div class="li" style="padding:14px 16px"><span class="qs s"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12v14H6a2 2 0 0 1-2-2zM16 9h4v8a2 2 0 0 1-2 2M8 9h5M8 13h5"/></svg></span><div class="g"><b>공지</b><p>가정통신문 · 학급공지 · 공지사항</p></div></div><div class="li" style="padding:14px 16px"><span class="qs c"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 3v9h9"/></svg></span><div class="g"><b>설문</b><p>학부모에게 질문하고 결과 보기</p></div></div><div class="li" style="padding:14px 16px"><span class="qs m"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><div class="g"><b>반 톡방 참여 코드</b><p>학생 초대 · 24시간 유효</p></div></div></div></div><div class="tabbar"><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>오늘</div><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg>보내기</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>＋ 눌렀을 때</b>이모지 대신 선 아이콘. 목록형 시트.</figcaption></figure><figure><div class="phone flat"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="scr"><div class="ttl"><b>설정</b><span></span></div>
+ <div class="list"><div class="li"><div class="g"><b>김하늘 선생님</b><p>3학년 2반 · 해오름초등학교</p></div></div></div>
+ <div class="sect"><span>알림</span></div>
+ <div class="list"><div class="li"><div class="g"><b>즉시 알림</b><p>일반 연락은 오늘 화면에서 모아 봐요</p></div><span class="chip c-green">긴급 · 위협만</span></div>
+ <div class="li"><div class="g"><b>반 톡방 참여 코드</b></div><span class="go">›</span></div></div>
+ <div class="list" style="margin-top:12px"><div class="li" style="color:var(--coral-deep);font-weight:800">로그아웃</div></div></div><div class="tabbar"><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8 12.5l3 3 5-6"/></svg>오늘</div><div class=""><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg>보내기</div><div class="on"><svg class="i" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>설정</div></div></div><figcaption><b>설정</b>알림은 기본적으로 긴급 · 위협만 즉시. 나머지는 모아 봐요.</figcaption></figure></div>
+<h2>4. 이번에 바꾼 모양 규칙</h2>
+<div class="cmp">
+<div><h3>모양</h3><div class="card" style="border-radius:8px"><p>· 둥근 카드 → 흰 목록 + 가는 구분선<br>· 모서리는 3~8px (칩 3, 아이콘 타일 6, 버튼 8)<br>· 긴급만 왼쪽 빨간 선으로 강조</p></div></div>
+<div><h3>버튼</h3><div class="card" style="border-radius:8px"><p>· 숫자 칸 → 아이콘 버튼 + 옆 숫자<br>· 승인 / 반려 → 꽉 찬 사각 하단 바<br>· 만들기 → ＋ 하나</p></div></div>
+<div><h3>아이콘</h3><div class="card" style="border-radius:8px"><p>· 이모지 모두 제거<br>· 2px 선 아이콘 (탭바 · 시트 · 버튼 · 안내 줄)<br>· 쿠션이는 일반 화면에서만</p></div></div>
+</div></body></html>

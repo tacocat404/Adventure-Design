@@ -11,6 +11,7 @@ import os
 import re
 import secrets
 import sqlite3
+import urllib.request
 import time
 from contextlib import closing, contextmanager
 from datetime import date, datetime, timedelta, timezone
@@ -22,7 +23,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from app.ai.analyzer import analyze as ai_analyze, precheck as ai_precheck, warmup as ai_warmup
+from app.ai.analyzer import ENV as CONF, analyze as ai_analyze, precheck as ai_precheck, warmup as ai_warmup
 
 BACKEND = Path(__file__).resolve().parents[2]
 DB_PATH = Path(os.environ.get("CUSHION_DB", BACKEND / "cushion.db"))
@@ -93,17 +94,26 @@ def check_pw(pw, stored):
     return hmac.compare_digest(hashlib.scrypt(pw.encode(), salt=salt.encode(), n=2**14, r=8, p=1).hex(), h)
 
 
-def make_token(uid):
-    body = base64.urlsafe_b64encode(json.dumps({"u": uid, "e": int(time.time()) + TOKEN_DAYS * 86400}).encode()).decode().rstrip("=")
+def sign(data, ttl):
+    body = base64.urlsafe_b64encode(json.dumps({**data, "e": int(time.time()) + ttl}).encode()).decode().rstrip("=")
     return f"{body}.{hmac.new(SECRET, body.encode(), 'sha256').hexdigest()}"
 
 
-def read_token(tok):
+def unsign(tok):
     body, _, sig = tok.partition(".")
     if not hmac.compare_digest(sig, hmac.new(SECRET, body.encode(), "sha256").hexdigest()):
         return None
     data = json.loads(base64.urlsafe_b64decode(body + "=" * (-len(body) % 4)))
-    return data["u"] if data["e"] > time.time() else None
+    return data if data["e"] > time.time() else None
+
+
+def make_token(uid):
+    return sign({"u": uid}, TOKEN_DAYS * 86400)
+
+
+def read_token(tok):
+    data = unsign(tok)
+    return data.get("u") if data else None
 
 
 REVOKED = set()  # ponytail: 서버를 다시 켜면 로그아웃 목록이 사라짐. 문제 되면 revoked_tokens 테이블로.
@@ -112,7 +122,7 @@ REVOKED = set()  # ponytail: 서버를 다시 켜면 로그아웃 목록이 사�
 def current(authorization: Optional[str] = Header(None)):
     tok = (authorization or "").removeprefix("Bearer ").strip()
     uid = read_token(tok) if tok and tok not in REVOKED else None
-    u = row("SELECT * FROM users WHERE id = ?", uid) if uid else None
+    u = row("SELECT * FROM users WHERE id = ? AND status = 'active'", uid) if uid else None
     if not u:
         raise ApiError("UNAUTHORIZED", 401, "login required")
     u["token"] = tok
@@ -125,7 +135,8 @@ def need(u, *roles):
 
 
 def user_out(u):
-    return {"id": u["id"], "role": u["role"], "name": u["name"], "school_id": u["school_id"]}
+    school = row("SELECT name FROM schools WHERE id = ?", u["school_id"])
+    return {"id": u["id"], "role": u["role"], "name": u["name"], "school_id": u["school_id"], "school_name": school["name"] if school else None}
 
 
 def notify(c, user_id, kind, ref_type, ref_id):
@@ -178,10 +189,10 @@ def run_analysis(mid):
             c.execute("UPDATE messages SET analysis_status = 'failed' WHERE id = ?", (mid,))
             return
         c.execute(
-            "INSERT INTO analyses (message_id, ai_category, urgent_type, summary, requests, masked_count, masked_spans, threat_reason, attempts, model, analyzed_at)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO analyses (message_id, ai_category, urgent_type, summary, requests, masked_count, masked_spans, threat_reason, attempts, model, analyzed_at, request_summary)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (mid, r["category"], r["urgent_type"], r["summary"], json.dumps(r["requests"], ensure_ascii=False),
-             len(r["masked_spans"]), json.dumps(r["masked_spans"]), r["threat_reason"], attempts, r["model"], now()))
+             len(r["masked_spans"]), json.dumps(r["masked_spans"]), r["threat_reason"], attempts, r["model"], now(), r.get("request_summary")))
         c.execute("UPDATE messages SET analysis_status = 'done', category = ? WHERE id = ?", (r["category"], mid))
         if r["category"] == "urgent":
             notify(c, m["teacher_id"], "urgent", "message", mid)
@@ -228,8 +239,23 @@ def init_db():
         run_analysis(save_message(pid, cls[2], text, mt, due, False)[0])
 
 
+def ensure_demo_students():
+    """학생 테스트 계정(student1~3, 3학년 2반). 이미 만들어진 DB에도 빠진 것만 채운다."""
+    cls = row("SELECT c.id, c.school_id FROM classes c JOIN users t ON t.id = c.teacher_id WHERE t.login_id = 'teacher1' ORDER BY c.id DESC LIMIT 1")
+    if not cls:
+        return
+    with tx() as c:
+        for i, name in enumerate(["정서준", "오하은", "강지호"], 1):
+            if c.execute("SELECT 1 FROM users WHERE login_id = ?", (f"student{i}",)).fetchone():
+                continue
+            uid = c.execute("INSERT INTO users (role, name, school_id, login_id, password_hash, created_at) VALUES ('student', ?, ?, ?, ?, ?)",
+                            (name, cls["school_id"], f"student{i}", hash_pw(DEMO_PW), now())).lastrowid
+            c.execute("INSERT INTO class_members (class_id, user_id, member_role, joined_at) VALUES (?, ?, 'student', ?)", (cls["id"], uid, now()))
+
+
 ai_warmup()
 init_db()
+ensure_demo_students()
 
 
 # ───────── 요청 몸통 ─────────
@@ -241,11 +267,24 @@ class Login(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
+class Social(BaseModel):
+    provider: Literal["kakao", "google"]
+    token: str = Field(min_length=1, max_length=2000)
+
+
 class Signup(BaseModel):
+    login_id: str = Field(min_length=4, max_length=20, pattern=r"^[A-Za-z0-9_]+$")
+    password: str = Field(min_length=8, max_length=64)
+    role: Literal["parent", "teacher", "admin"]
     school_id: int
     name: str = Field(min_length=1, max_length=30)
-    login_id: str = Field(min_length=3, max_length=30, pattern=r"^[A-Za-z0-9_.-]+$")
-    password: str = Field(min_length=8, max_length=200)
+
+
+class SocialSignup(BaseModel):
+    ticket: str = Field(min_length=1, max_length=2000)
+    role: Literal["parent", "teacher", "admin"]
+    school_id: int
+    name: str = Field(min_length=1, max_length=30)
 
 
 class Link(BaseModel):
@@ -270,6 +309,11 @@ class Via(BaseModel):
 
 class Body(BaseModel):
     body: str = Field(min_length=1, max_length=2000)
+
+
+class RoomBody(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+    reply_to: Optional[int] = None
 
 
 class Action(BaseModel):
@@ -301,7 +345,28 @@ def login(b: Login):
     u = row("SELECT * FROM users WHERE login_id = ?", b.login_id)
     if not u or not check_pw(b.password, u["password_hash"]):
         raise ApiError("WRONG_CREDENTIALS", 401)
-    return {"token": make_token(u["id"]), "user": user_out(u)}
+    if u["status"] != "active":
+        raise ApiError("PENDING_APPROVAL", 403)
+    out = {"token": make_token(u["id"]), "user": user_out(u)}
+    if u["role"] == "student":  # 학생 화면은 반 번호가 필요하다 (참여 코드로 들어올 때와 같은 모양)
+        out["class_id"] = row("SELECT class_id FROM class_members WHERE user_id = ? AND member_role = 'student' LIMIT 1", u["id"])["class_id"]
+    return out
+
+
+@app.post("/api/auth/signup", status_code=201)
+def signup(b: Signup):
+    """일반 가입 (아이디 · 비밀번호). 학부모는 바로, 선생님 · 교직원은 학교 관리자 승인 뒤부터 쓴다."""
+    if not row("SELECT id FROM schools WHERE id = ?", b.school_id):
+        raise ApiError("NOT_FOUND", 404, "school")
+    if row("SELECT id FROM users WHERE login_id = ?", b.login_id):
+        raise ApiError("ID_TAKEN", 409)
+    status = "active" if b.role == "parent" else "pending"
+    with tx() as c:
+        uid = c.execute("INSERT INTO users (role, name, school_id, login_id, password_hash, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (b.role, b.name.strip(), b.school_id, b.login_id, hash_pw(b.password), status, now())).lastrowid
+    if status == "pending":
+        return {"pending": True}
+    return {"token": make_token(uid), "user": user_out(row("SELECT * FROM users WHERE id = ?", uid))}
 
 
 @app.get("/api/schools")
@@ -311,15 +376,66 @@ def schools(q: str = ""):
     return {"schools": rows("SELECT id, name FROM schools WHERE name LIKE ? ORDER BY name LIMIT 20", f"%{q.strip()}%")}
 
 
-@app.post("/api/auth/signup", status_code=201)
-def signup(b: Signup):
+# 소셜 로그인 (11.03): 앱이 제공자에게서 받은 접근 토큰을 서버가 제공자 프로필 주소로 확인한다.
+# ponytail: 아래 세 줄 확인은 카카오 · 네이버 · 구글 개발자 앱 키가 있어야 실제로 시험할 수 있다 (아직 못 해 봄).
+#           키가 없는 동안은 "demo:이름" 토큰(CUSHION_DEMO_LOGIN=on)으로 돌린다.
+PROFILES = {
+    "kakao": ("https://kapi.kakao.com/v2/user/me", lambda d: str(d["id"]), lambda d: ((d.get("kakao_account") or {}).get("profile") or {}).get("nickname")),
+    "google": ("https://www.googleapis.com/oauth2/v3/userinfo", lambda d: d["sub"], lambda d: d.get("name")),
+}
+
+
+def demo_on():
+    return CONF.get("CUSHION_DEMO_LOGIN", "on") == "on"
+
+
+def social_profile(provider, token):
+    if token.startswith("demo:") and demo_on():
+        name = token[5:].strip()[:30]
+        if not name:
+            raise ApiError("SOCIAL_FAILED", 401, "demo name")
+        return f"demo:{name.lower()}", name
+    url, uid_of, name_of = PROFILES[provider]
+    try:
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+        d = json.load(urllib.request.urlopen(req, timeout=5))
+        return uid_of(d), name_of(d)
+    except Exception:
+        raise ApiError("SOCIAL_FAILED", 401, provider)
+
+
+@app.get("/api/config")
+def config():
+    from app.api.oauth import ready  # 아래에서 불러오는 모듈이라 쓸 때 가져온다
+    return {"demo_login": demo_on(), "providers": list(PROFILES), "ready": ready()}
+
+
+@app.post("/api/auth/social")
+def social(b: Social):
+    uid_, name = social_profile(b.provider, b.token)
+    u = row("SELECT * FROM users WHERE provider = ? AND provider_uid = ?", b.provider, uid_)
+    if not u:  # 처음 오신 분: 학교 · 역할을 받아 가입시킨다 (social/signup)
+        return {"needs_signup": True, "name": name or "", "ticket": sign({"p": b.provider, "i": uid_}, 1800)}
+    if u["status"] != "active":
+        raise ApiError("PENDING_APPROVAL", 403)
+    return {"token": make_token(u["id"]), "user": user_out(u)}
+
+
+@app.post("/api/auth/social/signup", status_code=201)
+def social_signup(b: SocialSignup):
+    t = unsign(b.ticket)
+    if not t or "p" not in t:
+        raise ApiError("UNAUTHORIZED", 401, "ticket")
     if not row("SELECT id FROM schools WHERE id = ?", b.school_id):
         raise ApiError("NOT_FOUND", 404, "school")
-    if row("SELECT id FROM users WHERE login_id = ?", b.login_id):
-        raise ApiError("LOGIN_ID_TAKEN", 409)
+    if row("SELECT id FROM users WHERE provider = ? AND provider_uid = ?", t["p"], t["i"]):
+        raise ApiError("ALREADY_JOINED", 409)
+    status = "active" if b.role == "parent" else "pending"  # 선생님 · 교직원은 학교 관리자가 승인해야 쓴다
     with tx() as c:
-        uid = c.execute("INSERT INTO users (role, name, school_id, login_id, password_hash, created_at) VALUES ('parent', ?, ?, ?, ?, ?)",
-                        (b.name, b.school_id, b.login_id, hash_pw(b.password), now())).lastrowid
+        uid = c.execute("INSERT INTO users (role, name, school_id, provider, provider_uid, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (b.role, b.name.strip(), b.school_id, t["p"], t["i"], status, now())).lastrowid
+    if status == "pending":
+        return {"pending": True}
     return {"token": make_token(uid), "user": user_out(row("SELECT * FROM users WHERE id = ?", uid))}
 
 
@@ -374,11 +490,11 @@ def link(class_id: int, b: Link, u=Depends(current)):
 def conversation(class_id: int, u=Depends(current)):
     need(u, "parent")
     linked(u, class_id)
-    msgs = rows("SELECT id, original_text text, msg_type, due_date, used_suggestion, received_at at FROM messages WHERE parent_id = ? AND class_id = ?",
+    msgs = rows("SELECT id, original_text text, msg_type, used_suggestion, received_at at, (done_at IS NOT NULL OR teacher_state = 'replied') done FROM messages WHERE parent_id = ? AND class_id = ?",
                 u["id"], class_id)
     reps = rows("""SELECT r.id, r.body text, r.sent_at at FROM replies r JOIN messages m ON m.id = r.message_id
                    WHERE m.parent_id = ? AND m.class_id = ?""", u["id"], class_id)
-    items = [{"kind": "message", **m, "used_suggestion": bool(m["used_suggestion"])} for m in msgs] + [{"kind": "reply", **r} for r in reps]
+    items = [{"kind": "message", **m, "used_suggestion": bool(m["used_suggestion"]), "done": bool(m["done"])} for m in msgs] + [{"kind": "reply", **r} for r in reps]
     teacher = row("SELECT t.name FROM classes c JOIN users t ON t.id = c.teacher_id WHERE c.id = ?", class_id)
     # ponytail: 대화를 한 번에 다 줌. 길어지면 limit · before_id로 끊기 (명세 01절).
     return {"teacher_name": teacher["name"], "items": sorted(items, key=lambda x: x["at"]), "next_before_id": None}
@@ -401,8 +517,8 @@ def send_message(b: NewMessage, bg: BackgroundTasks, u=Depends(current)):
 
 
 # ───────── C 교사 ─────────
-INBOX_SQL = """SELECT m.id, m.category, m.analysis_status, m.msg_type, m.due_date, m.received_at, m.teacher_state, m.original_text,
-               a.summary, a.masked_count, a.urgent_type, cm.child_name, tc.status case_status
+INBOX_SQL = """SELECT m.id, m.category, m.analysis_status, m.msg_type, m.due_date, m.received_at, m.teacher_state, m.original_text, m.done_at,
+               a.summary, a.requests, a.request_summary, a.masked_count, a.urgent_type, cm.child_name, tc.status case_status
                FROM messages m LEFT JOIN analyses a ON a.message_id = m.id
                LEFT JOIN class_members cm ON cm.user_id = m.parent_id AND cm.class_id = m.class_id
                LEFT JOIN threat_cases tc ON tc.message_id = m.id
@@ -412,8 +528,8 @@ INBOX_SQL = """SELECT m.id, m.category, m.analysis_status, m.msg_type, m.due_dat
 def inbox_item(m):
     out = {k: m[k] for k in ("id", "child_name", "category", "analysis_status", "summary", "msg_type", "due_date",
                              "masked_count", "received_at", "teacher_state")}
-    if m["category"] == "threat":
-        out.update(case_status=m["case_status"], label="공격적 표현")
+    if m["category"] == "threat":  # 공격적 표현은 교사에게 숨긴다: 정당한 요청 한 문장만 일반 연락처럼 보여 준다
+        out.update(category="normal", summary=m["request_summary"], masked_count=0)
     return out
 
 
@@ -421,11 +537,12 @@ def inbox_item(m):
 def inbox(filter: Literal["todo", "notice", "school"] = "todo", u=Depends(current)):
     need(u, "teacher")
     ms = rows(INBOX_SQL, u["id"])
-    open_ = [m for m in ms if m["teacher_state"] != "replied"]
+    open_ = [m for m in ms if m["teacher_state"] != "replied" and not m["done_at"]]  # 답장했거나 확인 체크한 것은 목록에서 빠진다
     groups = {
-        "todo": [m for m in open_ if m["category"] in (None, "normal")],
+        # 공격적 표현만 있으면 담임에게 안 보이고 학교(관리자)에게만 간다. 정당한 요청이 섞여 있으면 그 요청만 담임에게 (건수는 counts.school)
+        "todo": [m for m in open_ if m["category"] in (None, "normal") or (m["category"] == "threat" and m["request_summary"])],
         "notice": [],  # ponytail: 알림 필터 규칙이 미정(명세 07절)이라 지금은 0개
-        "school": [m for m in ms if m["category"] == "threat"],
+        "school": [m for m in ms if m["category"] == "threat" and m["case_status"] in ("new", None)],  # 건수만 쓴다. 학교에서 처리 중인 건
     }
     day_ago = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
     return {
@@ -435,13 +552,13 @@ def inbox(filter: Literal["todo", "notice", "school"] = "todo", u=Depends(curren
         "urgent": [{"id": m["id"], "child_name": m["child_name"], "urgent_type": m["urgent_type"],
                     "preview": m["original_text"][:40], "received_at": m["received_at"]}
                    for m in open_ if m["category"] == "urgent"],
-        "items": [inbox_item(m) for m in groups[filter]],
+        "items": [inbox_item(m) for m in groups[filter]] if filter == "todo" else [],
         "next_before_id": None,
     }
 
 
 def teacher_message(u, mid):
-    m = row("""SELECT m.*, a.summary, a.requests, a.masked_count, a.masked_spans, a.urgent_type, a.threat_reason,
+    m = row("""SELECT m.*, a.summary, a.requests, a.request_summary, a.masked_count, a.masked_spans, a.urgent_type, a.threat_reason,
                c.grade, c.class_no, cm.child_name
                FROM messages m LEFT JOIN analyses a ON a.message_id = m.id JOIN classes c ON c.id = m.class_id
                LEFT JOIN class_members cm ON cm.user_id = m.parent_id AND cm.class_id = m.class_id
@@ -471,9 +588,12 @@ def message_detail(mid: int, u=Depends(current)):
     m = teacher_message(u, mid)
     done = m["analysis_status"] == "done"
     out = {k: m[k] for k in ("id", "child_name", "grade", "class_no", "received_at", "category", "analysis_status",
-                             "msg_type", "due_date", "summary", "masked_count")}
+                             "msg_type", "summary", "masked_count")}
+    out["parent_id"] = m["parent_id"]
+    if m["category"] == "threat":  # 공격적 표현은 보여 주지 않는다: 정당한 요청 한 문장만
+        out.update(summary=m["request_summary"], masked_count=0)
     out["requests"] = json.loads(m["requests"]) if m["requests"] else []
-    out["segments"] = segments(m["original_text"], json.loads(m["masked_spans"])) if done and m["category"] != "urgent" else None
+    out["segments"] = segments(m["original_text"], json.loads(m["masked_spans"])) if done and m["category"] not in ("urgent", "threat") else None
     out["original_text"] = None
     with tx() as c:
         if m["teacher_state"] == "new":
@@ -491,6 +611,8 @@ def message_detail(mid: int, u=Depends(current)):
 def message_original(mid: int, b: Via, u=Depends(current)):
     need(u, "teacher")
     m = teacher_message(u, mid)
+    if m["category"] == "threat":
+        raise ApiError("FORBIDDEN", 403, "원문은 학교(관리자)만 볼 수 있어요")
     with tx() as c:
         log_view(c, mid, u["id"], b.via)
     return {"original_text": m["original_text"], "received_at": m["received_at"],
@@ -525,6 +647,36 @@ def admin_case(u, case_id):
     if k["school_id"] != u["school_id"]:
         raise ApiError("FORBIDDEN", 403)
     return k
+
+
+@app.get("/api/admin/members")
+def members(u=Depends(current)):
+    need(u, "admin")
+    return {"pending": rows("SELECT id, role, name, provider, created_at FROM users WHERE school_id = ? AND status = 'pending' ORDER BY id", u["school_id"])}
+
+
+def pending_member(u, uid):
+    need(u, "admin")
+    m = row("SELECT * FROM users WHERE id = ? AND school_id = ? AND status = 'pending'", uid, u["school_id"])
+    if not m:
+        raise ApiError("NOT_FOUND", 404, "member")
+    return m
+
+
+@app.post("/api/admin/members/{uid}/approve")
+def approve_member(uid: int, u=Depends(current)):
+    pending_member(u, uid)
+    with tx() as c:
+        c.execute("UPDATE users SET status = 'active' WHERE id = ?", (uid,))
+    return {"id": uid, "status": "active"}
+
+
+@app.post("/api/admin/members/{uid}/reject")
+def reject_member(uid: int, u=Depends(current)):
+    pending_member(u, uid)
+    with tx() as c:
+        c.execute("DELETE FROM users WHERE id = ?", (uid,))  # 아직 아무 기록도 없는 계정이라 지워도 된다
+    return {"id": uid, "status": "rejected"}
 
 
 @app.get("/api/admin/cases")
@@ -672,20 +824,25 @@ def room_access(u, class_id):
 @app.get("/api/rooms/{class_id}/messages")
 def room_messages(class_id: int, after_id: Optional[int] = None, u=Depends(current)):
     cls = room_access(u, class_id)
-    sql = """SELECT r.id, r.sender_id, u.name sender_name, u.role sender_role, r.body, r.sent_at
+    sql = """SELECT r.id, r.sender_id, u.name sender_name, u.role sender_role, COALESCE(r.body_masked, r.body) shown, r.body orig, r.masked_count, r.sent_at, r.reply_to
              FROM room_messages r JOIN users u ON u.id = r.sender_id WHERE r.class_id = ?"""
     msgs = (rows(sql + " AND r.id > ? ORDER BY r.id", class_id, after_id) if after_id is not None
-            else rows(sql + " ORDER BY r.id DESC LIMIT 50", class_id)[::-1])
+            else rows(sql + " ORDER BY r.sent_at DESC, r.id DESC LIMIT 50", class_id)[::-1])
     count = row("SELECT COUNT(*) n FROM class_members WHERE class_id = ? AND member_role = 'student'", class_id)["n"]
-    return {"class_name": f"{cls['grade']}학년 {cls['class_no']}반", "member_count": count, "messages": msgs}
+    from app.api.care import enrich_room  # 아래에서 불러오는 모듈이라 쓸 때 가져온다
+    msgs, pin = enrich_room(msgs, class_id, u["id"], u["role"])
+    return {"class_name": f"{cls['grade']}학년 {cls['class_no']}반", "member_count": count, "messages": msgs, "pin": pin}
 
 
 @app.post("/api/rooms/{class_id}/messages", status_code=201)
-def room_send(class_id: int, b: Body, u=Depends(current)):
+def room_send(class_id: int, b: RoomBody, u=Depends(current)):
     room_access(u, class_id)
-    t = now()
+    if b.reply_to and not row("SELECT id FROM room_messages WHERE id = ? AND class_id = ?", b.reply_to, class_id):
+        raise ApiError("NOT_FOUND", 404, "reply target")
+    t = now()  # 반 톡방은 AI를 거치지 않는다 (가리기는 학부모 메시지와 학생의 1:1 톡방에만)
     with tx() as c:
-        rid = c.execute("INSERT INTO room_messages (class_id, sender_id, body, sent_at) VALUES (?, ?, ?, ?)", (class_id, u["id"], b.body, t)).lastrowid
+        rid = c.execute("INSERT INTO room_messages (class_id, sender_id, body, sent_at, reply_to) VALUES (?, ?, ?, ?, ?)",
+                        (class_id, u["id"], b.body, t, b.reply_to)).lastrowid
     return {"id": rid, "sent_at": t}
 
 
@@ -722,3 +879,19 @@ def views(mid: int, u=Depends(current)):
         raise ApiError("FORBIDDEN", 403)
     return {"views": rows("""SELECT u.name viewer_name, u.role viewer_role, v.via, v.viewed_at FROM original_views v
                              JOIN users u ON u.id = v.viewer_id WHERE v.message_id = ? ORDER BY v.id""", mid)}
+
+
+# ───────── 학교 생활 (출결 · 공지 · 양식 · 설문 · 오늘) ─────────
+from app.api.school import router as school_router  # noqa: E402  (위의 함수를 쓰므로 맨 아래에서 불러온다)
+
+app.include_router(school_router)
+
+from app.api.oauth import router as oauth_router  # noqa: E402
+
+app.include_router(oauth_router)
+
+from app.api.care import router as care_router  # noqa: E402
+
+app.include_router(care_router)
+
+from app.api import demo_data  # noqa: E402,F401  (시연용 더미 데이터: 가장 마지막에 불러온다)

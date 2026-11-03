@@ -199,7 +199,7 @@
   const RULES = [
     ['결정', '사람은 users 한 테이블', 'role 칸(parent · teacher · admin · student)으로 나눕니다. 화면 권한도 이 칸 하나로 판단합니다.', 'st-done'],
     ['결정', '원문: 교사는 골라서, 관리자는 증거로', '교사는 [원문 보기]를 누를 때만 받습니다. 관리자는 위협으로 넘어온 메시지만, 받은 시간 · 지문과 함께 봅니다.', 'st-done'],
-    ['결정', '로그인: 어른은 아이디 · 비밀번호, 학생은 코드 · 이름', '학부모 · 교사 · 관리자는 아이디 · 비밀번호로 로그인합니다. 학생은 10.16 결정대로 참여 코드와 이름만 씁니다. 다른 기기에서도 코드 · 이름으로 다시 들어오고, 같은 반에 같은 이름이 있으면 그 학생으로 이어 줍니다 (11.02).', 'st-done'],
+    ['결정', '로그인: 어른은 소셜 로그인, 학생은 코드 · 이름', '학부모 · 교사 · 관리자는 카카오 · 네이버 · 구글로 로그인합니다 (11.03, 11.02의 아이디 · 비밀번호를 바꿈). 처음이면 학교를 골라 가입하고, 선생님 · 교직원은 학교 관리자가 승인해야 씁니다(users.status). 학생은 10.16 결정대로 참여 코드와 이름만 씁니다. 같은 반에 같은 이름이 있으면 그 학생으로 이어 줍니다. 아이디 · 비밀번호는 테스트 계정(시드)에만 남깁니다.', 'st-done'],
     ['결정', '학부모는 학교 검색 → 선생님 목록', '가입할 때 학교 이름을 검색해 고르고, 그 학교의 반 · 담임 목록에서 담임을 골라 자녀 이름을 적습니다 (11.02). 고르면 그 반의 class_members에 parent로 들어갑니다.', 'st-done'],
     ['결정', '유형 · 기한은 학부모가 고름', '보낼 때 요청 유형과 답장 기한을 학부모가 고릅니다 (11.02). 그래서 messages에 두고, AI는 요약 · 가림 · 분류만 합니다.', 'st-done'],
     ['원칙', '저장이 분석보다 먼저', '메시지를 받으면 원문과 서버 시간을 먼저 저장하고, 그다음에 AI 분석을 돌립니다 (플로우 B).', 'st-doing'],
@@ -222,8 +222,10 @@
       ['id', 'INTEGER', 'PK', ''], ['name', 'TEXT', '필수', '학교 이름'], ['created_at', 'TEXT', '필수', '만든 시간'] ] },
     { n: 'users', ko: '사람', g: 'people', flow: '공통', what: '학부모 · 교사 · 관리자 · 학생 모두. role 칸으로 나눔.', cols: [
       ['id', 'INTEGER', 'PK', ''], ['role', 'TEXT', '필수', 'parent · teacher · admin · student'], ['name', 'TEXT', '필수', '화면에 보이는 이름'],
-      ['school_id', 'INTEGER', 'FK→schools', '소속 학교'], ['login_id', 'TEXT', '선택 · 겹치지 않음', '로그인 아이디. 학생만 비어 있음 (코드와 이름으로 참여)'],
-      ['password_hash', 'TEXT', '선택', '비밀번호 해시 (bcrypt 등). 학생만 비어 있음. 비밀번호 글자는 저장하지 않음'], ['created_at', 'TEXT', '필수', '가입 시간'] ] },
+      ['school_id', 'INTEGER', 'FK→schools', '소속 학교'], ['login_id', 'TEXT', '선택 · 겹치지 않음', '테스트 계정용 아이디. 소셜 계정 · 학생은 비어 있음'],
+      ['password_hash', 'TEXT', '선택', '테스트 계정용 비밀번호 해시. 소셜 계정 · 학생은 비어 있음. 비밀번호 글자는 저장하지 않음'],
+      ['provider', 'TEXT', '선택', '소셜 로그인 제공자: kakao · naver · google (11.03)'], ['provider_uid', 'TEXT', '선택 · (provider와 함께) 겹치지 않음', '제공자가 준 사용자 번호'],
+      ['status', 'TEXT', '필수', 'active · pending. 선생님 · 교직원은 학교 관리자가 승인하기 전까지 pending (11.03)'], ['created_at', 'TEXT', '필수', '가입 시간'] ] },
     { n: 'classes', ko: '반', g: 'people', flow: 'E · F', what: '학년 · 반과 담임. 반 하나에 반 톡방 하나.', cols: [
       ['id', 'INTEGER', 'PK', ''], ['school_id', 'INTEGER', 'FK→schools', ''], ['teacher_id', 'INTEGER', 'FK→users', '담임 (role = teacher)'],
       ['year', 'INTEGER', '필수', '학년도 (예: 2026)'], ['grade', 'INTEGER', '필수', '학년 1~6'], ['class_no', 'INTEGER', '필수', '반'],
@@ -404,7 +406,8 @@
 
   // ───────── 06 화면 → 테이블 ─────────
   const SCR = [
-    ['G1 · G2 로그인 · 가입', 'users · schools', 'users', '학부모 · 교사 · 관리자만 아이디 · 비밀번호 (11.02). 학부모 가입은 학교 이름 검색(schools.name)으로 school_id를 고름. 비밀번호는 해시로만 저장.'],
+    ['G1 · G2 로그인 · 가입', 'users · schools', 'users', '학부모 · 선생님 · 교직원은 카카오 · 네이버 · 구글 (11.03). 처음이면 학교 이름 검색(schools.name)으로 school_id를 고르고, 선생님 · 교직원은 status = pending으로 들어가 관리자 승인을 기다림.'],
+    ['D4 가입 승인 (새 화면)', 'users', 'users', '관리자 학교의 pending 계정 목록 → 승인(status = active) · 거절(행 삭제). 11.03'],
     ['A0 선생님 목록', 'classes · users · class_members', 'class_members', '학부모 학교의 반 · 담임 목록. 처음 고르면 자녀 이름과 함께 class_members에 parent로 넣음 (11.02).'],
     ['A1 ~ A4 학부모 작성', '—', '—', '보내기 전 검사는 저장하지 않음. 경고 시트도 저장 없음. 유형 · 기한 고르기 칸이 입력창에 들어감 (11.02, 와이어 고칠 것).'],
     ['A5 보낸 뒤', 'messages · replies', 'messages', '보내면 원문 · 받은 시간 · 지문 · 유형 · 기한 저장 → 분석 시작. 제안 문장을 골랐으면 used_suggestion = 1. 담임 답장은 replies에서.'],
@@ -440,10 +443,14 @@ CREATE TABLE users (
   role           TEXT NOT NULL CHECK (role IN ('parent','teacher','admin','student')),
   name           TEXT NOT NULL,
   school_id      INTEGER NOT NULL REFERENCES schools(id),
-  login_id       TEXT UNIQUE,            -- 학생은 NULL (코드와 이름으로 참여)
-  password_hash  TEXT,                   -- 해시만 저장 · 학생은 NULL
+  login_id       TEXT UNIQUE,            -- 테스트 계정용. 소셜 계정 · 학생은 NULL
+  password_hash  TEXT,                   -- 해시만 저장 · 소셜 계정 · 학생은 NULL
+  provider       TEXT CHECK (provider IN ('kakao','naver','google')),  -- 소셜 로그인 (11.03)
+  provider_uid   TEXT,                   -- 제공자가 준 사용자 번호
+  status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','pending')),  -- 선생님 · 교직원은 학교 관리자 승인 전 pending
   created_at     TEXT NOT NULL,
-  CHECK (role = 'student' OR (login_id IS NOT NULL AND password_hash IS NOT NULL))
+  UNIQUE (provider, provider_uid),
+  CHECK (role = 'student' OR provider IS NOT NULL OR (login_id IS NOT NULL AND password_hash IS NOT NULL))
 );
 CREATE INDEX school_search ON schools(name);   -- 학부모 가입: 학교 이름 검색
 

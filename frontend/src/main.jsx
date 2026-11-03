@@ -6,8 +6,9 @@ import Login from './pages/Login.jsx'
 import Parent from './pages/Parent.jsx'
 import Teacher from './pages/Teacher.jsx'
 import Admin from './pages/Admin.jsx'
-import { RoomChat } from './pages/Rooms.jsx'
+import Student from './pages/Student.jsx'
 import './styles.css'
+import './melt.css'
 
 function App() {
   const [me, setMe] = useState(null)
@@ -20,7 +21,7 @@ function App() {
 
   if (!ready) return null
   if (!me) return <Login onIn={signIn} />
-  if (me.role === 'student') return <RoomChat classId={auth.classId} userId={me.id} onOut={signOut} />
+  if (me.role === 'student') return <Student me={me} classId={auth.classId} onOut={signOut} />
   const Page = { parent: Parent, teacher: Teacher, admin: Admin }[me.role]
   return <Page me={me} onOut={signOut} />
 }
