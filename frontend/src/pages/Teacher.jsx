@@ -96,7 +96,7 @@ function Detail({ id, onBack }) {
   }
   const due = dday(d.due_date)
   const threat = d.category === 'threat'
-  const segs = d.segments?.map((s, i) => s.mask ? <Sticker key={i} n={threat ? null : s.mask} plain={threat}>{threat && '가림'}</Sticker> : <span key={i}>{s.t}</span>)
+  const segs = d.segments?.map((s, i) => s.mask ? <Sticker key={i} n={s.mask} /> : <span key={i}>{s.t}</span>)
 
   return (
     <div className="app">
@@ -115,20 +115,18 @@ function Detail({ id, onBack }) {
         </>}
         {d.analysis_status === 'pending' && <div className="cxr"><Cushi face="read" size={48} /><div className="say">쿠션이가 읽는 중이에요. 잠시만요!</div></div>}
 
-        {d.segments && !threat && <>
+        {threat && <div className="banner school"><b>학교로 넘겼어요</b>{CASE[d.case?.status]}</div>}
+        {/* 위협도 일반과 같은 화면: 걸러 낸 원문 + 요약 + 기한 · 유형 (11.03 팀장 결정, E2의 “위협 화면엔 쿠션이 없음”을 바꿈) */}
+        {d.segments && <>
           <div className="cxr"><Cushi face="read" size={58} label="읽는 중인 쿠션이" />
             <div className="say butter"><p className="lb">쿠션이가 읽어 봤어요</p><p>{d.summary}</p>
               <div className="minis"><div className="mini"><p>기한</p><p>{dueText(d.due_date)}</p></div><div className="mini"><p>유형</p><p>{TYPES[d.msg_type]}</p></div></div></div></div>
         </>}
-        {threat && <>
-          <div className="banner school"><b>학교로 넘겼어요</b>{CASE[d.case?.status]}</div>
-          <div className="chunk"><p className="cap">요약</p><p>{d.summary}</p></div>
-        </>}
         {d.segments && <>
           <span className="chipc">원래 보낸 말</span>
           <div className="bub full">{segs}</div>
-          {d.masked_count > 0 && <div className="row"><span className="cap grow">거친 표현 {d.masked_count}곳에 {threat ? '가림 표시를' : '스티커를'} 붙였어요</span>
-            <button className="btn b-white sm" onClick={() => original('teacher_sheet')}>{threat ? '원문 보기' : '떼고 보기'}</button></div>}
+          {d.masked_count > 0 && <div className="row"><span className="cap grow">거친 표현 {d.masked_count}곳에 스티커를 붙였어요</span>
+            <button className="btn b-white sm" onClick={() => original('teacher_sheet')}>떼고 보기</button></div>}
         </>}
 
         {d.replies.map((r) => <div key={r.id} className="bub me">{r.body}<div className="cap">{when(r.sent_at)}</div></div>)}
