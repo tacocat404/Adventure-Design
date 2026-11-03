@@ -77,7 +77,7 @@ flowchart LR
 | 화면 | React (모바일 화면 기준 웹) | 화면 26장 · 부품 21개 |
 | 서버 | Python FastAPI | API 28개 · 토큰 로그인 · 10초마다 새 소식 확인 |
 | DB | SQLite | 테이블 13개 · 원문 잠금 트리거 → [`schema.sql`](backend/app/db/schema.sql) |
-| AI | LLM | 이름 가림 → 키워드 필터 → LLM → 긴급 / 위협 분기 · 5초 넘으면 1번 재시도 |
+| AI | 로컬 모델 + 충남대 API | 거친 표현 판단은 키워드 + 로컬 모델(`smilegate-ai/kor_unsmile`), 분류 · 요약 · 순한 문장은 충남대 AI 포털 API(`claude-haiku-5-5`). 이름은 바꾸고 모욕 구절은 가려서 보내요. 5초 넘으면 1번 재시도 → [평가 결과](ml/results.md) |
 
 ## 진행 상황
 
@@ -88,7 +88,8 @@ flowchart LR
 - [x] API 명세 초안 (11.02)
 - [x] 앱 초안 (11.02): API 28개 · 화면(로그인 · 학부모 · 교사 · 관리자 · 반 톡방) · 키워드 규칙 AI
 - [ ] Todo 분담표
-- [ ] AI: 키워드 규칙 → 학습한 로컬 모델(판단) + API LLM(작성)
+- [x] AI 2일 버전 (11.03): 로컬 모델 + 키워드 판단 · API 분류 · 요약 · 순한 문장, 평가셋 90개와 지표([ml/results.md](ml/results.md))
+- [ ] AI: 평가셋 팀 검토 · 확대, 교권 메시지로 직접 학습
 - [ ] 화면 다듬기 · 연결 · 시연
 
 ## 실행하기
@@ -125,7 +126,11 @@ cd frontend && npm run dev
 - 예시 계정은 비밀번호가 모두 `pass1234`예요: 교사 `teacher1`(김하늘, 3학년 2반) · 관리자 `admin1` · 학부모 `parent1`(민서) · `parent2`(하윤) · `parent3`(서연)
 - 학생은 교사 화면 → 반 톡방 → 참여 코드로 들어가요.
 - API 문서는 서버를 켠 뒤 http://localhost:8000/docs 에서 볼 수 있어요.
-- 흐름 검사: `cd backend && .venv/Scripts/python test_flow.py` · AI 규칙 검사: `.venv/Scripts/python app/ai/analyzer.py`
+- **AI까지 켜려면** (선택, 안 하면 키워드 버전으로 돌아요)
+  1. `backend/.env.example`을 `backend/.env`로 복사하고 `CNU_API_KEY=` 뒤에 충남대 AI 포털 키를 넣어요. `.env`는 레포에 올라가지 않아요.
+  2. 로컬 판단 모델 설치(약 2GB, 처음 한 번): `cd backend && .venv/Scripts/python -m pip install -r requirements-ai.txt --extra-index-url https://download.pytorch.org/whl/cpu`
+  3. 서버를 다시 켜요. 처음엔 모델을 내려받느라 1분쯤 걸려요.
+- 흐름 검사: `cd backend && .venv/Scripts/python test_flow.py` (AI는 끄고 흐름만) · AI 검사: `.venv/Scripts/python app/ai/analyzer.py` · AI 평가: 레포 맨 위에서 `backend/.venv/Scripts/python ml/evaluate.py` → `ml/results.md`
 - macOS · Linux에서는 `.venv/Scripts/python` 대신 `.venv/bin/python`을 써요.
 
 ## 문서
