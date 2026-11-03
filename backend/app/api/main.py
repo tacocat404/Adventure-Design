@@ -11,6 +11,7 @@ import os
 import re
 import secrets
 import sqlite3
+import urllib.request
 import time
 from contextlib import closing, contextmanager
 from datetime import date, datetime, timedelta, timezone
@@ -22,7 +23,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from app.ai.analyzer import analyze as ai_analyze, precheck as ai_precheck, warmup as ai_warmup
+from app.ai.analyzer import ENV as CONF, analyze as ai_analyze, precheck as ai_precheck, warmup as ai_warmup
 
 BACKEND = Path(__file__).resolve().parents[2]
 DB_PATH = Path(os.environ.get("CUSHION_DB", BACKEND / "cushion.db"))
@@ -93,17 +94,26 @@ def check_pw(pw, stored):
     return hmac.compare_digest(hashlib.scrypt(pw.encode(), salt=salt.encode(), n=2**14, r=8, p=1).hex(), h)
 
 
-def make_token(uid):
-    body = base64.urlsafe_b64encode(json.dumps({"u": uid, "e": int(time.time()) + TOKEN_DAYS * 86400}).encode()).decode().rstrip("=")
+def sign(data, ttl):
+    body = base64.urlsafe_b64encode(json.dumps({**data, "e": int(time.time()) + ttl}).encode()).decode().rstrip("=")
     return f"{body}.{hmac.new(SECRET, body.encode(), 'sha256').hexdigest()}"
 
 
-def read_token(tok):
+def unsign(tok):
     body, _, sig = tok.partition(".")
     if not hmac.compare_digest(sig, hmac.new(SECRET, body.encode(), "sha256").hexdigest()):
         return None
     data = json.loads(base64.urlsafe_b64decode(body + "=" * (-len(body) % 4)))
-    return data["u"] if data["e"] > time.time() else None
+    return data if data["e"] > time.time() else None
+
+
+def make_token(uid):
+    return sign({"u": uid}, TOKEN_DAYS * 86400)
+
+
+def read_token(tok):
+    data = unsign(tok)
+    return data.get("u") if data else None
 
 
 REVOKED = set()  # ponytail: 서버를 다시 켜면 로그아웃 목록이 사라짐. 문제 되면 revoked_tokens 테이블로.
@@ -112,7 +122,7 @@ REVOKED = set()  # ponytail: 서버를 다시 켜면 로그아웃 목록이 사�
 def current(authorization: Optional[str] = Header(None)):
     tok = (authorization or "").removeprefix("Bearer ").strip()
     uid = read_token(tok) if tok and tok not in REVOKED else None
-    u = row("SELECT * FROM users WHERE id = ?", uid) if uid else None
+    u = row("SELECT * FROM users WHERE id = ? AND status = 'active'", uid) if uid else None
     if not u:
         raise ApiError("UNAUTHORIZED", 401, "login required")
     u["token"] = tok
@@ -241,11 +251,16 @@ class Login(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
-class Signup(BaseModel):
+class Social(BaseModel):
+    provider: Literal["kakao", "naver", "google"]
+    token: str = Field(min_length=1, max_length=2000)
+
+
+class SocialSignup(BaseModel):
+    ticket: str = Field(min_length=1, max_length=2000)
+    role: Literal["parent", "teacher", "admin"]
     school_id: int
     name: str = Field(min_length=1, max_length=30)
-    login_id: str = Field(min_length=3, max_length=30, pattern=r"^[A-Za-z0-9_.-]+$")
-    password: str = Field(min_length=8, max_length=200)
 
 
 class Link(BaseModel):
@@ -311,15 +326,66 @@ def schools(q: str = ""):
     return {"schools": rows("SELECT id, name FROM schools WHERE name LIKE ? ORDER BY name LIMIT 20", f"%{q.strip()}%")}
 
 
-@app.post("/api/auth/signup", status_code=201)
-def signup(b: Signup):
+# 소셜 로그인 (11.03): 앱이 제공자에게서 받은 접근 토큰을 서버가 제공자 프로필 주소로 확인한다.
+# ponytail: 아래 세 줄 확인은 카카오 · 네이버 · 구글 개발자 앱 키가 있어야 실제로 시험할 수 있다 (아직 못 해 봄).
+#           키가 없는 동안은 "demo:이름" 토큰(CUSHION_DEMO_LOGIN=on)으로 돌린다.
+PROFILES = {
+    "kakao": ("https://kapi.kakao.com/v2/user/me", lambda d: str(d["id"]), lambda d: ((d.get("kakao_account") or {}).get("profile") or {}).get("nickname")),
+    "naver": ("https://openapi.naver.com/v1/nid/me", lambda d: d["response"]["id"], lambda d: d["response"].get("name") or d["response"].get("nickname")),
+    "google": ("https://www.googleapis.com/oauth2/v3/userinfo", lambda d: d["sub"], lambda d: d.get("name")),
+}
+
+
+def demo_on():
+    return CONF.get("CUSHION_DEMO_LOGIN", "on") == "on"
+
+
+def social_profile(provider, token):
+    if token.startswith("demo:") and demo_on():
+        name = token[5:].strip()[:30]
+        if not name:
+            raise ApiError("SOCIAL_FAILED", 401, "demo name")
+        return f"demo:{name.lower()}", name
+    url, uid_of, name_of = PROFILES[provider]
+    try:
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
+        d = json.load(urllib.request.urlopen(req, timeout=5))
+        return uid_of(d), name_of(d)
+    except Exception:
+        raise ApiError("SOCIAL_FAILED", 401, provider)
+
+
+@app.get("/api/config")
+def config():
+    return {"demo_login": demo_on(), "providers": list(PROFILES)}
+
+
+@app.post("/api/auth/social")
+def social(b: Social):
+    uid_, name = social_profile(b.provider, b.token)
+    u = row("SELECT * FROM users WHERE provider = ? AND provider_uid = ?", b.provider, uid_)
+    if not u:  # 처음 오신 분: 학교 · 역할을 받아 가입시킨다 (social/signup)
+        return {"needs_signup": True, "name": name or "", "ticket": sign({"p": b.provider, "i": uid_}, 1800)}
+    if u["status"] != "active":
+        raise ApiError("PENDING_APPROVAL", 403)
+    return {"token": make_token(u["id"]), "user": user_out(u)}
+
+
+@app.post("/api/auth/social/signup", status_code=201)
+def social_signup(b: SocialSignup):
+    t = unsign(b.ticket)
+    if not t or "p" not in t:
+        raise ApiError("UNAUTHORIZED", 401, "ticket")
     if not row("SELECT id FROM schools WHERE id = ?", b.school_id):
         raise ApiError("NOT_FOUND", 404, "school")
-    if row("SELECT id FROM users WHERE login_id = ?", b.login_id):
-        raise ApiError("LOGIN_ID_TAKEN", 409)
+    if row("SELECT id FROM users WHERE provider = ? AND provider_uid = ?", t["p"], t["i"]):
+        raise ApiError("ALREADY_JOINED", 409)
+    status = "active" if b.role == "parent" else "pending"  # 선생님 · 교직원은 학교 관리자가 승인해야 쓴다
     with tx() as c:
-        uid = c.execute("INSERT INTO users (role, name, school_id, login_id, password_hash, created_at) VALUES ('parent', ?, ?, ?, ?, ?)",
-                        (b.name, b.school_id, b.login_id, hash_pw(b.password), now())).lastrowid
+        uid = c.execute("INSERT INTO users (role, name, school_id, provider, provider_uid, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (b.role, b.name.strip(), b.school_id, t["p"], t["i"], status, now())).lastrowid
+    if status == "pending":
+        return {"pending": True}
     return {"token": make_token(uid), "user": user_out(row("SELECT * FROM users WHERE id = ?", uid))}
 
 
@@ -526,6 +592,36 @@ def admin_case(u, case_id):
     if k["school_id"] != u["school_id"]:
         raise ApiError("FORBIDDEN", 403)
     return k
+
+
+@app.get("/api/admin/members")
+def members(u=Depends(current)):
+    need(u, "admin")
+    return {"pending": rows("SELECT id, role, name, provider, created_at FROM users WHERE school_id = ? AND status = 'pending' ORDER BY id", u["school_id"])}
+
+
+def pending_member(u, uid):
+    need(u, "admin")
+    m = row("SELECT * FROM users WHERE id = ? AND school_id = ? AND status = 'pending'", uid, u["school_id"])
+    if not m:
+        raise ApiError("NOT_FOUND", 404, "member")
+    return m
+
+
+@app.post("/api/admin/members/{uid}/approve")
+def approve_member(uid: int, u=Depends(current)):
+    pending_member(u, uid)
+    with tx() as c:
+        c.execute("UPDATE users SET status = 'active' WHERE id = ?", (uid,))
+    return {"id": uid, "status": "active"}
+
+
+@app.post("/api/admin/members/{uid}/reject")
+def reject_member(uid: int, u=Depends(current)):
+    pending_member(u, uid)
+    with tx() as c:
+        c.execute("DELETE FROM users WHERE id = ?", (uid,))  # 아직 아무 기록도 없는 계정이라 지워도 된다
+    return {"id": uid, "status": "rejected"}
 
 
 @app.get("/api/admin/cases")

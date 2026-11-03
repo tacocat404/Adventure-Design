@@ -61,8 +61,10 @@ c.post(f"/api/teacher/messages/{urg}/replies", json={"body": "바로 확인할�
 assert not c.get("/api/teacher/inbox", headers=teacher).json()["urgent"]
 
 # D: 위협 사건 → 증거(지문 확인) → 대응 기록 → 담임 알림
-case = c.get("/api/admin/cases", headers=admin).json()["cases"][-1]  # 가장 오래된 것 = 예시 “각오하고 계세요”
-ev = c.get(f"/api/admin/cases/{case['id']}", headers=admin).json()
+for case in c.get("/api/admin/cases", headers=admin).json()["cases"]:  # 예시 “각오하고 계세요” 사건을 찾는다
+    ev = c.get(f"/api/admin/cases/{case['id']}", headers=admin).json()
+    if "각오" in ev["original_text"]:
+        break
 assert ev["hash_ok"] and "각오" in ev["original_text"]
 assert c.post(f"/api/admin/cases/{case['id']}/actions", json={"action_type": "meeting", "memo": "면담"}, headers=admin).json()["case_status"] == "handled"
 assert c.get(f"/api/messages/{case['message_id']}/views", headers=admin).json()["views"]
@@ -82,5 +84,23 @@ assert c.post("/api/rooms/join", json={"code": code, "name": "b"}).json()["error
 c.post(f"/api/rooms/{rid}/messages", json={"body": "선생님 안녕하세요"}, headers=student)
 assert c.get(f"/api/rooms/{rid}/messages", headers=teacher).json()["messages"][0]["sender_name"] == "김서준"
 assert c.get(f"/api/rooms/{rid}/messages", headers=parent).status_code == 403
+
+# 소셜 로그인 (데모 토큰): 학부모는 바로, 선생님은 관리자 승인 뒤에
+sc = c.post("/api/auth/social", json={"provider": "kakao", "token": "demo:새학부모"}).json()
+assert sc["needs_signup"]
+ok = c.post("/api/auth/social/signup", json={"ticket": sc["ticket"], "role": "parent", "school_id": 1, "name": "새학부모"})
+assert ok.status_code == 201 and ok.json()["user"]["role"] == "parent"
+assert c.post("/api/auth/social", json={"provider": "kakao", "token": "demo:새학부모"}).json()["user"]["name"] == "새학부모"
+tc = c.post("/api/auth/social", json={"provider": "google", "token": "demo:새선생"}).json()
+pend = c.post("/api/auth/social/signup", json={"ticket": tc["ticket"], "role": "teacher", "school_id": 1, "name": "새선생"})
+assert pend.json() == {"pending": True}
+assert c.post("/api/auth/social", json={"provider": "google", "token": "demo:새선생"}).json()["error"]["code"] == "PENDING_APPROVAL"
+mem = c.get("/api/admin/members", headers=admin).json()["pending"]
+assert [m["name"] for m in mem] == ["새선생"]
+assert c.get("/api/admin/members", headers=teacher).status_code == 403
+assert c.post(f"/api/admin/members/{mem[0]['id']}/approve", headers=admin).json()["status"] == "active"
+assert c.post("/api/auth/social", json={"provider": "google", "token": "demo:새선생"}).json()["user"]["role"] == "teacher"
+bad = c.post("/api/auth/social", json={"provider": "naver", "token": "진짜아닌토큰"})
+assert bad.json()["error"]["code"] == "SOCIAL_FAILED"
 
 print("flow ok")
