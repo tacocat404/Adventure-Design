@@ -3,6 +3,7 @@ import os
 import tempfile
 
 os.environ["CUSHION_DB"] = os.path.join(tempfile.mkdtemp(), "test.db")
+os.environ.update(CUSHION_LOCAL_MODEL="off", CNU_API_KEY="")  # 흐름만 보는 검사: AI는 키워드 버전으로 (AI는 ml/evaluate.py)
 
 from fastapi.testclient import TestClient  # noqa: E402
 

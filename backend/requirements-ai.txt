@@ -1,0 +1,4 @@
+# 로컬 판단 모델(kor_unsmile)용 — 선택 설치. 없으면 키워드 규칙만으로 돈다.
+# 설치: .venv/Scripts/python -m pip install -r requirements-ai.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0
+transformers==5.22.1
