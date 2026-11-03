@@ -22,7 +22,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from app.ai.analyzer import analyze as ai_analyze, precheck as ai_precheck
+from app.ai.analyzer import analyze as ai_analyze, precheck as ai_precheck, warmup as ai_warmup
 
 BACKEND = Path(__file__).resolve().parents[2]
 DB_PATH = Path(os.environ.get("CUSHION_DB", BACKEND / "cushion.db"))
@@ -162,11 +162,14 @@ def save_message(parent_id, class_id, text, msg_type, due_date, used_suggestion)
 
 
 def run_analysis(mid):
-    m = row("SELECT m.*, c.school_id FROM messages m JOIN classes c ON c.id = m.class_id WHERE m.id = ?", mid)
+    m = row("""SELECT m.*, c.school_id, p.name parent_name, t.name teacher_name, cm.child_name
+               FROM messages m JOIN classes c ON c.id = m.class_id JOIN users p ON p.id = m.parent_id JOIN users t ON t.id = m.teacher_id
+               LEFT JOIN class_members cm ON cm.user_id = m.parent_id AND cm.class_id = m.class_id WHERE m.id = ?""", mid)
+    names = [m["child_name"], m["parent_name"], m["teacher_name"]]  # API로 보내기 전에 바꿀 이름
     r, attempts = None, 0
-    for attempts in (1, 2):  # ponytail: 키워드 버전은 바로 끝나서 5초 제한을 걸지 않음. LLM을 붙일 때 타임아웃 추가.
+    for attempts in (1, 2):  # API 5초 제한 · 재시도는 analyzer 안에서. 여기선 분석 자체가 터졌을 때만 한 번 더.
         try:
-            r = ai_analyze(m["original_text"])
+            r = ai_analyze(m["original_text"], names)
             break
         except Exception:
             r = None
@@ -225,6 +228,7 @@ def init_db():
         run_analysis(save_message(pid, cls[2], text, mt, due, False)[0])
 
 
+ai_warmup()
 init_db()
 
 
@@ -383,7 +387,8 @@ def conversation(class_id: int, u=Depends(current)):
 @app.post("/api/parent/precheck")
 def precheck(b: Text, u=Depends(current)):
     need(u, "parent")
-    return ai_precheck(b.text)  # 결과는 저장하지 않음 (10.16 결정)
+    kids = [r["child_name"] for r in rows("SELECT child_name FROM class_members WHERE user_id = ?", u["id"])]
+    return ai_precheck(b.text, [u["name"], *kids])  # 결과는 저장하지 않음 (10.16 결정)
 
 
 @app.post("/api/parent/messages", status_code=201)

@@ -58,6 +58,7 @@
         <a href="#metrics" class="px-3 py-2 rounded-full hover:bg-white">지표</a>
         <a href="#schedule" class="px-3 py-2 rounded-full hover:bg-white">일정</a>
         <a href="#risks" class="px-3 py-2 rounded-full hover:bg-white">위험</a>
+        <a href="#result" class="px-3 py-2 rounded-full hover:bg-white">결과</a>
       </div>
     </div>
   </nav>
@@ -168,7 +169,7 @@
     </section>
 
     <!-- 07 위험 -->
-    <section id="risks" class="pt-20 pb-20">
+    <section id="risks" class="pt-20">
       <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
         <span class="eyebrow text-sm font-bold text-mute">07</span>
         <span class="text-2xl md:text-3xl font-black tracking-tight">위험과 대비 · 정할 것</span>
@@ -177,6 +178,39 @@
       <div class="mt-7 grid grid-cols-1 md:grid-cols-2 gap-4" id="risk-list"></div>
       <p class="reveal mt-12 text-sm font-bold text-mute keep">다음 회의에서 정할 것</p>
       <ol class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 keep border-t-2 border-ink" id="open-list"></ol>
+    </section>
+
+    <!-- 08 2일 버전 결과 (11.03) -->
+    <section id="result" class="pt-20 pb-20">
+      <h2 class="reveal flex flex-wrap items-baseline gap-x-3 gap-y-1 keep">
+        <span class="eyebrow text-sm font-bold text-mute">08</span>
+        <span class="text-2xl md:text-3xl font-black tracking-tight">제출용 2일 버전 · 결과</span>
+        <span class="text-mute">26.11.03 · 6주 계획을 2일로 줄여 구현 · 숫자는 ml/results.md</span>
+      </h2>
+      <div class="reveal mt-7 grid grid-cols-1 md:grid-cols-3 gap-4 keep">
+        <div class="card rounded-2xl p-5"><span class="badge st-temp">바꾼 것 1</span><p class="mt-3 font-extrabold">직접 학습 → 공개 학습 모델</p><p class="mt-2 text-[14.5px] text-[#5a564f] leading-relaxed">데이터 수집 · 학습 시간이 없어 한국어 악플로 이미 학습된 <code class="k">smilegate-ai/kor_unsmile</code>을 로컬에서 돌리고 키워드 규칙과 함께 쓴다. 교권 메시지 직접 학습은 다음 단계.</p></div>
+        <div class="card rounded-2xl p-5"><span class="badge st-temp">바꾼 것 2</span><p class="mt-3 font-extrabold">분류는 API도 함께 판단</p><p class="mt-2 text-[14.5px] text-[#5a564f] leading-relaxed">키워드만으로는 위협 재현율 0.40 · 긴급 0.70이라 “놓치는 것보다 한 번 더” 원칙에 못 미쳤다. 키워드와 API 중 더 심각한 쪽을 따른다. 이름은 바꾸고 모욕 구절은 가린 문장만 보낸다.</p></div>
+        <div class="card rounded-2xl p-5"><span class="badge st-temp">바꾼 것 3</span><p class="mt-3 font-extrabold">평가셋 300 → 90 · 다른 AI 비교 뺌</p><p class="mt-2 text-[14.5px] text-[#5a564f] leading-relaxed">문장 60개 · 메시지 30개(<code class="k">ml/eval_set.json</code>, 팀 검토 전). 비교는 키워드 / 로컬 모델 / 둘 다, 분류는 키워드 / 키워드 + API. 작성 API는 충남대 AI 포털 <code class="k">claude-haiku-5-5</code>.</p></div>
+      </div>
+      <div class="reveal mt-6 card rounded-2xl overflow-x-auto">
+        <table class="mx w-full min-w-[44rem] text-[15px] keep">
+          <thead><tr class="border-b-2 border-ink text-left"><th class="px-5 py-3.5 font-extrabold">지표</th><th class="px-5 py-3.5 font-extrabold">키워드만</th><th class="px-5 py-3.5 font-extrabold">앱 (로컬 모델 + 키워드 · API)</th></tr></thead>
+          <tbody class="divide-y divide-line">
+            <tr><td class="px-5 py-3 font-bold">거친 표현 F1</td><td class="px-5 py-3">0.64</td><td class="px-5 py-3 font-semibold">0.83 (로컬 모델만 0.73)</td></tr>
+            <tr><td class="px-5 py-3 font-bold">과잉 가림률</td><td class="px-5 py-3">0.00</td><td class="px-5 py-3 font-semibold">0.03</td></tr>
+            <tr><td class="px-5 py-3 font-bold">교사를 향한 비꼼 잡은 수</td><td class="px-5 py-3">3 / 15</td><td class="px-5 py-3 font-semibold">7 / 15 — 남은 과제</td></tr>
+            <tr><td class="px-5 py-3 font-bold">긴급 재현율</td><td class="px-5 py-3">0.70</td><td class="px-5 py-3 font-semibold">0.90</td></tr>
+            <tr><td class="px-5 py-3 font-bold">위협 재현율</td><td class="px-5 py-3">0.40</td><td class="px-5 py-3 font-semibold">0.90 ~ 1.00 (API 응답에 따라)</td></tr>
+            <tr><td class="px-5 py-3 font-bold">일반을 잘못 경보</td><td class="px-5 py-3">0건</td><td class="px-5 py-3 font-semibold">0건</td></tr>
+            <tr><td class="px-5 py-3 font-bold">보내기 전 검사 시간</td><td class="px-5 py-3">즉시</td><td class="px-5 py-3 font-semibold">약 3초 (5초 규칙 통과)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="reveal mt-5 text-[14px] leading-relaxed space-y-1.5 keep">
+        <li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>키워드 사전과 평가셋을 같은 사람이 만들어 키워드 점수는 실제보다 높게 나올 수 있다. API 지시문에는 평가셋 문장을 넣지 않고 유형 설명만 썼다(넣었을 때 위협 0.80, 뺐을 때 0.50 → 유형 설명으로 0.90 ~ 1.00).</span></li>
+        <li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>API 응답이 가끔 5초를 넘긴다. 넘으면 1번 더 묻고, 그래도 안 되면 키워드 결과로 돌아가 앱은 멈추지 않는다.</span></li>
+        <li class="text-[#5a564f] flex gap-2"><span class="mt-[9px] w-1 h-1 rounded-full bg-[#b7b1a6] shrink-0"></span><span>다음 단계: 팀이 평가셋을 검토 · 확대하고, 놓친 비꼼 표현을 모아 kor_unsmile을 교권 메시지로 추가 학습한다(원래 6주 계획의 2 ~ 3주차).</span></li>
+      </ul>
     </section>
   </main>
 
