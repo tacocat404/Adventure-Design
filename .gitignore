@@ -28,3 +28,4 @@ ml/models/
 ml/data/feedback_queue.json
 ml/data/gen/
 ml/experiments.json
+ml/data/gen_eval/
