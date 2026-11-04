@@ -8,6 +8,8 @@ import json
 import os
 import re
 import threading
+from concurrent.futures import ThreadPoolExecutor
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -22,6 +24,8 @@ LLM_TIMEOUT = 5  # 분석: 5초 넘으면 1번 재시도 (유저플로우 B). �
 # 거친 표현 (가림 대상)
 ROUGH = ["제대로 못", "그러고도", "자격", "무능", "한심", "미친", "꺼져", "개념", "똑바로",
          "멍청", "바보", "쓰레기", "정신 차", "돌았", "월급 받", "씨발", "시발", "ㅅㅂ", "병신", "ㅂㅅ"]
+# 뜻이 하나뿐인 욕설: 판단기가 뭐라 하든 가린다 (판단기는 '헷갈림' 데이터 때문에 키워드를 덜 믿게 배웠다 · stress_test 11.04)
+STRONG = ["무능", "한심", "개념 없", "개념없", "꺼져", "멍청", "쓰레기", "씨발", "시발", "ㅅㅂ", "병신", "ㅂㅅ", "개새"]
 # 위협 (애매해도 위협)
 THREAT = ["찾아가", "찾아갈", "각오", "가만 안 두", "가만두지", "가만 있지 않", "두고 보",
           "어디 사는지", "어디 사시는지", "죽여", "고소", "신고하겠", "신고할", "가만히 안", "가만 안", "SNS에 올", "인터넷에 올", "퍼뜨리"]
@@ -34,22 +38,37 @@ URGENT = {
 }
 REQUEST = ["주세요", "해 주", "부탁", "알려", "싶어요", "할까요", "있을까요", "바랍니다", "주실"]
 
+HANGUL = re.compile(r"[가-힣ㄱ-ㅎ]")
 # 쉼표 · 마침표 · 물음표 · 느낌표 단위 구절
 CLAUSE = re.compile(r"[^,.?!\n]+[,.?!]*")
+# 끊지 않는 부호: 숫자 사이(3.5점), 한 글자씩 끊어 쓴 말(개.념.없.네 — 예전엔 '개.'·'념.'으로 쪼개져 못 잡았다 · stress_test 11.04)
+KEEP_DOTS = re.compile(r"(?<=\d)[.,](?=\d)|(?:(?<=^)|(?<=\s))(?:\S[.·])+\S(?=[\s.,?!]|$)")
+
+
+CLAUSE_MAX = 80  # 문장 부호 없이 긴 구절은 띄어쓰기에서 60자 안팎으로 자른다 (930자 한 구절이 긴급으로 나왔다 · stress_test 11.04)
 
 
 def _clauses(text):
     out = []
-    for m in CLAUSE.finditer(text):
+    # 끊지 않을 부호만 '·'로 바꾼 같은 길이 사본에서 자리를 찾고, 글자는 원문에서 가져온다
+    probe = KEEP_DOTS.sub(lambda m: re.sub(r"[.,]", "·", m.group()), text)
+    for m in CLAUSE.finditer(probe):
         raw = m.group()
         lead = len(raw) - len(raw.lstrip())
-        if raw.strip():
-            out.append((m.start() + lead, m.end(), raw.strip()))
+        if not raw.strip():
+            continue
+        a, b = m.start() + lead, m.start() + len(raw.rstrip())
+        while b - a > CLAUSE_MAX:
+            cut = text.rfind(" ", a + 20, a + 60)
+            cut = cut if cut > a else a + 60
+            out.append((a, cut, text[a:cut].strip()))
+            a = cut + 1 if text[cut:cut + 1] == " " else cut
+        out.append((a, m.end(), text[a:m.end()].strip()))
     return out
 
 
 def _hits(s, words):
-    flat = re.sub(r"\s+", "", s)  # 띄어쓰기가 달라도 잡는다 (죽고싶다 · 죽고 싶다)
+    flat = re.sub(r"[\s.·,_\-~*^]+", "", s)  # 띄어쓰기 · 점으로 끊어 써도 잡는다 (죽고 싶다 · 개.념.없.네)
     return any(w in s or w.replace(" ", "") in flat for w in words)
 
 
@@ -77,7 +96,7 @@ def _load():
 
 def warmup():
     """서버를 켤 때 모델을 미리 올려 첫 요청이 기다리지 않게."""
-    threading.Thread(target=_load, daemon=True).start()
+    threading.Thread(target=lambda: load_judge() or _load(), daemon=True).start()
 
 
 def toxic_scores(sentences):
@@ -91,17 +110,71 @@ def toxic_scores(sentences):
     return [1 - float(r[clean]) for r in p]
 
 
+def kw_vec(s):
+    """키워드 판단 [거침, 위협, 긴급] — 스태킹의 첫 번째 점수."""
+    return [float(_hits(s, ROUGH + THREAT)), float(_hits(s, THREAT)), float(any(_hits(s, ws) for ws in URGENT.values()))]
+
+
+# ───────── 판단: 증류 학습한 로컬 판단기 (BERT + kNN + 스태킹 · INT8) ─────────
+JUDGE_DIR = Path(ENV.get("CUSHION_JUDGE_DIR") or Path(__file__).resolve().parents[3] / "ml" / "models" / "judge")
+_judge_model = None
+
+
+def load_judge():
+    """ml/models/judge가 있으면 증류 판단기, 없거나 깨졌으면 False (그때는 kor_unsmile + 키워드로 돈다)."""
+    global _judge_model
+    with _lock:
+        if _judge_model is None:
+            try:
+                if ENV.get("CUSHION_LOCAL_MODEL", "on") == "off" or not (JUDGE_DIR / "stack.json").exists():
+                    raise FileNotFoundError(JUDGE_DIR)
+                from app.ai.judge import Judge
+                _judge_model = Judge(JUDGE_DIR, quantize=ENV.get("CUSHION_INT8", "on") != "off")
+            except Exception:
+                _judge_model = False
+    return _judge_model
+
+
+def assess(sentences):
+    """문장마다 {rough, threat, urgent} 판단 + 가장 비슷한 학습 문장 유형. 증류 판단기가 없으면 예전 방식."""
+    if not sentences:
+        return [], []
+    j = load_judge()
+    if j:
+        # 한글이 거의 없는 구절(이모티콘만 · 영어 · 코드)은 학습한 적 없는 입력이라 모델 대신 키워드로만 본다 (stress_test 11.04)
+        ok = [len(HANGUL.findall(s)) >= 2 for s in sentences]
+        known = [s for s, k in zip(sentences, ok) if k]
+        flags, _, types = j.predict(known, [kw_vec(s) for s in known]) if known else ([], None, [])
+        it_f, it_t = iter(flags), iter(types)
+        out_f, out_t = [], []
+        for s, k in zip(sentences, ok):
+            if k:
+                f = next(it_f)
+                out_f.append({**f, "rough": f["rough"] or _hits(s, STRONG)}); out_t.append(next(it_t))
+            else:
+                v = kw_vec(s)
+                out_f.append({"rough": bool(v[0]), "threat": bool(v[1]), "urgent": bool(v[2])}); out_t.append([])
+        return out_f, out_t
+    rough = rough_flags(sentences, "both")
+    return [{"rough": r, "threat": _hits(s, THREAT), "urgent": any(_hits(s, ws) for ws in URGENT.values())}
+            for s, r in zip(sentences, rough)], [[] for _ in sentences]
+
+
 def rough_flags(sentences, mode="both"):
-    """mode: keyword · local · both (평가에서 셋을 비교)."""
+    """mode: keyword · local · both · judge (평가에서 넷을 비교)."""
     kw = [_hits(s, ROUGH + THREAT) for s in sentences]
     if mode == "keyword":
         return kw
+    if mode == "judge":
+        return [f["rough"] or f["threat"] for f in assess(sentences)[0]]
     sc = toxic_scores(sentences)
     lm = [x >= TOXIC_MIN for x in sc] if sc else [False] * len(sentences)
     return lm if mode == "local" else [a or b for a, b in zip(kw, lm)]
 
 
 def judge_name():
+    if load_judge():
+        return "judge(kor_unsmile 증류+kNN+스태킹" + (",int8)" if ENV.get("CUSHION_INT8", "on") != "off" else ")")
     return "kor_unsmile+keyword" if _load() else "keyword"
 
 
@@ -135,6 +208,9 @@ def writer_name():
     return ENV.get("CNU_MODEL") if ENV.get("CNU_API_KEY") else None
 
 
+_POOL = ThreadPoolExecutor(8, thread_name_prefix="llm")
+
+
 def _llm(system, user, tries=2, timeout=LLM_TIMEOUT):
     if not writer_name():
         return None
@@ -143,8 +219,14 @@ def _llm(system, user, tries=2, timeout=LLM_TIMEOUT):
                                  headers={"Authorization": "Bearer " + ENV["CNU_API_KEY"], "Content-Type": "application/json"})
     for _ in range(tries):
         try:
-            txt = json.load(urllib.request.urlopen(req, timeout=timeout))["choices"][0]["message"]["content"]
+            # urlopen의 timeout은 '한 번 읽을 때'만 재서, 서버가 조금씩 흘려보내면 끝없이 기다린다 (평가가 20분 멈춤 · 11.04)
+            # → 응답 전체에 시간 상한을 건다. 넘으면 버리고 다음 시도 / 로컬 결과로.
+            fut = _POOL.submit(lambda: json.load(urllib.request.urlopen(req, timeout=timeout)))
+            txt = fut.result(timeout=timeout + 1)["choices"][0]["message"]["content"]
             return json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
+        except urllib.error.URLError as e:
+            if not isinstance(e.reason, TimeoutError):
+                break  # 서버가 아예 안 받으면(끊김) 다시 물어도 같다 — 바로 로컬 결과로 (stress_test 11.04: 4.2초 → 즉시)
         except Exception:
             continue  # 시간 초과 · 형식 오류 → 한 번 더, 그래도 안 되면 키워드 버전
     return None
@@ -180,15 +262,45 @@ def _soften(text, spans):
 
 
 # ───────── 05절 계약 ─────────
-def _judge(text):
-    """화면에서 가릴 구간 · API로 보낼 때 가릴 구간(위협 구절은 요약할 내용이라 빼고) · 요청 · 나머지."""
+PAIRS_MAX = 12  # 이웃 구절 묶음은 앞에서 12개까지 (아주 긴 글에서 느려지지 않게)
+
+
+def _assess_text(text):
+    """구절마다 판단 + 이웃한 두 구절을 이은 판단(“집에 안 왔어요. 연락이 안 돼요.”처럼 이어야 보이는 긴급 · 위협용).
+    (구절, 구절 판단, 구절 유형, 묶음 판단 목록, 묶음 유형 목록) — 묶음은 분류에만 쓰고 가림에는 안 쓴다.
+    메시지 통째로 넣지 않는 이유: 학습 문장은 짧아서, 긴 글을 통째로 넣으면 엉뚱하게 긴급이 떴다 (stress_test 11.04)."""
     cl = _clauses(text)
-    flags = rough_flags([s for _, _, s in cl])
-    spans = [{"start": a, "end": b} for (a, b, _), f in zip(cl, flags) if f]
-    api_spans = [{"start": a, "end": b} for (a, b, s), f in zip(cl, flags) if f and not _hits(s, THREAT)]
-    requests = [s for (_, _, s), f in zip(cl, flags) if not f and _hits(s, REQUEST)]
-    rest = [s for (_, _, s), f in zip(cl, flags) if not f]
+    sents = [s for _, _, s in cl]
+    pairs = [sents[i] + " " + sents[i + 1] for i in range(min(len(sents) - 1, PAIRS_MAX))]
+    flags, types = assess(sents + pairs)
+    n = len(sents)
+    # 거친 구절이 낀 묶음은 긴급 근거로 안 쓴다: 교사를 탓하는 말 + 아이 걱정을 이으면 학습에 없던 문장이 돼
+    # “짝이랑 안 맞아서 매일 울면서 와요”(구절만은 긴급 0.02)가 묶음에서 긴급 0.87이 됐다 (시연 문장 · 11.04)
+    rough = [f["rough"] or f["threat"] for f in flags[:n]]
+    pair_flags = [{**f, "urgent": f["urgent"] and not (rough[i] or rough[i + 1])} for i, f in enumerate(flags[n:])]
+    return cl, flags[:n], types[:n], pair_flags, types[n:]
+
+
+def _judge(text, _pre=None):
+    """화면에서 가릴 구간 · API로 보낼 때 가릴 구간(위협 구절은 요약할 내용이라 빼고) · 요청 · 나머지."""
+    cl, flags = (_pre or _assess_text(text))[:2]
+    hide = [f["rough"] or f["threat"] for f in flags]
+    spans = [{"start": a, "end": b} for (a, b, _), h in zip(cl, hide) if h]
+    api_spans = [{"start": a, "end": b} for (a, b, _), h, f in zip(cl, hide, flags) if h and not f["threat"]]
+    requests = [s for (_, _, s), h in zip(cl, hide) if not h and _hits(s, REQUEST)]
+    rest = [s for (_, _, s), h in zip(cl, hide) if not h]
     return spans, api_spans, requests, rest
+
+
+URGENT_OF = {"긴급_학폭": "school_violence", "긴급_학대": "child_abuse", "긴급_자해": "safety", "긴급_안전": "safety"}
+THREAT_OF = {"위협_신체": "신체 위해를 암시하는", "위협_대면": "찾아가겠다는", "위협_신상": "신상을 퍼뜨리겠다는",
+             "위협_법적": "법적 조치로 압박하는", "위협_조건부": "조건부로 경고하는"}
+
+
+def _nearest(types, table):
+    """kNN 이웃 중 가장 많은 유형 (표에 있는 것만)."""
+    got = [table[t] for row in types for t in row if t in table]
+    return max(set(got), key=got.count) if got else None
 
 
 SOFTEN_TIMEOUT = 15  # 다듬기는 7초 안팎 걸린다 (11.04 측정). 4초 제한이면 늘 실패해 구절만 지운 문장이 나갔다
@@ -214,11 +326,21 @@ SEVERITY = {"normal": 0, "threat": 1, "urgent": 2}
 
 
 def analyze(original_text: str, names=(), use_api=True) -> dict:
-    urgent_type = next((t for t, ws in URGENT.items() if _hits(original_text, ws)), None)
+    pre = _assess_text(original_text)
+    cl, flags, types, pair_flags, pair_types = pre
+    all_flags, all_types = flags + pair_flags, types + pair_types
+    is_urgent = any(f.get("urgent") for f in all_flags)
+    is_threat = any(f.get("threat") for f in all_flags)
+    kw_urgent = next((t for t, ws in URGENT.items() if _hits(original_text, ws)), None)
+    urgent_type = (kw_urgent or _nearest([t for f, t in zip(all_flags, all_types) if f.get("urgent")], URGENT_OF) or "safety") if is_urgent else None
     threat_words = [w for w in THREAT if _hits(original_text, [w])]
-    category = "urgent" if urgent_type else "threat" if threat_words else "normal"
-    reason = ", ".join(f"‘{w}’" for w in threat_words) + " 같은 위협 표현이 들어 있어요." if threat_words else None
-    spans, api_spans, requests, rest = _judge(original_text)
+    category = "urgent" if is_urgent else "threat" if is_threat else "normal"
+    reason = None
+    if is_threat:
+        kind = _nearest([t for f, t in zip(all_flags, all_types) if f.get("threat")], THREAT_OF)
+        reason = (", ".join(f"‘{w}’" for w in threat_words) + " 같은 위협 표현이 들어 있어요." if threat_words
+                  else f"{kind} 표현과 비슷한 문장이 있어요." if kind else "위협으로 볼 수 있는 표현이 있어요.")
+    spans, api_spans, requests, rest = _judge(original_text, pre)
     summary = " ".join(requests or rest[-1:]) or "거친 표현만 있어 요약할 요청이 없어요. 원문 보기로 확인해 주세요."
     writer = None
     request_summary = " ".join(requests) or None  # 키워드만 돌 때: 거친 구절이 아닌 요청 구절

@@ -915,4 +915,8 @@ from app.api.care import router as care_router  # noqa: E402
 
 app.include_router(care_router)
 
+from app.api.feedback import router as feedback_router  # noqa: E402
+
+app.include_router(feedback_router)
+
 from app.api import demo_data  # noqa: E402,F401  (시연용 더미 데이터: 가장 마지막에 불러온다)
