@@ -611,7 +611,7 @@ def message_detail(mid: int, u=Depends(current)):
     m = teacher_message(u, mid)
     done = m["analysis_status"] == "done"
     out = {k: m[k] for k in ("id", "child_name", "grade", "class_no", "received_at", "category", "analysis_status",
-                             "msg_type", "summary", "masked_count")}
+                             "msg_type", "summary", "masked_count", "urgent_type")}  # urgent_type: 상세 배너 "긴급 · 안전" (11.05)
     out["parent_id"] = m["parent_id"]
     out["cushion"] = done and is_rough(m)  # 쿠션이 요약만 보여 주고, 요약을 누르면 원문 (11.04)
     if out["cushion"]:
