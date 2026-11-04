@@ -29,3 +29,6 @@ ml/data/feedback_queue.json
 ml/data/gen/
 ml/experiments.json
 ml/data/gen_eval/
+
+# 시연 초기화 백업 (backend/demo_reset.py)
+*.db.bak-*
