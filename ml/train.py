@@ -81,7 +81,7 @@ def load_items():
     """학습 데이터 전체. reviewed.json(팀원 두 명이 검수 · 가장 우선) + train.json(API LLM) + short.json(짧은 긴급 · 위협)
     + hand.json(직접 쓴 위협) + claude.json(Sonnet 에이전트). 같은 문장이 여러 파일에 있으면 앞 파일(사람 검수) 라벨을 쓴다."""
     out, seen = [], set()
-    for f in ("reviewed.json", "train.json", "short.json", "hand.json", "claude.json", "claude_F.json"):
+    for f in ("reviewed.json", "train.json", "short.json", "hand.json", "claude.json", "claude_F.json", "claude_G.json"):
         p = ROOT / "ml" / "data" / f
         for x in (json.loads(p.read_text(encoding="utf-8"))["items"] if p.exists() else []):
             key = "".join(x["text"].split())

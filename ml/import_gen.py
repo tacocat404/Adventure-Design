@@ -69,10 +69,14 @@ def merge():
                    if i in labels and r not in agree)
     print("불일치 상위:", miss.most_common(8))
 
-    old = [x["text"] for f in ("train.json", "short.json", "hand.json", *(["claude.json"] if G else [])) if (ROOT / "ml" / "data" / f).exists()
+    old = [x["text"] for f in ("train.json", "short.json", "hand.json", *(["claude.json", "claude_F.json"] if G else [])) if (ROOT / "ml" / "data" / f).exists()
            for x in json.loads((ROOT / "ml" / "data" / f).read_text(encoding="utf-8"))["items"]]
     ev = json.loads((ROOT / "ml" / "eval_set.json").read_text(encoding="utf-8"))
     ev_g = [grams(s["text"]) for s in ev["sentences"]] + [grams(m["text"]) for m in ev["messages"]]
+    big = ROOT / "ml" / "eval_big.json"  # 큰 합성 시험셋과도 겹치면 안 된다 (11.05)
+    if big.exists():
+        eb = json.loads(big.read_text(encoding="utf-8"))
+        ev_g += [grams(x["text"]) for x in eb["sentences"] + eb["messages"]]
     seen = {"".join(t.split()) for t in old}
     keep, near_eval = [], 0
     for r in agree:
