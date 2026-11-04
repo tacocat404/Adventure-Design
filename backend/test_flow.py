@@ -76,6 +76,7 @@ assert not c.get("/api/teacher/inbox", headers=teacher).json()["urgent"]
 # D: 위협 사건 → 증거(지문 확인) → 대응 기록 → 담임 알림
 for case in c.get("/api/admin/cases", headers=admin).json()["cases"]:  # 예시 “각오하고 계세요” 사건을 찾는다
     ev = c.get(f"/api/admin/cases/{case['id']}", headers=admin).json()
+    assert ev["threat_reason"], ev  # 11.05: 학교로 넘어간 사건은 위협이든 거친 일반 메시지든 판단 이유가 있어야 한다
     if "각오" in ev["original_text"]:
         break
 assert ev["hash_ok"] and "각오" in ev["original_text"]

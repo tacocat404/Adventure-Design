@@ -270,7 +270,8 @@ def is_rough(m):
 
 def cushion_summary(m):
     if m["category"] == "threat":
-        return m["request_summary"] or "거친 표현만 있어 학교에 넘겼어요."
+        # 11.05: 위협인데 “거친 표현만 있어”라고 떴다 — 요청이 없을 때만, 위협이라 넘겼다고 정확히
+        return m["request_summary"] or "위협으로 볼 수 있는 표현이 있어 학교에 넘겼어요. 담임에게 전할 정당한 요청은 없었어요."
     return m["summary"]
 
 

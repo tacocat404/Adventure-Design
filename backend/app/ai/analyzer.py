@@ -19,7 +19,9 @@ ENV = {**{k.strip(): v.strip() for k, _, v in (l.partition("=") for l in (ENV_FI
 
 LOCAL_NAME = "smilegate-ai/kor_unsmile"
 TOXIC_MIN = 0.3  # 1 - clean 점수가 이 값 이상이면 거침. 0.3 · 0.4 모두 과잉 가림 0.03, 재현율은 0.3이 높음 (ml/results.md)
-LLM_TIMEOUT = 5  # 분석: 5초 넘으면 1번 재시도 (유저플로우 B). 보내기 전 검사는 4초 1번만
+# 분석: 8초 넘으면 1번 재시도. 분석은 보낸 뒤 백그라운드에서 돌아 학부모 · 교사가 기다리지 않는다.
+# 11.05: 요청 기준 · 이유 지시가 늘며 응답이 5초 안팎이 돼, 5초 제한이면 절반쯤 끊겨 API 요청 요약 · 이유가 버려졌다.
+LLM_TIMEOUT = 8
 
 # 거친 표현 (가림 대상)
 ROUGH = ["제대로 못", "그러고도", "자격", "무능", "한심", "미친", "꺼져", "개념", "똑바로",
@@ -36,7 +38,9 @@ URGENT = {
     "safety": ["다쳤", "위험", "무너", "화재", "자해", "자살", "실종", "죽고 싶", "죽고싶", "죽을 것 같", "죽어 버리", "죽어버리", "살기 싫", "살고 싶지 않",
                "사라지고 싶", "극단적", "목숨", "스스로 해치", "손목", "유서"],
 }
-REQUEST = ["주세요", "해 주", "부탁", "알려", "싶어요", "할까요", "있을까요", "바랍니다", "주실"]
+REQUEST = ["주세요", "해 주세요", "해 주시", "부탁", "알려", "싶어요", "할까요", "있을까요", "바랍니다", "주실",
+           # 11.05: “한 번만 다시 봐주시면 안 될까요?”를 못 잡았다
+           "주시면", "될까요", "봐 주", "줄 수", "주시겠", "가능할까", "괜찮을까", "해 줘", "드려도"]
 
 HANGUL = re.compile(r"[가-힣ㄱ-ㅎ]")
 # 쉼표 · 마침표 · 물음표 · 느낌표 단위 구절
@@ -181,6 +185,12 @@ def judge_name():
 
 
 # ───────── 작성: 충남대 API ─────────
+# 요약(교사에게 보임)과 보내기 전 검사(학부모에게 “이 요청은 전달돼요”로 보임)가 같은 기준을 써야 한다.
+# 11.05: 요약은 “성적 · 평가 압박은 요청 아님”, 검사는 “성적 다시 확인”을 요청으로 뽑아 — 학부모에겐 전달된다고 하고 교사에겐 안 갔다.
+REQUEST_RULE = """정당한 요청 = 담임이 할 수 있는 일을 부탁하는 것. 예: 자리 · 모둠 변경, 상담, 준비물 · 숙제 문의, 성적 · 채점 기준을 다시 확인하거나 설명해 달라는 것, 아이를 살펴봐 달라는 것, 일정 · 연락 요청.
+위협이나 거친 말이 함께 있어도, 그 안의 요청 자체가 정당하면 넣는다 (위협 부분만 뺀다).
+요청이 아닌 것 = 사과 · 무릎 꿇기 같은 굴종 요구, 점수를 올려라 · 바꿔라는 결과 강요, 찾아오겠다 · 신고하겠다 · 퍼뜨리겠다는 협박."""
+
 SUMMARY_SYS = """너는 학교 소통 앱 '쿠션톡'의 분류 · 요약 도우미야. 학부모가 담임에게 보낸 메시지를 읽어.
 1) category를 골라.
    - urgent: 학생이 위험한 상황 — 학교폭력(신체 · 언어 · 금전 피해), 아동학대 · 방임, 학생의 신체 · 생명 안전(사고, 행방 불명, 자해 위험, 위험한 시설)
@@ -189,9 +199,11 @@ SUMMARY_SYS = """너는 학교 소통 앱 '쿠션톡'의 분류 · 요약 도우
 2) summary: 담임이 할 일을 해요체 한 문장으로. 요청이 있으면 "~해 달라는 요청이에요.", 없으면 "~라는 내용이에요."로 끝내. 위협이면 무엇을 하겠다는지 담담하게 적어.
 - [가림N]은 모욕 표현을 가려 둔 자리야. 요약에 넣지 마. [이름N]은 사람 이름이야. 그대로 써.
 - 요청은 하나도 빼지 말고, 메시지에 없는 내용은 지어내지 마.
-3) request_summary: 담임이 정당하게 처리할 수 있는 요청만 해요체 한 문장으로 (예: 자리 변경 · 상담 · 준비물 문의 · 숙제 양 조정). 사과 · 무릎 꿇기 같은 굴종 요구, 성적 · 평가를 바꾸라는 압박, 찾아오겠다 · 신고하겠다는 협박은 요청이 아니야 — 절대 넣지 마. 정당한 요청이 하나도 없으면 null.
+3) request_summary: 정당한 요청만 해요체 한 문장으로 ("~해 달라는 요청이에요."). 정당한 요청이 하나도 없을 때만 null.
+""" + REQUEST_RULE + """
 4) requests: 위의 정당한 요청만 짧게 (없으면 []).
-JSON만 출력해: {"category": "urgent|threat|normal", "urgent_type": "school_violence|child_abuse|safety|null", "reason": "urgent · threat로 본 이유 한 문장 (normal이면 null)", "summary": "...", "request_summary": "... 또는 null", "requests": ["짧은 요청", ...]}"""
+5) reason: urgent · threat로 본 이유 한 문장. 무엇이 왜 문제인지 구체적으로 — 어떤 요구에 어떤 압박을 붙였는지 (예: "성적 재검토를 요구하면서 교육청 보고를 압박 수단으로 썼어요."). normal이면 null.
+JSON만 출력해: {"category": "urgent|threat|normal", "urgent_type": "school_violence|child_abuse|safety|null", "reason": "... 또는 null", "summary": "...", "request_summary": "... 또는 null", "requests": ["짧은 요청", ...]}"""
 
 SOFTEN_SYS = """학부모가 담임에게 보내려는 메시지에 거친 표현이나 위협이 섞여 있어. 담임이 기분 상하지 않게 예의 바른 메시지로 다시 써 줘.
 - 거친 구절을 그냥 지우지 마. 그 말에 담긴 감정 · 걱정을 정중한 말로 바꿔.
@@ -203,6 +215,7 @@ SOFTEN_SYS = """학부모가 담임에게 보내려는 메시지에 거친 표�
 - 요청 · 사실 · 기한은 하나도 빼거나 바꾸지 말고, 없는 요청을 지어내지 마.
 - 학부모 말투(해요체)로. 서로 다른 두 가지로.
 keeps에는 담임에게 그대로 전해지는 정당한 요청만 짧게 적어 (위협 · 감정 표현은 넣지 마).
+""" + REQUEST_RULE + """
 JSON만 출력해: {"suggestions": ["고친 메시지 1", "고친 메시지 2"], "keeps": ["짧은 요청", ...]}"""
 
 
@@ -295,8 +308,46 @@ def _judge(text, _pre=None):
 
 
 URGENT_OF = {"긴급_학폭": "school_violence", "긴급_학대": "child_abuse", "긴급_자해": "safety", "긴급_안전": "safety"}
-THREAT_OF = {"위협_신체": "신체 위해를 암시하는", "위협_대면": "찾아가겠다는", "위협_신상": "신상을 퍼뜨리겠다는",
-             "위협_법적": "법적 조치로 압박하는", "위협_조건부": "조건부로 경고하는"}
+# kNN 이웃 유형 → 왜 위협인지 (판단 이유에 걸린 구절과 함께 쓴다)
+THREAT_OF = {"위협_신체": "몸을 해칠 수 있다고 암시해요", "위협_대면": "학교 · 교사를 찾아가겠다며 압박해요",
+             "위협_신상": "교사의 신상을 퍼뜨리겠다고 해요", "위협_법적": "신고 · 민원 · 소송을 압박 수단으로 써요",
+             "위협_조건부": "들어주지 않으면 가만있지 않겠다고 경고해요", "위협_요청섞임": "요구를 들어주지 않으면 불이익을 주겠다는 뜻이에요",
+             "위협_돌려말하기": "교사의 사생활을 아는 척하며 압박해요"}
+
+
+def _quote(s, n=40):
+    s = s.strip()
+    return "‘" + (s if len(s) <= n else s[:n].rstrip() + "…") + "’"
+
+
+def _threat_reason(cl, flags, types, pair_flags, pair_types, api_reason):
+    """판단 이유 = ‘걸린 구절’ — 왜. 구절은 서버가 위협으로 본 곳(없으면 묶음 · 키워드), 왜는 API 이유 → kNN 유형 → 기본 문구.
+    11.05: “법적 조치로 압박하는 표현과 비슷한 문장이 있어요”만으로는 어디가 문제인지 알 수 없었다."""
+    hit = [s for (_, _, s), f in zip(cl, flags) if f.get("threat")]
+    hit_types = [t for f, t in zip(flags, types) if f.get("threat")]
+    if not hit:  # 두 구절을 이어야 보이는 위협
+        sents = [s for _, _, s in cl]
+        hit = [sents[i] + " " + sents[i + 1] for i, f in enumerate(pair_flags) if f.get("threat")]
+        hit_types = [t for f, t in zip(pair_flags, pair_types) if f.get("threat")]
+    if not hit:  # 서버는 못 봤고 키워드 · API만 위협이라고 할 때
+        hit = [s for _, _, s in cl if _hits(s, THREAT)]
+    why = (api_reason or "").strip() or _nearest(hit_types, THREAT_OF) or "교사를 향한 위협으로 볼 수 있어 학교에서 한 번 더 확인해요."
+    if not hit:
+        return why
+    more = f" 외 {len(hit) - 1}곳" if len(hit) > 1 else ""
+    return f"{_quote(hit[0])}{more} — {why}"
+
+
+def _rough_reason(text, spans):
+    """위협은 아니지만 거친 표현을 고치지 않고 보내 학교로 넘어간 메시지의 판단 이유 (11.05: 관리자 화면에 빈칸으로 떴다)."""
+    first = text[spans[0]["start"]:spans[0]["end"]]
+    more = f" 외 {len(spans) - 1}곳" if len(spans) > 1 else ""
+    return f"{_quote(first)}{more} — 교사를 향한 거친 표현을 고치지 않고 보냈어요."
+
+
+def _request_sentence(items):
+    items = [i.strip().rstrip(".?!~ ") for i in items if i and i.strip()]
+    return ("요청: " + " · ".join(items)) if items else None
 
 
 def _nearest(types, table):
@@ -335,29 +386,33 @@ def analyze(original_text: str, names=(), use_api=True) -> dict:
     is_threat = any(f.get("threat") for f in all_flags)
     kw_urgent = next((t for t, ws in URGENT.items() if _hits(original_text, ws)), None)
     urgent_type = (kw_urgent or _nearest([t for f, t in zip(all_flags, all_types) if f.get("urgent")], URGENT_OF) or "safety") if is_urgent else None
-    threat_words = [w for w in THREAT if _hits(original_text, [w])]
     category = "urgent" if is_urgent else "threat" if is_threat else "normal"
-    reason = None
-    if is_threat:
-        kind = _nearest([t for f, t in zip(all_flags, all_types) if f.get("threat")], THREAT_OF)
-        reason = (", ".join(f"‘{w}’" for w in threat_words) + " 같은 위협 표현이 들어 있어요." if threat_words
-                  else f"{kind} 표현과 비슷한 문장이 있어요." if kind else "위협으로 볼 수 있는 표현이 있어요.")
+    api_reason = None
     spans, api_spans, requests, rest = _judge(original_text, pre)
     summary = " ".join(requests or rest[-1:]) or "거친 표현만 있어 요약할 요청이 없어요. 원문 보기로 확인해 주세요."
     writer = None
-    request_summary = " ".join(requests) or None  # 키워드만 돌 때: 거친 구절이 아닌 요청 구절
+    local_requests = list(requests)  # 서버가 찾은 요청 구절 (거친 구절은 뺀 것)
+    request_summary = _request_sentence(local_requests)
     # API도 분류를 판단한다: 키워드만으로는 위협 재현율 0.40 (ml/results.md). 더 심각한 쪽을 따른다 — 놓치는 것보다 한 번 더.
     hidden, pairs = _hide(original_text, api_spans, names)
     r = _llm(SUMMARY_SYS, hidden) if use_api else None
     if r and r.get("summary"):
-        summary, requests, writer = _show(r["summary"], pairs), [_show(x, pairs) for x in r.get("requests") or []], writer_name()
-        request_summary = _show(r["request_summary"], pairs) if r.get("request_summary") else None  # 교사에게 보이는 건 이 문장뿐
+        summary, writer = _show(r["summary"], pairs), writer_name()
+        api_requests = [_show(x, pairs) for x in r.get("requests") or [] if isinstance(x, str)]
+        requests = api_requests
+        # 교사에게 보이는 건 이 문장뿐 — API 요약 → API 요청 목록. API가 “요청 없음”이라고 답했으면 그대로 믿는다:
+        # 서버 키워드는 “이해해 주셔서 감사해요”도 요청으로 잡는다 (11.05). 서버 요청 구절은 API가 응답하지 못했을 때만.
+        request_summary = (_show(r["request_summary"], pairs) if isinstance(r.get("request_summary"), str) and r["request_summary"].strip()
+                           and r["request_summary"].strip() not in ("null", "None") else _request_sentence(api_requests))
         api_cat = r.get("category") if r.get("category") in SEVERITY else "normal"
+        api_reason = _show(r.get("reason") or "", pairs) if isinstance(r.get("reason"), str) and r.get("reason") not in ("null", "None") else None
         if SEVERITY[api_cat] > SEVERITY[category]:
-            category, reason = api_cat, _show(r.get("reason") or "", pairs) or reason
+            category = api_cat
             urgent_type = r.get("urgent_type") if r.get("urgent_type") in URGENT else urgent_type or "safety"
     if category == "urgent":
         spans = []  # 긴급은 가리지 않고 원문 그대로
+    reason = (_threat_reason(cl, flags, types, pair_flags, pair_types, api_reason) if category == "threat"
+              else _rough_reason(original_text, spans) if category == "normal" and spans else None)
     return {
         "category": category,
         "urgent_type": urgent_type if category == "urgent" else None,
@@ -365,7 +420,7 @@ def analyze(original_text: str, names=(), use_api=True) -> dict:
         "requests": requests,
         "request_summary": request_summary,
         "masked_spans": spans,
-        "threat_reason": reason if category == "threat" else None,
+        "threat_reason": reason,  # 위협이면 왜 위협인지, 거친 표현을 그대로 보낸 일반 메시지면 어디가 거친지 (둘 다 학교로 넘어간다)
         "model": judge_name() + (f"/{writer}" if writer else ""),
     }
 
@@ -376,7 +431,14 @@ if __name__ == "__main__":
     assert r["category"] == "normal" and len(r["masked_spans"]) == 2, r
     assert [raw[s["start"]:s["end"]] for s in r["masked_spans"]][0] == "애들 하나 제대로 못 보세요?"
     assert "자리" in r["summary"], r
+    assert r["threat_reason"] and "제대로 못" in r["threat_reason"], r  # 거친 표현을 그대로 보냈으면 어디가 거친지
     assert analyze("하윤이가 쉬는 시간마다 친구들한테 맞는다고 해요.")["category"] == "urgent"
+    # 11.05: 위협이 섞여도 정당한 요청은 교사에게 가고, 판단 이유는 걸린 구절을 인용한다 (API 없이도)
+    g = "선생님, 우리 애가 이번 성적 때문에 많이 힘들어하는데, 한 번만 다시 봐주시면 안 될까요? 이런 일까지 교육청에 말씀드리고 싶진 않거든요."
+    for use in (False, True):
+        rg = analyze(g, names=["민서"], use_api=use)
+        assert rg["category"] == "threat" and rg["request_summary"] and "교육청" not in rg["request_summary"], rg
+        assert "교육청" in rg["threat_reason"] and "‘" in rg["threat_reason"], rg
     assert analyze("내일 아침에 교실로 직접 찾아갈 테니 각오하고 계세요.")["category"] == "threat"
     p = precheck(raw, names=["민서"])
     assert p["rough"] and p["suggestions"] and all("제대로 못" not in s for s in p["suggestions"]), p
