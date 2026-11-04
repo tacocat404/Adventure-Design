@@ -1,7 +1,7 @@
 // 교사: 홈(카테고리 바) · 메시지 상세 C4~C8 · 원문 시트 C5 · 보내기(공지 · 설문 · 반 톡방) · 설정
 import { useEffect, useState } from 'react'
 import { api, usePoll, useUnread, CASE, TYPES, URGENT, when } from '../api.js'
-import { Btn, Composer, Cushi, Header, Marked, Sheet, Sticker, TabBar, Title } from '../components/ui.jsx'
+import { Btn, Composer, Cushi, CushionNote, Header, Marked, Sheet, Sticker, TabBar, Title } from '../components/ui.jsx'
 import { AccountSheet, Approvals, Attendance, AlarmCtx, MenuCtx, Messages, TripDetail, tabSignals, useAlarm, useTeacherHome } from './TeacherHome.jsx'
 import { JoinCodeSheet, TeacherTalk } from './Rooms.jsx'
 import { Send, useTeacherClass } from './School.jsx'
@@ -40,17 +40,25 @@ export default function Teacher({ me, onOut }) {
   )
 }
 
+const FEEDBACK = [
+  ['over_masked', '가리지 않아도 되는 말을 가렸어요'],
+  ['missed_rough', '거친 말인데 안 가렸어요'],
+  ['should_be_urgent', '긴급으로 알려야 했어요'],
+  ['should_be_threat', '위협으로 봐야 했어요'],
+  ['should_be_normal', '긴급 · 위협이 아니에요'],
+]
+
 function Detail({ id, onBack, onTalk }) {
   const [d, setD] = useState(null)
   const [orig, setOrig] = useState(null) // { via, text, spans, at }
+  const [fb, setFb] = useState(null) // null · 'open' · 'sent' — AI 판단 피드백 (재학습 큐)
   const load = async () => setD(await api(`/teacher/messages/${id}`))
   useEffect(() => { load() }, [id]) // 다시 묻지 않음: 긴급 상세는 열 때마다 열람 기록이 남음
   if (!d) return <div className="app" />
-  const original = async (via) => {
+  const original = async (via, show = via) => {
     const r = await api(`/teacher/messages/${id}/original`, { method: 'POST', body: { via } })
-    setOrig({ via, text: r.original_text, spans: r.rough_spans, at: r.received_at })
+    setOrig({ via: show, text: r.original_text, spans: r.rough_spans, at: r.received_at })
   }
-  const threat = d.category === 'threat'
   const segs = d.segments?.map((s, i) => s.mask ? <Sticker key={i} n={s.mask} /> : <span key={i}>{s.t}</span>)
 
   return (
@@ -69,7 +77,11 @@ function Detail({ id, onBack, onTalk }) {
         </>}
         {d.analysis_status === 'pending' && <p className="cap center">분석 중</p>}
 
-        {threat && <div className="banner school"><b>학교 이관</b>{CASE[d.case?.status]}</div>}
+        {d.cushion && <>
+          <CushionNote summary={d.summary} type={TYPES[d.msg_type]} original={orig?.text} open={orig?.via === 'cushion'}
+            onToggle={() => (orig?.via === 'cushion' ? setOrig(null) : original('teacher_sheet', 'cushion'))} />
+          {d.case && <div className="banner school"><b>학교 이관</b>{CASE[d.case.status]}</div>}
+        </>}
         {/* 위협도 일반과 같은 화면: 걸러 낸 원문 + 요약 + 기한 · 유형 (11.03 팀장 결정, E2의 “위협 화면엔 쿠션이 없음”을 바꿈) */}
         {d.segments && <>
           <div className="cxr"><Cushi face="read" size={58} label="읽는 중인 쿠션이" />
@@ -83,6 +95,9 @@ function Detail({ id, onBack, onTalk }) {
             <button className="btn b-white sm" onClick={() => original('teacher_sheet')}>원문 보기</button></div>}
         </>}
 
+        {d.analysis_status === 'done' && (fb === 'sent'
+          ? <p className="cap center">알려 주셔서 고마워요. 쿠션이가 다음 학습 때 참고할게요.</p>
+          : <button className="btn b-white sm" onClick={() => setFb('open')}>쿠션이 판단이 틀렸나요?</button>)}
       </div>
       <div className="dock"><Btn onClick={() => onTalk(d.parent_id, `${d.child_name} 보호자`)}>톡방에서 답장</Btn></div>
 
@@ -92,6 +107,17 @@ function Detail({ id, onBack, onTalk }) {
           <p className="cap center">{when(orig.at)} 받음</p>
           <div className="quote"><Marked text={orig.text} spans={orig.spans} /></div>
           <Btn kind="white" onClick={() => setOrig(null)}>닫기</Btn>
+        </Sheet>
+      )}
+      {fb === 'open' && (
+        <Sheet onClose={() => setFb(null)}>
+          <h3>어떻게 틀렸나요?</h3>
+          {FEEDBACK.filter(([k]) => k !== `should_be_${d.category}` && (k !== 'over_masked' || d.masked_count > 0 || d.cushion)).map(([k, label]) => (
+            <Btn key={k} kind="white" onClick={async () => {
+              await api(`/teacher/messages/${id}/feedback`, { method: 'POST', body: { kind: k } })
+              setFb('sent')
+            }}>{label}</Btn>))}
+          <Btn kind="white" onClick={() => setFb(null)}>닫기</Btn>
         </Sheet>
       )}
     </div>

@@ -34,12 +34,14 @@ assert sent.status_code == 201, sent.text
 mid = sent.json()["id"]
 assert c.post("/api/parent/messages", json={"class_id": cid, "text": raw, "msg_type": "nope"}, headers=parent).json()["error"]["code"] == "VALIDATION"
 
-# C: 메시지함 → 상세(가린 글자 안 옴) → 원문(기록) → 답장
+# C: 메시지함 → 상세(쿠션 요약만, 원문 안 옴) → 원문(기록) → 답장
+# 거친 표현을 고치지 않고 보낸 일반 메시지는 담임에게 쿠션 요약만 보여 주고, 요약을 눌러야 원문 (11.04 규칙)
 box = c.get("/api/teacher/inbox", headers=teacher).json()
 assert box["urgent"] and box["counts"]["school"] == 1
 assert any(i["id"] == mid for i in box["items"])
 d = c.get(f"/api/teacher/messages/{mid}", headers=teacher).json()
-assert d["masked_count"] == 1 and {"mask": 1} in d["segments"] and "제대로 못" not in str(d["segments"])
+assert d["masked_count"] == 1 and d["cushion"] and d["summary"] and d["segments"] is None
+assert "제대로 못" not in str(d)
 assert d["original_text"] is None
 o = c.post(f"/api/teacher/messages/{mid}/original", json={"via": "teacher_sheet"}, headers=teacher).json()
 assert "제대로 못" in o["original_text"]
@@ -54,11 +56,16 @@ bx = c.get("/api/teacher/inbox", headers=teacher).json()
 todo_ids = [i["id"] for i in bx["items"]]
 assert tid in todo_ids and all(i["category"] == "normal" for i in bx["items"])  # 요청이 섞인 위협은 요청만, 위협 표시 없이
 td = c.get(f"/api/teacher/messages/{tid}", headers=teacher).json()
-assert td["segments"] is None and "찾아" not in (td["summary"] or "") and td["masked_count"] == 0
-assert c.post(f"/api/teacher/messages/{tid}/original", json={"via": "teacher_sheet"}, headers=teacher).status_code == 403
+assert td["cushion"] and td["segments"] is None and "찾아" not in (td["summary"] or "") and "채점" in (td["summary"] or "")
+# 11.04: 위협 원문도 담임이 쿠션이 요약을 눌러 볼 수 있다 (열람은 기록, 학교에도 넘어가 있음)
+assert "찾아" in c.post(f"/api/teacher/messages/{tid}/original", json={"via": "teacher_sheet"}, headers=teacher).json()["original_text"]
 sc = c.get("/api/teacher/inbox?filter=school", headers=teacher).json()
 assert sc["items"] == [] and sc["counts"]["school"] >= 2  # 건수만
-assert all(i not in todo_ids for i in [x["message_id"] for x in c.get("/api/admin/cases", headers=admin).json()["cases"]] if i != tid)  # 요청 없는 위협은 목록에 없음
+# 학교로 넘어간 메시지가 담임 목록에도 있으면(정당한 요청이 섞인 경우 · 11.04) 담임에게는 쿠션 요약만 보여야 한다
+for x in c.get("/api/admin/cases", headers=admin).json()["cases"]:
+    if x["message_id"] in todo_ids:
+        dd = c.get(f"/api/teacher/messages/{x['message_id']}", headers=teacher).json()
+        assert dd["cushion"] and dd["summary"] and dd["segments"] is None, dd
 assert len(c.get("/api/admin/cases", headers=admin).json()["cases"]) >= 2
 
 # 긴급은 답장하면 맨 위에서 내려감

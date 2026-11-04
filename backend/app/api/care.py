@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.ai.analyzer import _judge
-from app.api.main import ApiError, current, linked, my_class, need, now, room_access, row, rows, tx
+from app.api.main import ApiError, current, cushion_summary, is_rough, linked, my_class, need, now, room_access, row, rows, tx
 from app.api.school import class_access, teacher_classes
 
 router = APIRouter()
@@ -499,17 +499,17 @@ def segs(text, spans):
 
 
 def parent_thread(tid, class_id, parent_id):
-    ms = rows("""SELECT m.id, m.original_text, m.received_at, m.category, m.teacher_state, m.done_at, a.masked_spans, a.masked_count, a.request_summary
+    ms = rows("""SELECT m.id, m.original_text, m.received_at, m.category, m.teacher_state, m.done_at, a.masked_spans, a.masked_count, a.request_summary, a.summary
                  FROM messages m LEFT JOIN analyses a ON a.message_id = m.id
                  WHERE m.teacher_id = ? AND m.class_id = ? AND m.parent_id = ? ORDER BY m.received_at, m.id""", tid, class_id, parent_id)
     out = []
     for m in ms:
-        if m["category"] == "threat":  # 공격적 표현은 교사에게 숨긴다: 정당한 요청 한 문장만, 없으면 대화에 올리지 않는다
-            if m["request_summary"]:
-                out.append({"id": f"m{m['id']}", "mid": m["id"], "from": "parent", "body": m["request_summary"], "sent_at": m["received_at"], "masked_count": 0, "original": None,
-                            "urgent": False, "new": m["teacher_state"] == "new", "done": bool(m["done_at"]) or m["teacher_state"] == "replied", "segments": None})
-                for r in rows("SELECT id, body, sent_at FROM replies WHERE message_id = ? ORDER BY id", m["id"]):
-                    out.append({"id": f"r{r['id']}", "mid": m["id"], "from": "teacher", "body": r["body"], "sent_at": r["sent_at"], "masked_count": 0, "original": None, "urgent": False, "new": False, "done": False, "segments": None})
+        if is_rough(m):  # 공격적 표현을 그대로 보냄: 쿠션이 요약 말풍선만, 누르면 원문 (11.04)
+            out.append({"id": f"m{m['id']}", "mid": m["id"], "from": "parent", "body": cushion_summary(m), "sent_at": m["received_at"], "masked_count": 0,
+                        "original": m["original_text"], "cushion": True, "urgent": False, "new": m["teacher_state"] == "new",
+                        "done": bool(m["done_at"]) or m["teacher_state"] == "replied", "segments": None})
+            for r in rows("SELECT id, body, sent_at FROM replies WHERE message_id = ? ORDER BY id", m["id"]):
+                out.append({"id": f"r{r['id']}", "mid": m["id"], "from": "teacher", "body": r["body"], "sent_at": r["sent_at"], "masked_count": 0, "original": None, "urgent": False, "new": False, "done": False, "segments": None})
             continue
         spans = json.loads(m["masked_spans"]) if m["masked_spans"] else []
         urgent = m["category"] == "urgent"

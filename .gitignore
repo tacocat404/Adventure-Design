@@ -22,3 +22,9 @@ Thumbs.db
 
 # 로컬 도구 파일
 .local/
+
+# 학습한 모델 (ml/train.py로 다시 만든다)
+ml/models/
+ml/data/feedback_queue.json
+ml/data/gen/
+ml/experiments.json

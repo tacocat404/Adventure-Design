@@ -1,7 +1,7 @@
 // E1 반 톡방 목록 · E2/E4 참여 코드 시트 · E3/F3 반 단체 톡방 (교사 · 학생 같은 화면)
 import { useEffect, useRef, useState } from 'react'
 import { api, usePoll, when } from '../api.js'
-import { Btn, Composer, Header, Ic, Sheet, Sticker } from '../components/ui.jsx'
+import { Btn, Composer, CushionNote, Header, Ic, Sheet, Sticker } from '../components/ui.jsx'
 import { SectionHead } from './TeacherHome.jsx'
 
 export function TeacherRooms({ me, onChat, title = '반 톡방', extra }) {
@@ -242,7 +242,9 @@ export function ParentChat({ classId, parentId, title, onBack }) {
                 {!mine && (head ? <span className="cav par">{(title || '보')[0]}</span> : <span className="cspace" />)}
                 <div className="ccol">
                   {!mine && head && <span className="cname">{title}</span>}
-                  <button className="msg" onClick={() => m.original && setOrig(orig === m.id ? null : m.id)}>{open ? m.original : m.segments ? m.segments.map((g, k) => g.mask ? <Sticker key={k} n={g.mask} /> : <span key={k}>{g.t}</span>) : m.body}</button>
+                  {m.cushion
+                    ? <CushionNote size={40} summary={m.body} original={m.original} open={!!open} onToggle={() => setOrig(orig === m.id ? null : m.id)} />
+                    : <button className="msg" onClick={() => m.original && setOrig(orig === m.id ? null : m.id)}>{open ? m.original : m.segments ? m.segments.map((g, k) => g.mask ? <Sticker key={k} n={g.mask} /> : <span key={k}>{g.t}</span>) : m.body}</button>}
                   {m.done && m.from === 'parent' && <span className="rxpill chk" aria-label="확인"><Ic name="tick" size={12} /></span>}
                   {m.urgent && <span className="maskchip urgchip">긴급</span>}
                   {m.masked_count > 0 && <span className="maskchip">{open ? '원문' : `${m.masked_count}곳 가림`}</span>}

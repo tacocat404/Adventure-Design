@@ -41,7 +41,10 @@ out = ["# AI 판단 평가 결과", "",
        "⚠️ 키워드 사전과 평가셋을 같은 사람이 만들어 **키워드 점수는 실제보다 높게 나올 수 있다.** 팀원이 새 문장을 더하면 더 공정해진다.", "",
        "## 1. 거친 표현 판단 (문장 단위)", "",
        "| 방식 | 정밀도 | 재현율 | F1 | 과잉 가림률 | 종류별 맞힌 수 |", "|---|---|---|---|---|---|"]
-for mode, label in (("keyword", "키워드만"), ("local", "로컬 모델만"), ("both", "로컬 모델 + 키워드 (앱)")):
+MODES = [("keyword", "키워드만"), ("local", "kor_unsmile만"), ("both", "kor_unsmile + 키워드 (이전 앱)")]
+if ai.load_judge():
+    MODES.append(("judge", "증류 판단기 BERT + kNN + 스태킹, INT8 (지금 앱)"))
+for mode, label in MODES:
     pred = ai.rough_flags(texts, mode)
     p, r, f, over = score(pred)
     out.append(f"| {label} | {p:.2f} | {r:.2f} | {f:.2f} | {over:.2f} | {by_group(pred)} |")
@@ -55,9 +58,16 @@ if sc:
         out.append(f"| {th} | {p:.2f} | {r:.2f} | {f:.2f} | {over:.2f} |")
 
 # 2. 메시지 분류 (긴급 · 위협 · 일반) — 키워드만 vs 키워드 + API 판단 (앱)
+saved = ai._judge_model
+ai._judge_model = False  # 키워드만: 증류 판단기를 잠시 끈다
 runs = [("키워드만", [ai.analyze(m["text"], use_api=False)["category"] for m in M])]
 if ai.writer_name():
-    runs.append((f"키워드 + API ({ai.writer_name()})", [ai.analyze(m["text"])["category"] for m in M]))
+    runs.append((f"키워드 + API ({ai.writer_name()}) — 이전 앱", [ai.analyze(m["text"])["category"] for m in M]))
+ai._judge_model = saved
+if ai.load_judge():
+    runs.append(("증류 판단기만 (API 없이)", [ai.analyze(m["text"], use_api=False)["category"] for m in M]))
+    if ai.writer_name():
+        runs.append((f"증류 판단기 + API — 지금 앱", [ai.analyze(m["text"])["category"] for m in M]))
 out += ["", "## 2. 메시지 분류 (긴급 · 위협 · 일반)", "", "| 방식 | 분류 | 재현율 | 놓친 메시지 |", "|---|---|---|---|"]
 for name, pred in runs:
     for cat, label in (("urgent", "긴급"), ("threat", "위협"), ("normal", "일반")):
