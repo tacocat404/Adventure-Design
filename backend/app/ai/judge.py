@@ -24,9 +24,12 @@ class Judge:
         self.torch = torch
         self.tok = AutoTokenizer.from_pretrained(path)
         m = AutoModelForSequenceClassification.from_pretrained(path).eval()
-        if quantize:
+        if quantize:  # INT8은 CPU 전용 — 앱은 이쪽
             m = torch.ao.quantization.quantize_dynamic(m, {torch.nn.Linear}, dtype=torch.qint8)
+        elif torch.cuda.is_available():  # 학습 때 kNN 뱅크 만들기는 GPU로 (Colab에서 2코어 CPU로 하면 학습보다 오래 걸렸다)
+            m = m.to("cuda")
         self.m = m
+        self.dev = next(m.parameters()).device if not quantize else "cpu"
         b = np.load(path / "bank.npz", allow_pickle=False)
         self.bank, self.bank_y, self.bank_type = b["emb"].astype(np.float32), b["y"].astype(np.float32), b["type"]
         self.cfg = json.loads((path / "stack.json").read_text(encoding="utf-8"))
@@ -35,12 +38,12 @@ class Judge:
         """BERT 한 번으로 (확률 n×3, 정규화한 문장 벡터 n×h)."""
         t = self.torch
         with t.inference_mode():
-            enc = self.tok(list(sents), return_tensors="pt", padding=True, truncation=True, max_length=MAX_LEN)
+            enc = self.tok(list(sents), return_tensors="pt", padding=True, truncation=True, max_length=MAX_LEN).to(self.dev)
             out = self.m(**enc, output_hidden_states=True)
-            p = t.sigmoid(out.logits).float().numpy()
+            p = t.sigmoid(out.logits).float().cpu().numpy()
             mask = enc["attention_mask"].unsqueeze(-1).float()
             h = (out.hidden_states[-1].float() * mask).sum(1) / mask.sum(1).clamp(min=1)
-            h = t.nn.functional.normalize(h, dim=-1).numpy()
+            h = t.nn.functional.normalize(h, dim=-1).cpu().numpy()
         return p, h
 
     def knn(self, h):
