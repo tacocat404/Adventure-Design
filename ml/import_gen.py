@@ -14,7 +14,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 GEN = ROOT / "ml" / "data" / "gen"
-OUT = ROOT / "ml" / "data" / "claude.json"
+# 묶음: 처음 생성은 A~E (→ claude.json). 나중에 더 만든 묶음은 글자 하나씩 (예: F → claude_F.json · blindF_* · labelF_*)
+G = sys.argv[2] if len(sys.argv) > 2 else ""
+OUT = ROOT / "ml" / "data" / (f"claude_{G}.json" if G else "claude.json")
 CHUNK = 200
 
 
@@ -32,7 +34,7 @@ def read_jsonl(paths):
 
 
 def generated():
-    rows = read_jsonl(sorted(p for p in GEN.glob("[A-E]_*.jsonl")))
+    rows = read_jsonl(sorted(p for p in GEN.glob(f"[{G or 'A-E'}]_*.jsonl")))
     rows = [r for r in rows if isinstance(r.get("text"), str) and r["text"].strip()
             and isinstance(r.get("rough"), bool) and r.get("category") in ("urgent", "threat", "normal")]
     for i, r in enumerate(rows):
@@ -49,17 +51,17 @@ def strip():
     rows = generated()
     blind = [{"id": r["id"], "text": r["text"]} for r in rows]
     random.Random(1).shuffle(blind)  # 같은 유형끼리 몰려 있으면 라벨러가 패턴으로 찍는다
-    for old in GEN.glob("blind_*.jsonl"):
+    for old in GEN.glob(f"blind{G}_*.jsonl"):
         old.unlink()
     for k in range(0, len(blind), CHUNK):
-        (GEN / f"blind_{k // CHUNK + 1}.jsonl").write_text(
+        (GEN / f"blind{G}_{k // CHUNK + 1}.jsonl").write_text(
             "\n".join(json.dumps(b, ensure_ascii=False) for b in blind[k:k + CHUNK]) + "\n", encoding="utf-8")
     print(f"생성 {len(rows)}줄 → blind_*.jsonl {(len(blind) + CHUNK - 1) // CHUNK}개", Counter(r["type"] for r in rows))
 
 
 def merge():
     rows = {r["id"]: r for r in generated()}
-    labels = {d["id"]: d for d in read_jsonl(sorted(GEN.glob("label_*.jsonl"))) if "id" in d}
+    labels = {d["id"]: d for d in read_jsonl(sorted(GEN.glob(f"label{G}_*.jsonl"))) if "id" in d}
     agree = [r for i, r in rows.items() if i in labels
              and bool(labels[i].get("rough")) == r["rough"] and labels[i].get("category") == r["category"]]
     print(f"생성 {len(rows)} · 라벨 받음 {len(labels)} · 두 라벨 일치 {len(agree)}")
@@ -67,7 +69,7 @@ def merge():
                    if i in labels and r not in agree)
     print("불일치 상위:", miss.most_common(8))
 
-    old = [x["text"] for f in ("train.json", "short.json", "hand.json") if (ROOT / "ml" / "data" / f).exists()
+    old = [x["text"] for f in ("train.json", "short.json", "hand.json", *(["claude.json"] if G else [])) if (ROOT / "ml" / "data" / f).exists()
            for x in json.loads((ROOT / "ml" / "data" / f).read_text(encoding="utf-8"))["items"]]
     ev = json.loads((ROOT / "ml" / "eval_set.json").read_text(encoding="utf-8"))
     ev_g = [grams(s["text"]) for s in ev["sentences"]] + [grams(m["text"]) for m in ev["messages"]]

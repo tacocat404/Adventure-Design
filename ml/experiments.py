@@ -53,13 +53,13 @@ def learning_curve():
             t = time.time()
             d = tmp / f"lc_{n}"
             train.main(out=d, limit=n, quiet=True)
-            use(Judge(d)); r = score()
+            use(Judge(d, quantize=False)); r = score()
             rows.append({"train": n, **r, "sec": round(time.time() - t)})
             print(rows[-1], flush=True)
             shutil.rmtree(d, ignore_errors=True)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    j = Judge(train.OUT)
+    j = Judge(train.OUT, quantize=False)
     n_all = json.loads((train.OUT / "train_log.json").read_text(encoding="utf-8")).get("train")
     use(j); rows.append({"train": n_all or "전체", **score()})
     print(rows[-1], flush=True)
@@ -67,7 +67,7 @@ def learning_curve():
 
 
 def ablation():
-    j = Judge(train.OUT)
+    j = Judge(train.OUT, quantize=False)
     full_stack, full_cfg = j.stack, j.cfg
     rows = []
     # 이전 앱 · 키워드만: 증류 판단기를 끄고 예전 경로로

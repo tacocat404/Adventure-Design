@@ -43,7 +43,7 @@ out = ["# AI 판단 평가 결과", "",
        "| 방식 | 정밀도 | 재현율 | F1 | 과잉 가림률 | 종류별 맞힌 수 |", "|---|---|---|---|---|---|"]
 MODES = [("keyword", "키워드만"), ("local", "kor_unsmile만"), ("both", "kor_unsmile + 키워드 (이전 앱)")]
 if ai.load_judge():
-    MODES.append(("judge", "증류 판단기 BERT + kNN + 스태킹, INT8 (지금 앱)"))
+    MODES.append(("judge", "증류 판단기 BERT + kNN + 스태킹 (지금 앱)"))
 for mode, label in MODES:
     pred = ai.rough_flags(texts, mode)
     p, r, f, over = score(pred)

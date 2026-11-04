@@ -129,7 +129,9 @@ def load_judge():
                 if ENV.get("CUSHION_LOCAL_MODEL", "on") == "off" or not (JUDGE_DIR / "stack.json").exists():
                     raise FileNotFoundError(JUDGE_DIR)
                 from app.ai.judge import Judge
-                _judge_model = Judge(JUDGE_DIR, quantize=ENV.get("CUSHION_INT8", "on") != "off")
+                # INT8(동적 양자화)는 기본 끔: 이 CPU에서 오히려 느렸고(메시지 한 통 중앙값 56ms vs fp32 40ms),
+                # 배치에 같이 들어간 문장에 따라 점수가 흔들렸다(같은 구절 긴급 0.15 ↔ 0.60 · 11.04). 비교용으로만 CUSHION_INT8=on
+                _judge_model = Judge(JUDGE_DIR, quantize=ENV.get("CUSHION_INT8", "off") == "on")
             except Exception:
                 _judge_model = False
     return _judge_model
@@ -174,7 +176,7 @@ def rough_flags(sentences, mode="both"):
 
 def judge_name():
     if load_judge():
-        return "judge(kor_unsmile 증류+kNN+스태킹" + (",int8)" if ENV.get("CUSHION_INT8", "on") != "off" else ")")
+        return "judge(kor_unsmile 증류+kNN+스태킹" + (",int8)" if ENV.get("CUSHION_INT8", "off") == "on" else ")")
     return "kor_unsmile+keyword" if _load() else "keyword"
 
 

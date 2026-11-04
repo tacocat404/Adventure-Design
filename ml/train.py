@@ -81,7 +81,7 @@ def load_items():
     """학습 데이터 전체. reviewed.json(팀원 두 명이 검수 · 가장 우선) + train.json(API LLM) + short.json(짧은 긴급 · 위협)
     + hand.json(직접 쓴 위협) + claude.json(Sonnet 에이전트). 같은 문장이 여러 파일에 있으면 앞 파일(사람 검수) 라벨을 쓴다."""
     out, seen = [], set()
-    for f in ("reviewed.json", "train.json", "short.json", "hand.json", "claude.json"):
+    for f in ("reviewed.json", "train.json", "short.json", "hand.json", "claude.json", "claude_F.json"):
         p = ROOT / "ml" / "data" / f
         for x in (json.loads(p.read_text(encoding="utf-8"))["items"] if p.exists() else []):
             key = "".join(x["text"].split())
@@ -161,7 +161,7 @@ def main(out=OUT, limit=None, quiet=False):
 
 def fit_stack(val, out=OUT, log=None, n_train=None):
     """스태킹: 검증셋으로 라벨마다 로지스틱 회귀 + 기준값."""
-    j = Judge(out, quantize=True)  # 앱과 똑같이 INT8로 돌린 점수로 맞춘다
+    j = Judge(out, quantize=False)  # 앱과 똑같이 fp32 (INT8은 배치에 따라 점수가 흔들려 뺐다)
     vt = [x["text"] for x in val]
     f = np.concatenate([j.features(vt[i:i + 64], [ai.kw_vec(s) for s in vt[i:i + 64]])[0] for i in range(0, len(vt), 64)])
     yv = np.array([label_vec(x) for x in val])
@@ -171,8 +171,10 @@ def fit_stack(val, out=OUT, log=None, n_train=None):
         q = 1 / (1 + np.exp(-(f[:, k, :] @ w + b)))
         th = pick_threshold(q, yv[:, k].astype(int), lab)
         if lab != "rough":
-            # 키워드 하나만으로는 위협 · 긴급이 되지 않게: '고소한 냄새', '찾아가는 음악회', '각오를 다지고'가 위협이 됐다 (stress_test 11.04)
-            th = max(th, round(float(1 / (1 + np.exp(-(b + w[0])))) + 0.02, 3))
+            # 키워드 · kNN만으로는 위협 · 긴급이 되지 않게 — BERT도 그렇다고 봐야 넘는다.
+            # 키워드만: '고소한 냄새', '찾아가는 음악회'가 위협이 됐다. kNN만: 시연 문장 '짝이랑 안 맞아서 매일 울면서 와요'가
+            # BERT 0.15인데 이웃이 긴급 문장이라 kNN 0.86 → 긴급이 됐다 (stress_test · 자체 검사 11.04)
+            th = max(th, round(float(1 / (1 + np.exp(-(b + w[0] + w[2])))) + 0.02, 3))
         cfg[lab] = {"w": [round(float(v), 4) for v in w], "b": round(float(b), 4), "th": th}
     (out / "stack.json").write_text(json.dumps(cfg, indent=1), encoding="utf-8")
     path = out / "train_log.json"
