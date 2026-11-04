@@ -1,7 +1,7 @@
 // 교사: 홈(카테고리 바) · 메시지 상세 C4~C8 · 원문 시트 C5 · 보내기(공지 · 설문 · 반 톡방) · 설정
 import { useEffect, useState } from 'react'
 import { api, usePoll, useUnread, CASE, TYPES, URGENT, when } from '../api.js'
-import { Btn, Composer, Cushi, Header, Marked, Sheet, Sticker, TabBar, Title } from '../components/ui.jsx'
+import { Btn, Composer, Cushi, CushionNote, Header, Marked, Sheet, Sticker, TabBar, Title } from '../components/ui.jsx'
 import { AccountSheet, Approvals, Attendance, AlarmCtx, MenuCtx, Messages, TripDetail, tabSignals, useAlarm, useTeacherHome } from './TeacherHome.jsx'
 import { JoinCodeSheet, TeacherTalk } from './Rooms.jsx'
 import { Send, useTeacherClass } from './School.jsx'
@@ -46,11 +46,10 @@ function Detail({ id, onBack, onTalk }) {
   const load = async () => setD(await api(`/teacher/messages/${id}`))
   useEffect(() => { load() }, [id]) // 다시 묻지 않음: 긴급 상세는 열 때마다 열람 기록이 남음
   if (!d) return <div className="app" />
-  const original = async (via) => {
+  const original = async (via, show = via) => {
     const r = await api(`/teacher/messages/${id}/original`, { method: 'POST', body: { via } })
-    setOrig({ via, text: r.original_text, spans: r.rough_spans, at: r.received_at })
+    setOrig({ via: show, text: r.original_text, spans: r.rough_spans, at: r.received_at })
   }
-  const threat = d.category === 'threat'
   const segs = d.segments?.map((s, i) => s.mask ? <Sticker key={i} n={s.mask} /> : <span key={i}>{s.t}</span>)
 
   return (
@@ -69,7 +68,11 @@ function Detail({ id, onBack, onTalk }) {
         </>}
         {d.analysis_status === 'pending' && <p className="cap center">분석 중</p>}
 
-        {threat && <div className="banner school"><b>학교 이관</b>{CASE[d.case?.status]}</div>}
+        {d.cushion && <>
+          <CushionNote summary={d.summary} type={TYPES[d.msg_type]} original={orig?.text} open={orig?.via === 'cushion'}
+            onToggle={() => (orig?.via === 'cushion' ? setOrig(null) : original('teacher_sheet', 'cushion'))} />
+          {d.case && <div className="banner school"><b>학교 이관</b>{CASE[d.case.status]}</div>}
+        </>}
         {/* 위협도 일반과 같은 화면: 걸러 낸 원문 + 요약 + 기한 · 유형 (11.03 팀장 결정, E2의 “위협 화면엔 쿠션이 없음”을 바꿈) */}
         {d.segments && <>
           <div className="cxr"><Cushi face="read" size={58} label="읽는 중인 쿠션이" />

@@ -196,7 +196,8 @@ def run_analysis(mid):
         c.execute("UPDATE messages SET analysis_status = 'done', category = ? WHERE id = ?", (r["category"], mid))
         if r["category"] == "urgent":
             notify(c, m["teacher_id"], "urgent", "message", mid)
-        if r["category"] == "threat":
+        # 위협이거나, 거친 표현을 고치지 않고 그대로 보냈으면 원문을 학교(관리자)에 넘긴다 (11.04)
+        if r["category"] == "threat" or (r["category"] == "normal" and r["masked_spans"]):
             case = c.execute("INSERT INTO threat_cases (message_id, school_id, status, opened_at) VALUES (?, ?, 'new', ?)",
                              (mid, m["school_id"], now())).lastrowid
             for (aid,) in c.execute("SELECT id FROM users WHERE role = 'admin' AND school_id = ?", (m["school_id"],)).fetchall():
@@ -253,9 +254,30 @@ def ensure_demo_students():
             c.execute("INSERT INTO class_members (class_id, user_id, member_role, joined_at) VALUES (?, ?, 'student', ?)", (cls["id"], uid, now()))
 
 
+def forward_rough():
+    """11.04 규칙 전에 받은 메시지 중 거친 표현이 그대로 온 것도 학교(관리자)에 넘긴다."""
+    with tx() as c:
+        for mid, school in c.execute("""SELECT m.id, cl.school_id FROM messages m JOIN analyses a ON a.message_id = m.id JOIN classes cl ON cl.id = m.class_id
+                                        WHERE m.category = 'normal' AND a.masked_count > 0
+                                        AND NOT EXISTS (SELECT 1 FROM threat_cases WHERE message_id = m.id)""").fetchall():
+            c.execute("INSERT INTO threat_cases (message_id, school_id, status, opened_at) VALUES (?, ?, 'new', ?)", (mid, school, now()))
+
+
+def is_rough(m):
+    """공격적 표현을 고치지 않고 보낸 메시지: 담임에게는 쿠션이 요약만, 원문은 요약을 눌러야 보인다."""
+    return m["category"] == "threat" or (m["category"] == "normal" and (m["masked_count"] or 0) > 0)
+
+
+def cushion_summary(m):
+    if m["category"] == "threat":
+        return m["request_summary"] or "거친 표현만 있어 학교에 넘겼어요."
+    return m["summary"]
+
+
 ai_warmup()
 init_db()
 ensure_demo_students()
+forward_rough()
 
 
 # ───────── 요청 몸통 ─────────
@@ -590,10 +612,11 @@ def message_detail(mid: int, u=Depends(current)):
     out = {k: m[k] for k in ("id", "child_name", "grade", "class_no", "received_at", "category", "analysis_status",
                              "msg_type", "summary", "masked_count")}
     out["parent_id"] = m["parent_id"]
-    if m["category"] == "threat":  # 공격적 표현은 보여 주지 않는다: 정당한 요청 한 문장만
-        out.update(summary=m["request_summary"], masked_count=0)
+    out["cushion"] = done and is_rough(m)  # 쿠션이 요약만 보여 주고, 요약을 누르면 원문 (11.04)
+    if out["cushion"]:
+        out["summary"] = cushion_summary(m)
     out["requests"] = json.loads(m["requests"]) if m["requests"] else []
-    out["segments"] = segments(m["original_text"], json.loads(m["masked_spans"])) if done and m["category"] not in ("urgent", "threat") else None
+    out["segments"] = segments(m["original_text"], json.loads(m["masked_spans"])) if done and m["category"] == "normal" and not out["cushion"] else None
     out["original_text"] = None
     with tx() as c:
         if m["teacher_state"] == "new":
@@ -610,9 +633,7 @@ def message_detail(mid: int, u=Depends(current)):
 @app.post("/api/teacher/messages/{mid}/original")
 def message_original(mid: int, b: Via, u=Depends(current)):
     need(u, "teacher")
-    m = teacher_message(u, mid)
-    if m["category"] == "threat":
-        raise ApiError("FORBIDDEN", 403, "원문은 학교(관리자)만 볼 수 있어요")
+    m = teacher_message(u, mid)  # 위협 원문도 담임이 쿠션이 요약을 눌러 볼 수 있다 (11.04). 열람은 기록하고, 학교에도 넘어가 있다
     with tx() as c:
         log_view(c, mid, u["id"], b.via)
     return {"original_text": m["original_text"], "received_at": m["received_at"],

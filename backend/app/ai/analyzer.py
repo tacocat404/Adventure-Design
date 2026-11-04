@@ -1,7 +1,7 @@
 """AI 분석 (API 명세 05절 계약 · AI 실험 계획 07절).
 
 판단 (로컬): 키워드 규칙 + kor_unsmile(smilegate-ai, 한국어 악플 BERT). 둘 중 하나라도 거칠다고 보면 가린다.
-작성 (API): 충남대 AI 포털 게이트웨이(backend/.env). 이름을 바꾸고 거친 구절을 가린 문장만 보낸다.
+작성 (API): 충남대 AI 포털 게이트웨이(backend/.env). 요약은 이름을 바꾸고 거친 구절을 가린 문장만, 다듬기는 이름만 바꾼 문장을 보낸다.
 torch · transformers가 없거나 .env 키가 없으면 키워드 규칙만으로 돈다 (앱은 멈추지 않음).
 """
 import json
@@ -118,12 +118,17 @@ SUMMARY_SYS = """너는 학교 소통 앱 '쿠션톡'의 분류 · 요약 도우
 4) requests: 위의 정당한 요청만 짧게 (없으면 []).
 JSON만 출력해: {"category": "urgent|threat|normal", "urgent_type": "school_violence|child_abuse|safety|null", "reason": "urgent · threat로 본 이유 한 문장 (normal이면 null)", "summary": "...", "request_summary": "... 또는 null", "requests": ["짧은 요청", ...]}"""
 
-SOFTEN_SYS = """학부모가 담임에게 보내려는 메시지를 예의 바르게 고쳐 줘.
-- [가림N]은 거친 표현이 있던 자리야. 빼고 써.
+SOFTEN_SYS = """학부모가 담임에게 보내려는 메시지에 거친 표현이나 위협이 섞여 있어. 담임이 기분 상하지 않게 예의 바른 메시지로 다시 써 줘.
+- 거친 구절을 그냥 지우지 마. 그 말에 담긴 감정 · 걱정을 정중한 말로 바꿔.
+  예: "애들이 얼마나 짜증나고 있는지 아세요?" → "요즘 아이들이 많이 힘들어해서 걱정이 돼요."
+  예: "애들 하나 제대로 못 보세요?" → "아이들을 조금 더 살펴봐 주시면 좋겠어요."
+- 위협(찾아가겠다, 각오해라, 가만있지 않겠다, 신고 · 고소 압박, 그렇게 아세요)은 반드시 빼. 만나서 이야기하고 싶다는 뜻이면 "필요하면 상담을 요청드리고 싶어요."처럼 정중하게 바꿔.
+- 비꼼 · 반말 · 느낌표 남발 · 맞춤법 · 띄어쓰기도 고쳐.
 - [이름N]은 사람 이름이야. 그대로 써.
-- 요청 · 사실 · 기한은 하나도 빼거나 바꾸지 말고, 없는 내용을 더하지 마.
-- 학부모 말투(해요체)로, 원래 길이와 비슷하게. 서로 다른 두 가지로.
-JSON만 출력해: {"suggestions": ["고친 메시지 1", "고친 메시지 2"], "keeps": ["그대로 전해지는 요청을 짧게", ...]}"""
+- 요청 · 사실 · 기한은 하나도 빼거나 바꾸지 말고, 없는 요청을 지어내지 마.
+- 학부모 말투(해요체)로. 서로 다른 두 가지로.
+keeps에는 담임에게 그대로 전해지는 정당한 요청만 짧게 적어 (위협 · 감정 표현은 넣지 마).
+JSON만 출력해: {"suggestions": ["고친 메시지 1", "고친 메시지 2"], "keeps": ["짧은 요청", ...]}"""
 
 
 def writer_name():
@@ -186,17 +191,21 @@ def _judge(text):
     return spans, api_spans, requests, rest
 
 
+SOFTEN_TIMEOUT = 15  # 다듬기는 7초 안팎 걸린다 (11.04 측정). 4초 제한이면 늘 실패해 구절만 지운 문장이 나갔다
+
+
 def precheck(text: str, names=()) -> dict:
     spans, _, keeps, _ = _judge(text)
     out = {"rough": bool(spans), "spans": spans, "suggestions": [], "keeps": keeps}
     if spans:
-        hidden, pairs = _hide(text, spans, names)
-        r = _llm(SOFTEN_SYS, hidden, tries=1, timeout=4)  # 5초 규칙: 학부모가 기다리는 중이라 다시 묻지 않음
+        # 다듬기는 거친 구절의 뜻을 알아야 순화할 수 있어 이름만 바꾸고 보낸다 (가림 없이). 결과는 저장하지 않는다.
+        hidden, pairs = _hide(text, [], names)
+        r = _llm(SOFTEN_SYS, hidden, tries=1, timeout=SOFTEN_TIMEOUT)
         if r and r.get("suggestions"):
             out["suggestions"] = [_show(s, pairs) for s in r["suggestions"][:2] if s]
             out["keeps"] = [_show(k, pairs) for k in r.get("keeps", [])] or keeps
         else:
-            soft = _soften(text, spans)
+            soft = _soften(text, spans)  # API가 안 될 때만: 거친 구절을 뺀 문장
             out["suggestions"] = [soft] if soft else []
     return out
 
