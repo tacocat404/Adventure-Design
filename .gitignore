@@ -26,3 +26,5 @@ Thumbs.db
 # 학습한 모델 (ml/train.py로 다시 만든다)
 ml/models/
 ml/data/feedback_queue.json
+ml/data/gen/
+ml/experiments.json

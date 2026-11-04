@@ -1,6 +1,6 @@
 """증류 학습 — kor_unsmile을 교사 LLM 라벨(ml/data/train.json)로 파인튜닝하고, kNN 뱅크 · 스태킹 가중치까지 만든다.
 
-실행 (레포 루트): backend/.venv/Scripts/python ml/train.py
+실행 (레포 루트): backend/.venv/Scripts/python ml/train.py   (GPU가 있으면 GPU로 · Colab: ml/colab_train.ipynb)
 결과: ml/models/judge/ (모델 · 토크나이저 · bank.npz · stack.json · train_log.json)
 평가셋(ml/eval_set.json)은 여기서 한 번도 쓰지 않는다. 기준값은 학습 데이터에서 떼어 둔 검증셋으로만 고른다.
 """
@@ -77,29 +77,50 @@ def split_clauses(items):
     return out
 
 
-def main():
+def load_items():
+    """학습 데이터 전체. reviewed.json(팀원 두 명이 검수 · 가장 우선) + train.json(API LLM) + short.json(짧은 긴급 · 위협)
+    + hand.json(직접 쓴 위협) + claude.json(Sonnet 에이전트). 같은 문장이 여러 파일에 있으면 앞 파일(사람 검수) 라벨을 쓴다."""
+    out, seen = [], set()
+    for f in ("reviewed.json", "train.json", "short.json", "hand.json", "claude.json"):
+        p = ROOT / "ml" / "data" / f
+        for x in (json.loads(p.read_text(encoding="utf-8"))["items"] if p.exists() else []):
+            key = "".join(x["text"].split())
+            if key not in seen:
+                seen.add(key)
+                out.append(x)
+    return out
+
+
+def split(items):
+    """검증셋을 먼저 떼고(고정), 나머지를 학습. 학습 곡선 실험에서도 같은 검증셋을 쓴다."""
+    items = list(items)
+    random.Random(SEED).shuffle(items)
+    n_val = max(60, len(items) * 15 // 100)
+    return items[:n_val], items[n_val:]
+
+
+def main(out=OUT, limit=None, quiet=False):
+    """limit: 학습 문장 수(구절로 늘리기 전 고유 문장)를 이만큼만 쓴다 — 학습 곡선 실험용."""
     random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
     torch.set_num_threads(max(1, torch.get_num_threads()))
-    # train.json(LLM 생성) + short.json(짧은 긴급 · 위협) + hand.json(직접 쓴 위협)
-    items = [x for f in ("train.json", "short.json", "hand.json") if (ROOT / "ml" / "data" / f).exists()
-             for x in json.loads((ROOT / "ml" / "data" / f).read_text(encoding="utf-8"))["items"]]
-    random.shuffle(items)
-    n_val = max(60, len(items) * 15 // 100)
-    val, tr = split_clauses(items[:n_val]), split_clauses(items[n_val:])  # 나눈 뒤에 늘린다: 같은 문장 조각이 학습 · 검증에 함께 들어가지 않게
-    print(f"학습 {len(tr)} · 검증 {len(val)}")
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    val0, tr0 = split(load_items())
+    tr0 = tr0[:limit] if limit else tr0
+    val, tr = split_clauses(val0), split_clauses(tr0)  # 나눈 뒤에 늘린다: 같은 문장 조각이 학습 · 검증에 함께 들어가지 않게
+    print(f"학습 {len(tr0)}문장(구절 포함 {len(tr)}) · 검증 {len(val)} · {dev}", flush=True)
 
-    if "--stack-only" in sys.argv:  # BERT는 그대로 두고 스태킹 · 기준값만 다시
-        return fit_stack(val)
+    if "--stack-only" in sys.argv and out == OUT:  # BERT는 그대로 두고 스태킹 · 기준값만 다시
+        return fit_stack(val, out)
     tok = AutoTokenizer.from_pretrained(ai.LOCAL_NAME)
     model = AutoModelForSequenceClassification.from_pretrained(
         ai.LOCAL_NAME, num_labels=3, problem_type="multi_label_classification", ignore_mismatched_sizes=True,
-        id2label=dict(enumerate(LABELS)), label2id={l: i for i, l in enumerate(LABELS)})
+        id2label=dict(enumerate(LABELS)), label2id={l: i for i, l in enumerate(LABELS)}).to(dev)
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01)
     steps = EPOCHS * ((len(tr) + BATCH - 1) // BATCH)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / (0.1 * steps)) * max(0.0, 1 - s / steps))
     # 위협 · 긴급은 수가 적으니 더 무겁게
     ys = np.array([label_vec(x) for x in tr])
-    pos_w = torch.tensor(np.clip((len(ys) - ys.sum(0)) / np.maximum(ys.sum(0), 1), 1, 5), dtype=torch.float32)
+    pos_w = torch.tensor(np.clip((len(ys) - ys.sum(0)) / np.maximum(ys.sum(0), 1), 1, 5), dtype=torch.float32, device=dev)
     loss_fn = torch.nn.BCEWithLogitsLoss(pos_weight=pos_w)
 
     log, t0 = [], time.time()
@@ -109,35 +130,38 @@ def main():
         total = 0.0
         for i in range(0, len(tr), BATCH):
             b = tr[i:i + BATCH]
-            enc = tok([x["text"] for x in b], return_tensors="pt", padding=True, truncation=True, max_length=MAX_LEN)
-            loss = loss_fn(model(**enc).logits, torch.tensor([label_vec(x) for x in b]))
+            enc = tok([x["text"] for x in b], return_tensors="pt", padding=True, truncation=True, max_length=MAX_LEN).to(dev)
+            loss = loss_fn(model(**enc).logits, torch.tensor([label_vec(x) for x in b], device=dev))
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step(); sched.step(); opt.zero_grad()
             total += loss.item() * len(b)
-            if (i // BATCH) % 50 == 0:
+            if not quiet and (i // BATCH) % 50 == 0:
                 print(f"  epoch {ep + 1} · {i}/{len(tr)} · {time.time() - t0:.0f}초", flush=True)
         log.append({"epoch": ep + 1, "loss": round(total / len(tr), 4), "sec": round(time.time() - t0)})
         print(log[-1])
 
-    OUT.mkdir(parents=True, exist_ok=True)
-    model.save_pretrained(OUT)
-    tok.save_pretrained(OUT)
+    out.mkdir(parents=True, exist_ok=True)
+    model.to("cpu").save_pretrained(out)  # 앱은 CPU에서 INT8로 돌린다
+    tok.save_pretrained(out)
+    del model
+    if dev == "cuda":
+        torch.cuda.empty_cache()
 
     # kNN 뱅크 = 학습 문장 (검증 문장은 넣지 않는다 — 스태킹이 실제처럼 '처음 보는 문장'으로 배우게)
-    np.savez(OUT / "bank.npz", emb=np.zeros((1, model.config.hidden_size), np.float16), y=np.zeros((1, 3), np.float16), type=np.array(["-"]))
-    (OUT / "stack.json").write_text(json.dumps({l: {"w": [0, 1, 0], "b": 0, "th": 0.5} for l in LABELS}), encoding="utf-8")
-    j = Judge(OUT, quantize=False)
+    np.savez(out / "bank.npz", emb=np.zeros((1, 768), np.float16), y=np.zeros((1, 3), np.float16), type=np.array(["-"]))
+    (out / "stack.json").write_text(json.dumps({l: {"w": [0, 1, 0], "b": 0, "th": 0.5} for l in LABELS}), encoding="utf-8")
+    j = Judge(out, quantize=False)
     embs = [j.encode([x["text"] for x in tr[i:i + 64]])[1] for i in range(0, len(tr), 64)]
-    np.savez(OUT / "bank.npz", emb=np.concatenate(embs).astype(np.float16), y=np.array([label_vec(x) for x in tr], np.float16),
+    np.savez(out / "bank.npz", emb=np.concatenate(embs).astype(np.float16), y=np.array([label_vec(x) for x in tr], np.float16),
              type=np.array([x["type"] for x in tr]))
 
-    fit_stack(val, log)
+    fit_stack(val, out, log, n_train=len(tr0))
 
 
-def fit_stack(val, log=None):
+def fit_stack(val, out=OUT, log=None, n_train=None):
     """스태킹: 검증셋으로 라벨마다 로지스틱 회귀 + 기준값."""
-    j = Judge(OUT, quantize=True)  # 앱과 똑같이 INT8로 돌린 점수로 맞춘다
+    j = Judge(out, quantize=True)  # 앱과 똑같이 INT8로 돌린 점수로 맞춘다
     vt = [x["text"] for x in val]
     f = np.concatenate([j.features(vt[i:i + 64], [ai.kw_vec(s) for s in vt[i:i + 64]])[0] for i in range(0, len(vt), 64)])
     yv = np.array([label_vec(x) for x in val])
@@ -150,10 +174,11 @@ def fit_stack(val, log=None):
             # 키워드 하나만으로는 위협 · 긴급이 되지 않게: '고소한 냄새', '찾아가는 음악회', '각오를 다지고'가 위협이 됐다 (stress_test 11.04)
             th = max(th, round(float(1 / (1 + np.exp(-(b + w[0])))) + 0.02, 3))
         cfg[lab] = {"w": [round(float(v), 4) for v in w], "b": round(float(b), 4), "th": th}
-    (OUT / "stack.json").write_text(json.dumps(cfg, indent=1), encoding="utf-8")
-    path = OUT / "train_log.json"
+    (out / "stack.json").write_text(json.dumps(cfg, indent=1), encoding="utf-8")
+    path = out / "train_log.json"
     prev = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    path.write_text(json.dumps({**prev, "val": len(val), "stack": cfg, "base": ai.LOCAL_NAME, **({"epochs": log} if log else {})},
+    path.write_text(json.dumps({**prev, "val": len(val), "stack": cfg, "base": ai.LOCAL_NAME, **({"epochs": log} if log else {}),
+                               **({"train": n_train} if n_train else {})},
                                ensure_ascii=False, indent=1), encoding="utf-8")
     print("스태킹", json.dumps(cfg, ensure_ascii=False))
 
