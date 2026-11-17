@@ -5,6 +5,19 @@ export const Cushi = ({ face, size = 58, label }) => (
   </span>
 )
 
+// 공격적 표현을 그대로 보낸 메시지: 담임에게는 쿠션이 요약만. 말풍선을 누르면 원문 (11.04)
+export const CushionNote = ({ summary, type, original, open, onToggle, size = 58 }) => (
+  <div className="cxr">
+    <Cushi face="read" size={size} label="읽는 중인 쿠션이" />
+    <button type="button" className="say butter cxtap" onClick={onToggle} aria-expanded={open}>
+      <p className="lb">{open ? '원래 보낸 말' : '쿠션이 요약'}</p>
+      <p>{open ? original : summary}</p>
+      {!open && type && <div className="minis"><div className="mini"><p>유형</p><p>{type}</p></div></div>}
+      <p className="cxhint">{open ? '눌러서 요약으로' : '눌러서 원문 보기'}</p>
+    </button>
+  </div>
+)
+
 export const Sticker = ({ n, plain, children }) => (
   <span className={`sticker${plain ? ' plain' : ''}`}>
     {!plain && <svg><use href="#cx-face" /></svg>}
@@ -32,7 +45,8 @@ export const Sheet = ({ onClose, warn, children }) => (
     <div className="dim" onClick={onClose} />
     <div className={`sheet${warn ? ' warn' : ''}`} role="dialog">
       {warn ? <div className="sign"><span className="plate">잠깐만요!</span><Cushi face="wait" size={96} /></div> : <span className="handle" />}
-      {children}
+      {/* 경고 시트는 표지판이 위로 튀어나와야 해서 바깥은 overflow: visible. 내용이 길면 안쪽만 스크롤 */}
+      {warn ? <div className="sheetbody">{children}</div> : children}
     </div>
   </>
 )

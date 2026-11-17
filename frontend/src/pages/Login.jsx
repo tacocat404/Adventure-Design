@@ -46,7 +46,7 @@ export default function Login({ onIn }) {
       <div className="page">
         <div className="cxr" style={{ alignItems: 'flex-end' }}>
           <Cushi face="hi" size={92} label="인사하는 쿠션이" />
-          
+          <div className="say" style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 8 }}>안녕하세요,<br />누구로 시작할까요?</div>
         </div>
         <div style={{ height: 8 }} />
         <div className="tiles">

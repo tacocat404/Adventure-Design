@@ -1,0 +1,2381 @@
+{
+ "_note": "Claude Sonnet 서브 에이전트가 만들고, 라벨을 지운 문장에 다른 에이전트가 다시 라벨을 붙여 두 번 다 맞은 것만. 실제 학부모 메시지 아님. 사람 검수 전.",
+ "items": [
+  {
+   "text": "씨발 숙제가 왜 이렇게 많아요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 알림장 또 안 보냈네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 어이없네 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개같네 이딴 식으로 하시니까 애가 힘들죠",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 짜증나네 답장도 없고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 급식 메뉴 공지를 왜 이제 올려요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "병신같이 일처리하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅂㅅ 아니에요? 준비물을 전날 밤에 알려주면 어떡해요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 거 아니에요 이게 무슨 성적이야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "또라이 같은 담임 만나서 우리 애만 고생이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꺼져 지금 기분 더러우니까",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "닥치고 공지나 제대로 올려요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "멍청하게 날짜를 잘못 적어놨네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무능하다 무능해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "한심하네 진짜 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기 같은 수행평가 기준이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "짜증나 죽겠네 진짜 이번 주만 몇 번째야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "어이없네 학부모 상담 시간을 이렇게 잡아요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "장난하냐 지금 우리 애 자리가 맨 뒤라고?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨 발 자리 바꿔달라고 몇 번을 말해요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개.념.없.네 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시1발 체험학습 비용 또 올랐네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅆㅂ 단톡방에 공지 하나 올리는 게 그렇게 어렵나",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅ ㅂ 진짜 짜증난다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 불친절하시네요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 늦게 알려주고 어쩌라는 거예요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개같은 숙제 양 좀 줄여주세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "병 신 같은 가정통신문이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅂㅅ같이 애들 편애하냐",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 우리 애 점수가 왜 이래요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꺼지세요 연락 좀 그만하시고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "닥쳐요 변명 듣기 싫으니까",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애들 가르치는 사람이 멍청해서 되겠어요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무능한 담임 때문에 애가 학교 가기 싫대요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "한심해서 말이 안 나오네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기 같은 급식이 나왔다던데 확인은 하셨어요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 짜증나 죽겠네 준비물 또 바뀌었어요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "어이가 없어서 웃음만 나오네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "장난하세요? 시험 범위를 하루 전에 바꿔요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 씨발 또 문자 안 읽었네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 진짜 말이 안 통하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 이걸 이제 알려줘요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 한심하다 선생이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 무능해 보여요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개판이네 반 운영이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "병신 같은 소리 하지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친놈처럼 숙제를 내주네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "또라이세요? 방학 숙제가 왜 이렇게 많아요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꺼져요 상담 필요 없어요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 우리 애 성적표 왜 이래요 오타 아니에요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨발 현장학습 신청서 마감이 오늘이었다고요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 어제 말했어야지 오늘 아침에 말하면 어쩌라고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 짜증나요 하루 종일 연락도 안 되고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 불성실하시네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개같이 일하시네요 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "병신 ㅋㅋ 가정통신문에 오타가 세 개나 있네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅂㅅ인가 모둠 편성을 이렇게 해놨네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이런 미친 급식 반찬이 이게 뭐예요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "또라이 같은 규칙을 왜 만들어서 애들 괴롭혀요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꺼지라고 하고 싶네요 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "닥치세요 더 듣기 싫습니다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "멍청한 건지 일부러 그러는 건지 모르겠네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무능력의 극치네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "한심한 선생이 한둘이 아니지만 그중에서도 최악이에요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기 같은 반 분위기 만들어놓고 책임은 없대요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "짜증나 죽겠어요 수업 시간표 또 바뀌었네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "어이없다 정말 ㅡㅡ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "장난하냐고요 숙제 검사도 안 하면서 왜 내요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 방과후 신청이 왜 이렇게 어려워요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨빨 이게 뭐라고 이렇게 오래 걸려요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존.나 어이없네 ㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈ같네 진짜 이 반",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "조까 그게 말이 돼요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시@발 단체복 사이즈 안 맞잖아요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기네 쓰레기 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애새끼들 관리도 못 하면서 무슨 담임이에요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "니가 선생이냐",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "선생 자격 없네 자격이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수준 낮다 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "답답해 죽겠다 말귀를 못 알아듣네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "머리가 있으면 생각을 좀 하세요 멍청하게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개짜증나요 오늘 알림장",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개빡치네 진짜 ㅡㅡ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "빡치게 하네 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 진짜 존나 싫다 이 담임",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 별로예요 이번 담임",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이딴 식으로 일할 거면 그만두시지 그래요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무슨 선생이 이래 한심하게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "참 어이없고 한심하네요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "썩었네 썩었어 학교 꼴이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "눈치가 없냐 센스가 없냐 ㅉㅉ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅉㅉ 한심하다 한심해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 ㅅㅂ 우리 애 급식 알레르기 또 확인 안 했어요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 우리 아들만 청소 당번이 왜 이렇게 많아",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨발 준비물 문자를 새벽에 보내면 어떡합니까",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 아침부터 기분 잡치게 하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개같은 하루네 선생님 때문에",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 어이없는 게 우리 애 이름도 틀렸어요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "상장 이름이 틀렸는데 사과도 없네 병신같이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이름 하나 못 맞추냐 멍청이야 뭐야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 듯이 짜증나네요 알림장 내용이 매번 달라서",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅁㅊ 이거 실화냐 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅁㅊㄴ 같은 시간표네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂㄹㅁ 진짜 일을 왜 이렇게 해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄹ하네 진짜 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "지랄하지 말고 제대로 알려주세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "지랄이네 지랄 숙제 검사 좀 하고 내세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "염병 숙제가 너무 많네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "썅 오늘도 연락 없네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개소리 좀 하지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "헛소리 그만하고 성적이나 다시 확인해요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "말 같지도 않은 소리를 하시네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "뭔 개소리를 그렇게 길게 합니까",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개판 오 분 전이네 이 반",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "엉망진창이네 진짜 어이없다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 진짜 존나 못한다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 못하네 담임",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ못함 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ느려 답장이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 늦게 답해주네 급한 일인데",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 급한 건데 왜 읽씹이야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅆㅂ 읽씹하지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "읽씹 ㅈㄴ 얄밉네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개얄밉네 진짜 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "재수없네 말투가 왜 그래요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "재수 없는 말투 좀 고치세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "말투가 ㅈㄴ 거슬려요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "기분 더럽네 오늘 전화 받고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "더러워서 진짜 말을 못 하겠네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 더러워 이런 대접 받으려고 보낸 거 아닌데",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼴 보기 싫으니까 연락하지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼴값 떨지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼴사납네 정말 ㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "허접하네 수업이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "허접한 수업 하면서 숙제만 많이 내네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수업을 병신처럼 하니까 성적이 이렇지",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수업 ㅈㄴ 못한다고 애가 그러던데",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애가 그러는데 선생님 수업 존나 지루하대요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "노잼이라고 하던데요 선생님 수업",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수업 ㅈ같다고 우리 애가 그래요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이 학교는 다 이런 병신들만 있나",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "교무실은 다 무능한 사람들뿐이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "교장이고 담임이고 다 무능해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "학교 시스템이 개판이에요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이 학교 ㅈㄴ 별로네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시스템 개같네 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 앱 알림 오류 왜 안 고쳐요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쿠션톡 알림도 안 오고 진짜 ㅈ같네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "앱이 병신이네 알림이 안 와요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이 앱 쓰레기예요 공지가 안 뜸",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "메시지 읽었으면서 대답은 왜 안 하냐고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "대답 좀 하라고 씨발",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "대답도 못하면서 선생 노릇은 하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "선생 노릇 제대로 해 멍청아",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "너 같은 선생 처음 본다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "당신 진짜 한심하다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "당신 같은 사람이 선생이라니 어이없네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이게 선생이야 장난이야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이게 학교냐 시장판이냐",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시장판이네 시장판 소란스럽기만 하고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이 반은 ㅈㄴ 시끄럽기만 하대요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 불공평하네 우리 애만 걸리고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "공평하게 좀 하세요 씨발 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "편애 쩌네 진짜 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "편애 개심하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "편애쟁이 같은 선생이네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "촌스럽게 왜 이래요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "촌스러운 사고방식이네 아직도 이래요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "옛날 사람이네 진짜 답답",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼰대 같은 말씀 하지 마세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼰대 ㅈㄴ 심하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 진짜 개꼰대네 선생이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼰대짓 좀 그만하세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애 앞에서 망신 주냐 개념 없게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개념이 없어도 정도가 있지",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개념 좀 챙기세요 개념",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개 념 없 다 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "상식이 없네 상식이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "상식 밖이에요 이건 진짜 미친 짓이에요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 짓이죠 이건 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 학교네 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 반이에요 이 반은",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "정신 나갔어요? 시험지를 이렇게 내요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "정신 좀 차리세요 정신",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "제정신이에요? 이런 숙제를 내게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "제정신 아니네 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 어이없다 ㅋㅋ 방금 문자 뭐예요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "방금 뭐라고 했냐 ㅅㅂ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "뭐라는 거야 씨발 말을 똑바로 해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "뭔 소리야 병신아",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "뭔 소린지 하나도 모르겠네 ㅅㅂ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "설명을 개같이 하네요 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "설명을 ㅈㄴ 못하세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "설명도 못 하면서 가르친다고요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "못 가르치면 그만두세요 무능한 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무능한데 월급은 받네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "월급 도둑이네 월급 도둑",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "월급 아깝다 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "세금 아깝다 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "밥값도 못 하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "밥값이나 하세요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓸모없는 알림장 왜 쓰는 거예요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓸모없는 공지만 올리고 필요한 건 안 올리네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓸데없는 숙제만 내고 병신같이",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓸데없는 짓 좀 그만해요 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아휴 한심 그 자체네요 ㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 놔 진짜 짜증나 죽겠네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 짜증나 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 열받아 죽겠네 공지 안 올린 거",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "화가 나서 말이 안 나옴 시발",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "아 진짜 ㅈㄴ 빡치는 게 우리 애 도시락 공지만 빠졌어요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "급식비 정산이 개판이네요 내역서도 안 주고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "급식비 계산 못 하세요? 멍청하게 두 번 걷었네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "교과서를 빠뜨리고 안 줬네요 진짜 한심하다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "방과후 수업료 중복 결제됐는데 병신같이 확인도 안 해요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "성적처리를 이따위로 하냐 ㅅㅂ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "생활기록부 오타가 있던데 일을 존나 대충 하시네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "출결 체크도 못 하세요? 결석으로 처리했던데 개같네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "지각 처리가 잘못됐는데 왜 말을 안 해줘요 씨발",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "자리 배치 대체 기준이 뭐예요 병신 같은데",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "짝 바꾸는 걸 이딴 식으로 하세요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "모둠 활동 점수 왜 이렇게 낮아요 미친 거 아냐",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수행평가 채점 기준이 말도 안 돼요 ㅈㄴ 주관적이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시험 문제 오류인데 인정도 안 하고 개념 없네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "문제 오류 인정 안 하는 것 보소 한심하다 ㅉㅉ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "체험학습 장소가 왜 이래요 존나 별로",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "소풍 장소 선정이 병신 같아요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "운동회 준비물 목록 이제 올려요? 일을 거지같이 하네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "학예회 의상 공지가 하루 전이라니 미쳤네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "졸업앨범 사진 이게 뭐예요 ㅅㅂ 우리 애 눈 감았잖아",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "앨범 사진 선택한 사람 눈이 병신이야?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "우리 애만 빠졌네 단체사진에서 개같다",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "조회 시간이 길다고 애가 짜증내요 말이 존나 많으시대요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애한테 소리 질렀다던데 이 미친 선생님아",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애한테 말투 조심해요 개념 챙기세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "애들 앞에서 무안 주는 건 쓰레기 같은 짓이죠",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "선생이 감정 조절도 못 하냐 한심하게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "감정 조절도 못 하는 사람이 담임이라니 어이없네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "성격이 ㅈ같으시네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "성격 파탄자 같아요 솔직히",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "인성이 쓰레기예요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "인성 보소 ㅋㅋ 병신이네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "인성 ㅈㄴ 별로",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "인성 바닥이네 바닥",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "바닥을 치네 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "수준 떨어지네 선생님 말투가",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "말하는 수준하고는 ㅉㅉ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "말하는 꼬라지 보소",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꼬라지가 그게 뭐예요 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "그 꼬라지로 선생 한다고요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "저 따위가 선생이라니 한심해",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "저런 게 담임이라니",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이런 담임 처음이에요 쓰레기 중의 쓰레기",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기통에나 들어가라 이 공지는",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "이 공지 쓰레기통에 버렸어요 ㅋ 내용이 너무 허접해서",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "허접 그 자체 ㅋㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅋㅋㅋ 병신 같은 답장이네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅎㅎ 정말 대단한 무능이시네요 ㅎ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅠㅠ 시발 진짜 힘드네 이 학교 때문에",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅡㅡ 아 ㅅㅂ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅡㅡ; 존나 어이없다 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "^^ 선생님 참 한심하시네요 ^^",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅋ 쓰레기 같은 학교생활 알림 감사합니다 ㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨발 반 단톡이 왜 이렇게 조용해 공지 좀 올려",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 담임 바뀌고 되는 게 하나도 없네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅㅂ 학부모 총회 날짜 왜 또 바뀌어요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅆㅂ 우리 애 알림장 검사 안 해주셨죠",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 대충이네 생활기록부 쓴 거",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 무책임하네요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개무책임하네 정말",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "병신같은 연락 방식이네요 전화는 왜 안 되고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅂㅅ 짓 좀 그만하세요 진짜",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "미친 수행 점수 기준을 학기 끝나고 알려줘요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "또라이 짓 하지 마시고 공지나 정확히 하세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "꺼져라 진짜 알림장 오타 좀 고치고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "닥쳐 그만 변명해 제발",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "멍청하다 멍청해 한 번만 더 확인하면 되는 걸",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "무능하단 소리 들어도 싸요 이 정도면",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "한심한 건 숙제 검사도 안 하는 거죠",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "쓰레기 같은 시험지 인쇄 상태 좀 보세요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "짜증나요 진짜 선생님 말투가",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "어이없다 못해 웃기네요 ㅋㅋ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "장난하냐 방과후 반 배정이 이게 뭐야",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅅ.ㅂ 진짜 일 좀 해요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "씨~발 이건 좀 아니지 않아요?",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개 같 네 정말 우리 애만 빼고 다 챙겨주고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시ㅂ 아침부터 문자 폭탄이네 정리도 안 하고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "시발 오늘 준비물이 뭔지 대체 알 수가 없네요",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "존나 정신없는 반이네 공지가 일관성이 없어",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈㄴ 어이없어서 할 말을 잃었네 교복 공지 보고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "개노답이네 이 반 운영",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "노답 담임이네 노답",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "ㅈ밥 같은 급식에 담임은 무관심하고",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "급식이 개판인데 선생이라는 사람이 모르쇠네",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "모르쇠로 일관하네 한심하게",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "눈치 없는 사람이 담임이면 이렇게 되는구나 ㅉㅉ",
+   "rough": true,
+   "category": "normal",
+   "type": "욕설_위협아님"
+  },
+  {
+   "text": "똑바로 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이거 하나 못 해?",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "빨리 답장해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생이 뭐 그래",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "일 좀 제대로 해라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "알림장 좀 제때 보내",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "숙제 좀 적당히 내라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "내 말 좀 들어봐 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애 자리 바꿔줘 지금 당장",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "답장이 왜 이렇게 늦어 빨리 보내",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "준비물 공지는 전날 낮에 올려야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "그것도 모르면 어떡해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "담임이면 담임답게 좀 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애들 관리 좀 잘해라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "공지 확인했으면 대답을 해야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "읽었으면 답장해 읽씹하지 말고",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생이면 다야? 애 얘기 좀 들어봐",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "말귀를 못 알아듣네 다시 설명할게",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "내가 시키는 대로 해 일단",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "급식 알레르기 좀 제대로 챙겨",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "우리 애 성적 다시 확인해봐 얼른",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이걸 아직도 안 했어? 일처리가 느리네",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "전화 좀 받아 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "문자 보면 바로 연락 줘",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이런 건 알아서 좀 해야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애 하나 못 챙기고 뭐 하는 거야",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "일을 왜 이렇게 해 답답하게",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "수업 준비나 좀 해라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "숙제 검사는 하고 내는 거야?",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생이 그렇게 말하면 안 되지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "시험 범위 정확히 알려줘 대충 말고",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "자꾸 같은 말 시키지 마",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "한 번 말하면 알아들어야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "왜 이렇게 늦게 알려줘 미리미리 하지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "상담 시간 내가 정한 걸로 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "다음엔 이런 일 없게 해라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "정신 좀 차리고 일해요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애 앞에서 말조심해라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애 불러서 혼내지 말고 나한테 말해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "연락 오면 바로바로 답해 알겠어?",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "그냥 시키는 대로 하면 되잖아",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "무슨 선생이 연락도 제때 안 받아",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생님이면 선생님답게 하세요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "기본이 안 돼 있네요 기본이",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이 정도는 기본 아니에요? 가르쳐드려야 아나",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애 가르치는 사람이 그것도 몰라?",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "그건 선생이 알아서 할 일이지 왜 나한테 시켜",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "왜 학부모한테 떠넘겨 선생이 해야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "사과부터 해 그다음에 얘기하자",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "먼저 사과해 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "변명하지 말고 고쳐",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "핑계 대지 마 그냥 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "말 돌리지 말고 대답이나 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "대답 똑바로 해요 지금",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "질문에 답을 하라고 답을",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "알았으면 바로 하세요 빨리",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "빨리빨리 좀 하자 선생님 ㅡㅡ",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "좀 더 신경 써 우리 애한테",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "우리 애만 따로 챙겨줘 알겠지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "담임이 나서서 해결 좀 해봐",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이런 건 담임이 먼저 연락해야지 내가 해야 돼?",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생님 일이 그렇게 바빠요? 답장은 해야죠",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "내 말부터 먼저 들어 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "어이구 선생님 일을 참 편하게 하시네요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "편하게 월급 받으시네요 선생님은 ㅎㅎ",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "수업은 제대로 하고 계신 거죠? 의심스럽네",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "교사 맞아요? 하는 거 보면 영 아닌데",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이게 최선이에요? 더 잘할 수 있잖아",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이 정도밖에 못 해요? 실망이네요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "실망이다 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "참 성의 없으시네요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "성의가 없어 성의가",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "너무 대충 하는 거 아니야",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "대충대충 하지 말고 제대로 좀 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "애들 앞에서 그렇게 하지 마라",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "나이도 어린 게 선생이라고 유세네",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "어린 선생이라 그런지 요령이 없네",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "경력도 얼마 안 되는 게 아는 척은",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "아직 멀었네 선생님 한참 멀었어",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생 하루 이틀 해요? 이런 것도 몰라요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "초보 티 너무 나네요 좀 배우세요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "좀 배워 오세요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "공부 좀 하고 와서 가르쳐요",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "엄마가 말하면 일단 들어야지",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "학부모가 말하면 알겠다고 해야지 왜 따져",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "왜 말대꾸야 선생이",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "어디서 말대꾸를 해요 선생님이",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "가르치려 들지 마세요 선생님",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "선생이 뭘 안다고 우리 애를 판단해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "우리 애 얘기 함부로 하지 마",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "쓸데없는 소리 말고 본론만 말해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "됐고 내가 말한 거나 해",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "아 됐어 말을 말자 선생이랑은",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "얘기가 안 통하네 선생이랑은",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "됐으니까 그냥 해줘",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "빨리 처리해 오늘 안에",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "시간 없으니까 지금 바로 연락 줘",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "이 공지 언제 보낼 거야 빨리 올려",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "답장 좀 빨리빨리 해라 선생",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  },
+  {
+   "text": "숙제 양 줄여 애 힘들어하잖아",
+   "rough": true,
+   "category": "normal",
+   "type": "반말무례"
+  }
+ ]
+}

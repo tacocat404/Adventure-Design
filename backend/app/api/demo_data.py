@@ -369,8 +369,115 @@ def seed_unify():
         c.execute("INSERT INTO demo_meta (key, at) VALUES ('rich_unify_v1', ?)", (now(),))
 
 
+# ───────── 발표 시연용 (present_v1 · 11.05) ─────────
+# 시연 순서: 로그인 → parent1 보내기 전 경고 → AI 소개 → teacher1 쿠션 요약 · 답장 → 방해 금지 + 긴급 → admin1 위협 이관 → 기타 기능.
+# parent1(박지영 · 민서)은 깨끗한 톡방에서 주인공 메시지를 처음 보내도록, 예의 바른 지난 대화만 남긴다.
+# 리허설 뒤에는 backend/demo_reset.py 로 parent1이 보낸 것과 아래 장면 데이터를 지우고 지금 시각 기준으로 다시 넣는다.
+P1_KEEP = {
+    "민서가 방과후 영어 수업을 신청하고 싶어요. 접수 기간이 언제인지 알려 주세요.",
+    "선생님, 민서가 요즘 학교 이야기를 잘 안 해요. 학교에서는 어떤가요?",
+    "안심이 되네요. 감사합니다 선생님!",
+    "다음 주 월요일 준비물이 어떻게 되나요?",
+}
+# (학부모 번호, 문장, 유형, 몇 시간 전, 선택) — 선택: reply · used · state · case(returned/handled) · memo
+PRESENT = [
+    # parent1 지난 기록: 순화 제안을 받아 고쳐 보낸 메시지 (A5 표시)
+    (1, "선생님, 민서가 요즘 수학 숙제를 많이 힘들어해요. 양을 조금만 조절해 주실 수 있을까요?", "study", 26,
+     {"used": True, "reply": "말씀 감사해요. 민서는 이번 주부터 문제 수를 절반으로 줄여서 내 줄게요."}),
+    # teacher1 할 일: 거친 말 속 요청 → 쿠션 요약 (원문은 학교로)
+    (3, "선생님 진짜 너무하시네요. 서연이 받아쓰기 점수를 왜 이렇게 짜게 주세요? 채점 기준 좀 알려 주세요.", "study", 1.5, {}),
+    # teacher1 할 일: 평범한 요청
+    (2, "하윤이 내일 치과 진료가 있어서 2교시에 등교할게요. 1교시 준비물은 미리 챙겨 보낼게요.", "absence", 0.8, {}),
+    # 방해 금지 중에도 맨 위에 남는 긴급
+    (5, "선생님, 하은이가 하굣길에 모르는 어른이 계속 따라왔다고 해요. 지금 집에 와서 무서워서 울고 있어요. 학교 앞 상황 좀 확인해 주세요.", "life", 0.5, {}),
+    # admin1: 위협 아님 → 담임에게 정상 전달로 돌려보낸 사건
+    (4, "아 진짜 짜증나네요. 체육복 주문한 지가 언젠데 아직도 안 나와요? 언제 나오는지 알려 주세요.", "other", 30,
+     {"state": "replied", "reply": "불편 드려 죄송해요. 체육복은 다음 주 화요일에 나눠 줄 예정이에요.", "case": "returned",
+      "memo": "원문 확인 결과 위협 아님. 불만 표현만 있어 담임에게 정상 전달함."}),
+]
+
+
+def _drop(c, ids):
+    """메시지와 그에 딸린 분석 · 답장 · 위협 사건 · 알림을 함께 지운다 (외래 키 순서대로).
+    메시지 · 처리 기록은 증거 보존 트리거로 삭제가 막혀 있다 — 시연 데이터 정리 때만, 같은 트랜잭션 안에서 잠깐 내렸다가 똑같이 다시 건다."""
+    if not ids:
+        return
+    locks = c.execute("SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND name IN ('keep_messages', 'keep_actions')").fetchall()
+    for name, _ in locks:
+        c.execute(f"DROP TRIGGER {name}")
+    q = ",".join("?" * len(ids))
+    cases = [r[0] for r in c.execute(f"SELECT id FROM threat_cases WHERE message_id IN ({q})", ids)]
+    reps = [r[0] for r in c.execute(f"SELECT id FROM replies WHERE message_id IN ({q})", ids)]
+    for ref, keys in (("case", cases), ("reply", reps), ("message", ids)):
+        if keys:
+            c.execute(f"DELETE FROM notifications WHERE ref_type = ? AND ref_id IN ({','.join('?' * len(keys))})", (ref, *keys))
+    if cases:
+        c.execute(f"DELETE FROM case_actions WHERE case_id IN ({','.join('?' * len(cases))})", cases)
+    for t in ("threat_cases", "replies", "original_views", "analyses"):
+        c.execute(f"DELETE FROM {t} WHERE message_id IN ({q})", ids)
+    if c.execute("SELECT 1 FROM sqlite_master WHERE name = 'ai_feedback'").fetchone():
+        c.execute(f"DELETE FROM ai_feedback WHERE message_id IN ({q})", ids)
+    c.execute(f"DELETE FROM messages WHERE id IN ({q})", ids)
+    for _, sql in locks:
+        c.execute(sql)
+
+
+def seed_present(force=False):
+    if os.environ.get("CUSHION_RICH_DEMO", "on") == "off":
+        return
+    with tx() as c:
+        c.execute("CREATE TABLE IF NOT EXISTS demo_meta (key TEXT PRIMARY KEY, at TEXT NOT NULL)")
+        if not force and c.execute("SELECT 1 FROM demo_meta WHERE key = 'present_v1'").fetchone():
+            return
+    teacher = row("SELECT id FROM users WHERE login_id = 'teacher1'")
+    cls = row("SELECT id FROM classes WHERE teacher_id = ? AND class_no = 2", teacher["id"]) if teacher else None
+    admin = row("SELECT id FROM users WHERE login_id = 'admin1'")
+    p = {i: (row("SELECT id FROM users WHERE login_id = ?", f"parent{i}") or {}).get("id") for i in range(1, 7)}
+    if not (cls and admin and all(p.values())):
+        return
+    cid, tid, aid = cls["id"], teacher["id"], admin["id"]
+    texts = [x[1] for x in PRESENT]
+    with tx() as c:
+        # parent1이 보낸 것 중 지난 대화가 아닌 것(테스트 · 리허설) + 지난번에 넣은 장면 데이터
+        drop = [r[0] for r in c.execute("SELECT id, original_text FROM messages WHERE parent_id = ?", (p[1],)) if r[1] not in P1_KEEP]
+        drop += [r[0] for r in c.execute(f"SELECT id FROM messages WHERE original_text IN ({','.join('?' * len(texts))})", texts)]
+        _drop(c, sorted(set(drop)))
+        c.execute("DELETE FROM teacher_alarm WHERE user_id = ?", (tid,))  # 방해 금지는 꺼진 채로 시작
+    for no, text, mtype, hrs, o in PRESENT:
+        t = ago(hours=hrs)
+        with tx() as c:
+            mid = c.execute("INSERT INTO messages (parent_id, teacher_id, class_id, original_text, received_at, original_hash, msg_type, used_suggestion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            (p[no], tid, cid, text, t, hashlib.sha256((text + t).encode()).hexdigest(), mtype, int(o.get("used", False)))).lastrowid
+        run_analysis(mid)
+        with tx() as c:
+            c.execute("UPDATE threat_cases SET opened_at = ? WHERE message_id = ?", (t, mid))
+            if o.get("reply"):
+                rt = ago(hours=max(hrs - 2, 0.2))
+                rid = c.execute("INSERT INTO replies (message_id, teacher_id, body, sent_at) VALUES (?, ?, ?, ?)", (mid, tid, o["reply"], rt)).lastrowid
+                c.execute("UPDATE messages SET teacher_state = 'replied', read_at = ? WHERE id = ?", (rt, mid))
+                c.execute("INSERT INTO notifications (user_id, kind, ref_type, ref_id, created_at, read_at) VALUES (?, 'reply', 'reply', ?, ?, ?)", (p[no], rid, rt, rt))
+            else:
+                notify(c, tid, "new_message", "message", mid)
+            case = c.execute("SELECT id FROM threat_cases WHERE message_id = ?", (mid,)).fetchone()
+            if case and o.get("case"):
+                done = ago(hours=max(hrs - 1, 0.1))
+                c.execute("UPDATE threat_cases SET status = ?, closed_at = ? WHERE id = ?", (o["case"], done, case[0]))
+                c.execute("INSERT INTO case_actions (case_id, admin_id, action_type, memo, created_at) VALUES (?, ?, ?, ?, ?)",
+                          (case[0], aid, "return_normal" if o["case"] == "returned" else "meeting", o["memo"], done))
+                c.execute("UPDATE notifications SET read_at = ? WHERE ref_type = 'case' AND ref_id = ?", (done, case[0]))
+    today = date.today().isoformat()
+    with tx() as c:
+        # 출결 '오늘' 칸: 서준 지각 · 하은 조퇴를 오늘 날짜로
+        for par, child, kind, detail, reason, hrs in ((p[4], "서준", "late", "질병", "아침에 병원에 들렀다 가요.", 5), (p[5], "하은", "early", "기타", "14시 치과 예약이 있어요.", 3)):
+            c.execute("DELETE FROM attendance WHERE parent_id = ? AND kind = ? AND reason = ?", (par, kind, reason))
+            c.execute("INSERT INTO attendance (class_id, parent_id, child_name, kind, att_date, detail, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                      (cid, par, child, kind, today, detail, reason, ago(hours=hrs)))
+        c.execute("INSERT OR REPLACE INTO demo_meta (key, at) VALUES ('present_v1', ?)", (now(),))
+
+
 seed()
 seed_chat()
 seed_dm()
 seed_talk()
 seed_unify()
+seed_present()

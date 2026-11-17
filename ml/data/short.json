@@ -1,0 +1,3065 @@
+{
+ "_note": "LLM이 만들고 다시 라벨을 붙여 두 번 다 맞은 문장만. 실제 학부모 메시지 아님. 사람 검수 전.",
+ "items": [
+  {
+   "text": "시우가 학교 끝나고 집에 혼자 있는다고 하던데요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "이 반 애들이 단체로 시우 무시하는거 알고 계신가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이 몸무게가 계속 줄어드는데 밥을 안 주는듯요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "사과 안 하면 가만 안 있을 겁니다 선생님",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "급식실 바닥 기름 있어서 넘어진 애 있대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "걱정이 되서 연락드립니다 아이가 죽고싶다고 했어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이번 학기 안에 답장 없으면 가만 안 있겠다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "수호 다리에 긁힌 상처가 계속 늘어나요 이상해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "서준이가 손목에 멍이 있어요 집에서 무슨 일 있나봐요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "지우가 사라지고 싶다고 했는데 괜찮은 건지 모르겠어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 손목 긋고 싶다고 했어요ㅠㅠ 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애 또 방치하면 가만 안 있는다 진짜",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이가 요즘 죽음 얘기만 하네요 혹시 학교에서 무슨일 있었나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "민지 또 혼내면 가만 안 있을거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "또 전화 안 받으면 가만 안 있을 거야",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "김영수 선생님 이거 고소당하기 싫으시면 지금 바로 답변하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "보호자랑 연락이 안 돼서 애가 걱정돼요 🙏",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "ㅅㅂ 신고합니다 진짜로",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "수아가 자기는 살 가치가 없다고 해서 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이번 일 또 흐지부지되면 가만 안 있겠습니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "준서가 셔틀이라고 불리면서 심부름 시킴 당함",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이 정도로 끝날 거 같아요? 고소 준비 중",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "ㄱㅅ 교실로 찾아갈 테니 시간 잡아주세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "이 아이 괴롭힘 계속되면 학교 자퇴 생각한대요 도와주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "변호사 선임했으니 각오하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "지금 병원인데 선생님 연락 한번만 주세요 급해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "교실 찾아갈테니까 시간 비워두세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "승현이 머리 맞았다고 보건실 다녀왔어요 알고계세요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "가정에서 제대로 돌봄을 못 받는 것 같아 상담 요청드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 교실 몇반인지 알려주세요 바로 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "학부모 단체에 다 알릴 거예요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "해결 안 되면 교실로 쳐들어갈 생각이에요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "다시 이런 일 생기면 가만 안 있겠어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "하준이가 사는 게 의미없다고 하는데 많이 걱정됩니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "서연이가 엄마가 때린다고 울면서 얘기하더라구요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 저희 애 또 빼먹으면 가만 안 있겠다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "선생님 지아 반에서 혼자 밥먹는데 다 피하는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "교실 천장에서 물 떨어진다고 하던데 감전 위험 없나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "계속 이러시면 변호사 통해서 고소할 거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "은서 옷이 며칠째 똑같고 씻지도 못하고 와요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아이가 밥을 며칠째 못 먹고 온 것 같아요ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "시우가 애들한테 협박받아서 돈 가져다줬대요 ㅅㅂ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이가 뒤에서 발로 차이고 밀쳐졌다고 합니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 우리애 반에서 완전 왕따인것 같아요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 우리 딸 따돌림 때문에 밥도 혼자 먹어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "화장실 전기 합선인지 불꽃 튀었다는데 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "교실 전기콘센트에서 불꽃 튀는 것 같다고 하던데 확인해봐 주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "요즘 우리 애가 죽고싶다 소리를 달고 살아요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이런식으로 하면 저도 가만 안 있어요 ㅡ.ㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "법대로 합시다 선생님.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "담임선생님 우리 아들이 죽고싶다고 해서 많이 걱정돼요 🙏",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "ㄱㅅ 선생님 시우가 애들한테 밀쳐져서 다쳤어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이 피해 그대로 두시면 언론사에 제보할게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "댓글 없으면 학부모회에 안건 올릴 수밖에요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "딸이 살기 싫다고 말해서 놀랐어요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "상담 또 미루면 가만 안 있을게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "애 가방에 침 뱉고 욕 적혀 있었어요 ㅡㅡ 진짜 너무해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "새벽에 나가서 밤늦게 들어오는 것 같아서 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "승우 얼굴에 맞은 자국 같은게 있어요 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "ㅇㅋ 신고할 준비 다 됐어요 🙂",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "준호가 단톡방에서 따돌림 당하는 것 같아요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이거 계속 이러면 교무실 말고 교실로 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "재은이 하교했는데 오늘 집에 안 와서 어디 있는지 확인 부탁요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "ㅇㅋ 그럼 교육청 민원으로 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "선생님 혼자 해결하실 거 아니면 제가 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "담임 이렇게 해도 되는 건가요? 고소 준비합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이 일 그냥 넘어갈 생각 마세요 신고합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "선생님 민준이 체육시간에 넘어져서 무릎 피났어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아이가 나 없어지면 편하지 않냐고 물어봐서 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "딸이 죽고 싶다고 말해서 학교에서도 살펴봐 주셨으면 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "ㅇㅋ 그럼 교육청 가서 얘기하죠 뭐",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "한 번만 더 연락 무시해봐 가만 안 있는다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "애가 겨울인데 얇은 옷 하나만 입고 와서 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에서 소리 지르고 때리는 것 같다고 애가 그래요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "한 번만 더 말 바꾸시면 증거 다 공개합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "우리 애 요즘 죽음에 대해 자꾸 얘기해서 불안해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 집 얘기만 하면 갑자기 조용해지고 표정이 굳어요 😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아들이 같은 반 애한테 계속 맞았다고 해요 답변좀요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이번에도 연락 씹으면 가만 안 있음 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "애가 밥 달라고 하면 욕먹는다고 해서 너무 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아이 물건 또 뺏으면 가만 안 있겠음 알죠",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "대충 넘기지 마시고 교실로 찾아갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "지아 몸에 담뱃불 자국 비슷한 게 있어서 너무 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 오늘 집에 와서 죽고싶다고 해서 놀랐어요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "민재 교복 찢어지고 돈도 뺏겼다네요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "애가 자꾸 짜증내서 봤더니 매일 맞고 있었어요ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "애 점수 또 깎으면 가만 안 있겠습니다!!",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "ㅅㅂ 우리애 손가락 문에 끼였대요 병원 다녀왔어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "시우가 자기 몸을 자주 때리는 것 같아요 걱정돼요 🙏",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "오늘 중으로 답 안 주시면 교실로 감",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "한 번만 더 무시하면 가만 안 있을 거예요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "담임쌤 교실에서 기다릴게요 빨리 오세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "ㄱㅅ 당하기 싫으면 똑바로 하세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "ㅠㅠ 준호가 교실에서 손가락 다쳤다는데 괜찮은가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "현우 화상 입었다는 얘기 들었는데 지금 상태 어때요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리애 친구랑 싸우다 눈 부은거 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "담임 선생님 우리 예은이가 죽고 싶대요 ㅠ 상담 가능할까요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "집에서 밥을 안 주는 것 같아요 간식 좀 챙겨주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "재현이 용돈 3만원 빼앗겼다고 울면서 말해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이가 칼로 손목 긋는 시늉을 했어요 많이 걱정됩니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "요즘 하루종일 게임만 하는데 돌봐주는 사람이 없는 듯해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "소율이가 쉬는시간마다 괴롭힘 당한다고 해요.",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "한동안 학대 당하는 것 같아서 걱정이 많아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "애 학교 가기 싫다하면 선생님 가만 안 있을게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "이 문제 해결 안 되면 학교로 찾아갈거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "애가 자기 때리고 싶다고 하고 울어서 걱정이에요 😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "지호가 집에서 맞는 것 같아요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "우리애 왕따 방치하면 가만 안있겠습니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "우리 아이한테 한 번만 더 그러면 가만 안 있겠어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "학부모 무시하면 가만 안 있는다고요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "교육청이랑 언론 다 알릴 겁니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "아이가 죽고싶다고 해서 밤새 잠을 못 잤어요 선생님",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 ㅠㅠ 아이가 죽고 싶다고 해서 밤에 잠이 안 와요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "교실 CCTV 확인 안 해주면 가만 안 있겠습니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "이거 계속 방치하면 교실로 쳐들어갈 겁니다 ㅠㅠ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "수행평가 불공정하게 하면 가만 안 있겠습니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "민준이가 요즘 살기 싫다고 자꾸 말해서 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이딴식으로 답장하면 가만 안 있을건데요?",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "다음주에 시간 내서 교실로 찾아뵐게요 준비하세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "집에서 자꾸 죽고싶다고 울어요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아들이 죽고싶다는 말을 반복해서 걱정이 많이됩니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "제 아이 일 이렇게 넘기면 교실로 찾아가요 😤",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "체벌이 심한 것 같아 연락드려요 확인 좀 해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "교육청에 민원 넣을게요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이번 주 안에 학교 한번 갈게요 준비해두세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "딸이 자해 흉터 보여주면서 웃길래 너무 무서웠어요 🥲",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "ㅅㅂ 애가 밥을 거의 못 먹는 것 같은데 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에 혼자 방치되는 것 같아요 선생님 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "계속 연락 무시하시면 교장선생님께 말씀드릴게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "도윤이 반에서 투명인간 취급 받는다고 해요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "지안이가 추운데 얇은 옷만 입고 와서 방임 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "국민신문고에 올릴 거니까 기다리세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "한번만 더 무시하면 가만 안 있을게요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이가 자꾸 배고프다고 해서 학대 같다는 생각이 들어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 서연이가 자꾸 죽고 싶다고 해서 연락드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "서준이 반 친구들이 자기 빼고 다 놀아서 힘들대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이번엔 진짜 고소합니다 기다리지 마세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "요즘 우리 애 표정이 어둡고 죽고싶단 말까지 해서 걱정입니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "지아 투명인간 취급받는다고 학교 가기 싫대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이 손목에 줄 자국 같은게 있어서 불안해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "하린이 따돌림 당해서 학교 가기 무서워함",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 우리 딸 반에서 아무도 안 놀아준대요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "소윤이가 다리 절뚝거리면서 집에 왔어요 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아이가 세상 떠나고 싶다고 말해서 제가 너무 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "민서가 반 애들한테 따돌림 당하는 것 같아요.",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "학폭위 열어서 신고할 거예요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "예린이가 엄마한테 맞았다고 하는데 확인 부탁해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "요즘 애가 죽고싶다는 말을 달고 살아요 어떻게 도와야하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 자기 때문에 다들 힘들다며 죽고싶다 그래요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "시우가 자기 상처를 보여주며 죽고 싶다고 했어요 걱정됩니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "지호 방에서 상처 난 걸 봤는데 너무 무서워요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "주원이 빵셔틀 당하는 것 같아요 확인 부탁해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "지호가 집에 가기 싫다고 자꾸 울어서 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "담임 교체 안 하면 교육청 민원 갑니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "하윤이 팔 부러진 것 같다고 병원 가야 한대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "체벌 한번 더 하면 가만 안 있을거다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "이 얘기 계속 안 하면 교실 찾아감",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "경찰서 가서 신고하면 알아서 하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "담임쌤 애가 학대 당하는 것 같아요 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "태민이 친구들이 돈 달라고 협박하는데 말 못하고 있었어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이 상태로 두면 교육청에 가만 안 있겠습니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이가 죽고싶다고 해서 밤에 잠을 못자겠어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "도윤이가 밤마다 혼자 나가 있다는데 방임 아닌가요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "해당 교사 징계 요구하겠습니다. 가만 안 둬요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "아이가 맞고 뺨까지 맞았대요 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "이번 일 설명 안 해주시면 교실로 찾아갑니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "우리 애 얘기 들으니 부모님이 자주 소리친다네요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "채원이가 체육 끝나고 어지럽다고 해서 연락드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "서연이가 쉬는시간마다 괴롭힘 당한대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "답장 없으면 제가 직접 찾아갑니다 김미영 드림",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "우리 딸 교복 찢기고 욕 많이 듣는대요 ㅠㅠ 조치해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 저희 애 왕따 당하는 것 같아요 빠른 조치 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "사과 없으면 교육청에 사실 확인 요청하겠습니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "운동장 철봉 나사 풀려있다는데 위험하지않나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "체육 끝나고 팔 들지도 못하던데 골절 아닌가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "교무실 말고 교실로 찾아갈 거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "재호 편의점에서 만원 뺏겼다는데 학교에서도 그래요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "약 먹어야 하는데 안 챙겨줘서 열이 계속 나요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "도윤이가 자해 얘기를 하는데 어떻게 해야할지 모르겠네요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "또 이런 식으로 하면 가만 안 있겠습니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이 학대 의심 신고 해야할까요? 고민이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "오늘 안에 연락 안 주시면 교실 찾아감",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "애 상처받으면 학부모 단체방에 공유할게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "담임쌤 오늘 폰 꺼져있어서 연락 못드렸어요 ㅜㅜ 아이 다침",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리 애 빼고 얘기하면 가만 안있겠다 진짜로",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "서준이 코피가 멈추질않아요 ㅅㅂ 어떡해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아들이 돈 안 주면 때린다고 협박받고 있어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "성적 그따위로 매기면 가만 안 둔다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "민서 코피가 멈추질 않는다고 하네요 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "민준이 손목 삐었는데 병원 가야될까요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "진짜 고소 각입니다 선생님 ㅋ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "신고접수 완료했어요 ㅎ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "아이 상태가 이상해요. 죽고 싶다는 말까지 해서 걱정이에요.",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "언론에 제보하면 어떻게 되는지 보자",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "서준이 이름 가지고 놀리면서 애들이 밀침",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "우리 막내가 자해 얘기를 해서 상담 받아야 할지 고민이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 요새 자꾸 아프게 하고 싶다는 말을 해요 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 죽고 싶다고 울면서 말하는데 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "서연이 등에 상처가 있는데 말을 안 해요😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에 어른이 없어서 혼자 방치되는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "걱정돼서 연락드려요 애가 죽고싶다는 말을 자주 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "운동장 철봉 나사 풀려있어서 아이가 떨어졌대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "다음에 또 이러면 가만 안 있겠다 진심임",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "수빈이 얼굴에 상처 났는데 장난이라고 하더라구요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "지우 머리에 혹났대요 ㅠㅠ 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "이러다 학교 가서 교실에서 따지게 생겼네요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "예은이가 죽고싶다 말한 거 학교에서도 들으셨나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이번에도 무시하면 민사로 갑니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "지호 학교 끝나고 골목에서 맞는다고 무서워해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "준호 머리 또 잡으면 가만 안 있겠음",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "전화 안 받으시면 교실 찾아갈 수밖에 없어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "아이 상처 주면 ㄱㅁㅇ 안 있겠다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "체육관 바닥에 물 고여있어서 미끄러져요 점검해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "서준이가 자기는 죽어야 한다고 했다는데 확인 부탁드립니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "요즘 자해 얘기를 자주 하는데 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "우리 아이 상태가 이상해서 학대 여부 봐주실 수 있나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님ㅠ 채원이 간식비 매일 뺏긴대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 승민이 가방 뺏기고 발로 차였어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "다은이가 칼에 손 베였다고 하던데 괜찮은지요 ㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "ㅋㅋ 교육청 신고 들어갑니다~",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "애 몸무게가 계속 줄고 있어서 밥을 제대로 안 먹이는 듯해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "다은이 반 아이들이 무시하고 말 안 걸어준다고 함",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "은우가 다리를 절뚝거려서 물어보니 아빠가 그랬대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아이 머리에 이 많은데 몇 주째 방치된 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "애 혼자 두고 부모님 며칠씩 나가 있는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "지호 머리채 잡혀서 옷 찢어져 왔어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "또 반 아이들 앞에서 망신 주면 가만 안 있을 거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "예은이 점심값 매일 뺏긴다는데 어떻게 해요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "민원 넣기 전에 얼른 답변 주세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "재민이 엄마 아빠가 술 마시고 애한테 화낸대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "조치 없으면 국민신문고에 올릴게요 ㅇㅇ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "교실 창문 깨져있던데 애들 다칠까봐 걱정돼요 😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "자해하고 싶다는 말을 했다고 들었는데 사실인가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 승현이가 집에서 죽고싶다고 소리쳤어요 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "교실 가서 얘기해야 바로 해결될 것 같네요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "급식실 바닥 기름때 많아서 미끄럼 사고 날까 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아이가 계단에서 굴러서 이마에 혹났어요 연락주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "어제 밤에 죽고싶다고 울면서 자더라고요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "국민신문고에 올려버릴게요 선생님",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "화장실 바닥에 물 고여서 미끄러질뻔했다네요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "교실 선풍기 날개가 빠질 것처럼 흔들려요 위험해보여요😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "이 집 아이 방치되는 거 같아서 신고 고민중이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "반 단톡방에서 또 그러면 가만 안 있을게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "현우 카톡방에서 욕먹고 나가라는 말 들었대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "체육시간에 minjun이 계속 밀치고 놀려요 같은반이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "민원 넣기 전에 처리하세요 안 하면 가만 안 있겠어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "재원이가 맞는 거 목격한 애가 있다고 들었어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "유찬이 복도에서 밀치고 욕설 들었대요 ㅠ 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "예린이 학교 끝나고 불려가서 맞았다고 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아동학대 같아서 조심스럽게 말씀드립니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "재민이가 자기 몸을 자꾸 긁어요 죽고 싶은 마음인 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 저희 애가 맞은 것 같은데 어떻게 해야하죠?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "언론사 기자 아는 사람 있으니까 기대하세요 ^^",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "법적 대응 들어갑니다 준비하세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "집에서 칼 쳐다보면서 죽고싶다고 해서 무서워요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "ㅅㅂ 애가 죽고싶대요... 어떡하죠 선생님",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "녹취 다 있으니까 신고 들어갑니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "숙제 또 안 봐주면 가만 안 있겠어요 선생님",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "얘기 안 하시면 학교 와서 교실 문 두드립니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "교육청 감사 요청할 거예요. 준비하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "담임이면 책임지세요 아니면 가만 안 있음",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "계단 난간 흔들거려요 애들이 매달려 있던데 조치좀요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "이 건 해결 안 되면 가만 안 있을꺼임",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "채원이 교실에서 욕 듣고 놀림받는다고 울었어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아들이 쉬는시간에 맞았다고 울면서 왔어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아이가 학교 옥상 출입문이 열려있다고 얘기하네요 확인부탁해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "지우 코피가 계속 나는데 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "교실 창문 난간 너무 낮아서 애들이 위험해 보여요 ㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "아이가 계절에 안 맞는 얇은 옷만 입고 와요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아이 앞에서 소리치면 가만 안 있겠어요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "방학 내내 혼자 집에 있었던 것 같아요 연락이 안 돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "아이가 자해하는 것 같은데 학교에서 이상 있었나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "하은이 필통이랑 돈 뺏겼대요 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "현우가 용돈 다 뺏겨서 울고 있어요😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "현우 체육복 찢기고 돈도 뺏겼어요 어떻게 된거죠?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "지호 이마 찢어져서 피 많이 났다는데 맞나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "언론 제보 하기 전에 해명하시죠",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "다은이 지갑에서 돈 가져가라고 협박당했대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "그 말 책임질 수 있어요? 고소할게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "걍 내일 교실 찾아갈게요 준비하고 계세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "현우 발목 부어있던데 넘어진 거라고만 하고 말을 흐려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "채원이가 죽고 싶다고 하는데 학교에서 혹시 들은 적 있으세요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "하준이 복도에서 같은반 아이가 발로 찼어요 ㅡㅡ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "지훈이 연락 두시간째 두절이에요 어디 있는지 알려주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "법대로 해요 선생님, 고소할 겁니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "체육시간에 또 방치하면 가만 안 있을꺼임ㅋ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "하은이 손가락 문에 찝혔는데 병원 가야될것같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "수업 중 유리문 깨져서 아이 손 베였다고 들었어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리애 용돈 강탈당했다는데 사실인가요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "애가 집에서 방치되는 것 같은데 상담 가능할까요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "애가 자해 얘기를 하는데 상담 받아보라고 해도 괜찮대요ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 책임 물을 거니까 그리 아세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "ㅎㅎ 그럼 제가 교실 찾아가서 직접 여쭤볼게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "지호 팔 골절이래요 깁스했어요 참고해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "지우가 집에서 없어지는 게 나을 것 같대요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 이 얘기 더 이상 메시지로는 안 해요 직접 갑니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "교실로 직접 올라갈 테니 기다리세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "선생님 아이가 살기 싫다고 해서 너무 걱정돼서 문자드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "자꾸 무시하면 경찰 신고합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "제가 교실로 가면 피곤해지실 거예요 🙂",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "교문 옆 공사 현장 펜스 열려있어요 아이들 위험해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "내일 점심시간에 교실 들를게요 기다리세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "학교 가서 직접 말씀드릴게요 기다리세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "우리 채원이 밥도 안먹고 죽고싶다고만 해서 걱정입니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "유치원 울타리 구멍 나 있어서 애들이 밖으로 나가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "요즘 애 씻기는걸 잘 안 해주시는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "진짜 교실로 쳐들어가기 전에 답변 주세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "그냥 찾아가면 편하실까요? 교실로 갈까요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "아이 손목에 줄 같은 자국이 있었어요 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "운동장 기구 부서져 있던데 아이들 접근 못하게 해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리 민수가 학교에서 자꾸 맞고 와요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "담임 바꿔주지 않으면 가만 안 있겠어요 😡",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "선생님 계속 이러시면 저 가만 안 있어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "ㅅㅂ 우리 딸이 죽고싶다는 말을 계속 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아이가 집에서 맞는다고 말했어요 확인해주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "반장 편애하면 학부모회 통해서라도 가만 안 있을거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "괴롭힘 당하는거 같은데 한번 봐주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "인권위에 진정 넣을 거예요 기다려보세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이래도 아무 조치 없으면 고소예요 ㅠ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이런 식으로 계속하시면 고소합니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "답장 늦으면 학교 가서 교실 문 두드립니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "방학 동안 애를 아무도 안 돌봐준 것 같아요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 저희 딸 얼굴에 멍이 들었는데 무슨일이에요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "애가 자기 손목 긋고 싶다고 하는데 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "서연이가 자해를 한 것 같은데 학교에서는 괜찮았나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "교실 찾아가서 얘기할 수밖에 없겠네요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "민준이가 며칠째 씻지 못하고 와서 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "담임선생님 도윤이 지갑 또 뺏겼어요 이번이 세번째임",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "준호 머리 때리면 진짜 가만 안 있겠다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "이 반 담임 고소한다고 전해주세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이대로면 고소까지 갑니다 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "엄마 아빠가 자주 싸우는데 애가 무서워하는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "예린이 물건 자꾸 숨기고 던지고 그런대요 확인좀",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "민서가 학교에서 자해한 흔적 보셨나요? 집에서 불안해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "담임선생님 교실 앞에서 기다리고 있을게요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "도윤이 엘리베이터에 손 끼였다는데 학교 측 조치 궁금합니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "반 친구들이 투명인간 취급한다고 하네요 😞",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "학교에서 친구들한테 죽고싶다는 말 했다던데 맞나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "민수가 사라지고 싶다고 했는데 학교에서는 괜찮았나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "변호사랑 상담 끝났어요 각오하세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "애가 세상에서 사라지고 싶다고 울었어요 ㄷㄷ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "학부모 무시하시는 거 같은데 교실로 가서 말씀드릴게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "이 문제 해결 안 하면 가만 안 있을 겁니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "교장실 찾아가서 따지기 전에 해결하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "계속 이러면 고소장 날아갑니다~",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "도윤이가 학원 끝나고 애들한테 맞았다고 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "민준이 팔에 멍이 있는데 집에서 맞은 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 이거 방송국에 제보해버린다 😠",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "도윤이가 집에 와서 자꾸 죽고 싶다고 울어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "변호사 선임했어요. 각오하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "선생님 민서가 점심시간마다 돈 빼앗기고 있대요ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이가 집에 가기 싫다고 울어서 이상해요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에 들어가기 싫다고 자꾸 학교에 남으려고 해요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "내일 아침 교실 앞으로 갈테니 준비하고 계세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "은우 또 때려서 코피났어요 이거 학폭 아닌가요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "승현이 얼굴에 멍 들었던데 혹시 무슨 일 있었나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리 준호가 학교에서 자꾸 맞고 온대요 ㅠㅠ 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "예준이가 굶었다고 하는데 사실인지 확인 부탁해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "시은이 머리 부딪혔다는데 괜찮은지 궁금해요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "한 번만 더 애 손대면 가만 안 있겠음",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "민준이가 자기 몸을 긁었다는데 많이 놀랐어요.",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "교실 찾아가는 거 말리지 마세요ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "아이가 자기 같은 거 없어져야 된다고 해요 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 집에서 무서워서 못 들어간다고 해요..",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "증거 다 모아놨으니 알아서 하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "나 가만 안 둘 거야 진짜로",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "교실 창문 깨져서 유리조각 있다고 들었어요 위험해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "민지가 친구들한테 자꾸 밀쳐져서 다쳤어요 확인좀요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아들이 죽고 싶다는 말을 자주 해서 걱정돼요.",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아이가 요새 밥도 안먹고 죽고싶다고만 해요 선생님 도와주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "교육청 민원 3번째에요. 이번엔 끝까지 갑니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "집에서 방치되는 것 같은데 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "급식에 이상한거 나오면 가만 안 있겠음 ㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "우리 아이가 죽고 싶다고 말을 해서 너무 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "준호 등에 맞은 자국 있던데 어떻게 된 건지 모르겠어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "ㅠㅠ 아들이 계단에서 굴러서 이마 찢어졌대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "애가 학교 가기 싫다고 해서 물어보니 괴롭힘 당한대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "소윤이가 집에서 맞는다고 말했는데 어쩌죠 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "서연이 점심값 빼앗겼다고 울면서 얘기하더라구요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "준이가 몇 달째 돈 뺏기고 있었대요 어떡하죠",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "전화 씹으면 가만 안 있겠어요 😠",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이 팔에 상처가 있어서 물어보니 죽고 싶다고 했어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "은우가 뜨거운 급식판에 손 데였대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "지훈이 용돈 매일 뺏긴다고 하는데 확인해 주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "주은이 얘기가 자꾸 바뀌는데 집에서 무슨 일이 있는듯",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에서 죽고싶다는 말을 계속 하는데 너무 불안해요 선생님",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "민원 넣고 기자한테도 얘기할게요 ㅡㅡ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "서준이 등에 상처가 많은데 어떻게 된 건지 모르겠어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에 보호자가 며칠째 안 계시는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "세윤이 셔틀 시키고 돈도 뺏는다고 합니다 ㅡㅡ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "장난으로 보이세요? 신고하겠습니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "소윤이 급식비 뺏겨서 굶었대요 너무 속상해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "우리 지훈이 어제 반 애들한테 맞고 왔어요 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "담임선생님 민지가 자해 이야기를 해서 연락드려요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "승우 또 단톡방에서 따돌림 당하는 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "답 안 주시면 교실로 찾아갈 수밖에 없어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "답변 늦게 하면 가만 안 있겠어요 ㅠㅠ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "엄마가 애를 때리는 것 같아요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "체육복 갈아입다 넘어져서 머리 부딪혔대요 괜찮은지요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "그냥 넘어갈 줄 아셨어요? 고소합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "채원이 짝꿍이 계속 때려서 힘들어해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "폭행 당했는데 쉬쉬하는 것 같아서 연락드림니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "복도 계단 난간이 흔들려요. 애들이 매달리던데 위험하지 않을까요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "우리 애 또 울리면 가만 안 있겠습니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "아이가 계단에서 굴러서 허리 아프다고 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "담임 바꿔주실 때까지 학교 상대로 소송 걸게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "엘리베이터 멈춰서 애가 갇혔다는데 괜찮나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "채은이 같은 모둠 애들이 일부러 끼워주지 않아요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이 몸에 담뱃불 자국 같은게 보였어요 ㄷㄷ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "체육창고 철봉 나사가 풀려있다는데 점검 좀 해주세요 ^^",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "점심시간에 교실 찾아갈 거니까 자리 계세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "민수 팔에 멍이 자주 보이는데 집에서 맞는 것 같아서 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "민지 체벌하면 가만 안 있겠음",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "애 또 울면 제가 가만 안 있는다 ㅅㅂ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "말로 안 되면 교실로 가서 해결하겠어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "말 바꾸면 가만 안 있을 거니까 그리 아세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "예준이 가방에 빵 한 개뿐이던데 점심 싸주는 거 맞나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "선생님 계속 이러시면 제가 직접 가야죠",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "애가 죽고 싶다는 말을 농담처럼 하는데 그냥 넘겨도 되나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아이 팔에 멍이 자주 보이는데 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "체육관 바닥 미끄러운데 그냥 두시나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "시우가 3학년 형들한테 맞고 용돈도 뺏겼어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 준호가 팔을 긁고 있더라구요 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "자기 몸 해치고 싶다고 하는데 어떻게 해야할지 모르겠어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "ㅅㅂ 진짜 고소 들어간다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "이건 방임인거 같은데 한번 봐주실수 있을까요😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "서연이가 운동장에서 공에 맞아서 눈이 부은 것 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "애가 밥도 못먹고 따돌림 때문에 힘들대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 답장 늦으면 학교로 갑니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "더 이상 참기 어렵네요 고소 준비합니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "법적으로 처리하겠습니다 더 이상 참기 힘드네요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "놀이터 그네 줄 끊어져 있다고 아이가 그러던데요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "이번엔 그냥 안 넘어갑니다 교실로 감",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "예은이가 칼로 자해했다는 얘기를 들어서 너무 놀랐어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아이가 요즘 살기 싫다고 자꾸 얘기해서 걱정이에요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "이건 명백한 직무유기니까 신고합니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "채원이 발목 삐었는데 파스만 붙여주셨나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "다음에도 우리 애 방치하면 학교위원회 올릴 거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "담임이시면 책임지고 설명하셔야죠 교실로 갑니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "담임이 계속 이러면 교육청에 가만 안 있을꺼임",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "건우가 오늘도 맞았어요... 어디서 맞았는지도 몰라요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "아이가 엄마 얘기만 나오면 몸을 움츠려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "시우가 굶어서 기운이 없는 것 같아요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "지윤이가 씻지도 못하고 학교 와서 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "애가 학교 가기 싫다고 울어요 왕따인가봐요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "담임 바뀌기 전까진 가만 안 있을래요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "하은이 단톡방에서 계속 놀림받고 있어요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "집에서도 죽고 싶다는 소리를 해서 많이 불안해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애가 세상에서 사라지고 싶다고 말했어요 걱정돼서 연락드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "지윤이가 팔에 상처 낸 것 같은데 선생님 혹시 보셨어요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "준혁이 이빨 하나 빠졌어요 피가 많이나요 ㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "딸이 밤에 죽고싶다고 울면서 말했어요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "엘리베이터 고장 났는데 아이들이 계속 타고 있어요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "다른 학부모 말 듣고 판단하면 가만 안 있을게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "애한테 또 그러면 저도 가만 안 있을게요 ㅠㅠ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "우리 애한테 한 번만 더 그러면 신고함",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "소민이 어깨 탈구된 것 같다고 했는데 병원 다녀왔어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "애가 자꾸 죽고 싶다고 하니까 선생님도 신경 좀 써주세요 🙏",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "하은이 옷이 계속 더러운데 집에서 신경을 안 쓰는 듯해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "체육관 바닥 물기 있어서 미끄러워요 빨리 치워주세요 😥",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "수아 학원 끝나고 밤 11시까지 혼자 있다고 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "오늘 하교 후 연락두절이라 너무 걱정돼요 답장좀 주세요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "나은이 친구들이 다 짜고 무시한대요 ㅠㅠㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "애가 집에 들어가기 싫다고 울어요 혹시 학대 아닐까요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "돌봄이 제대로 안되는 것 같아 걱정돼서 문자드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "하은이가 손목에 상처가 있어서 물어보니 죽고 싶다고 해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 지호가 힘들다며 죽고싶단 말을 반복해서 연락드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "하은이가 죽고 싶다고 쓴 메모를 봤어요 ㅠㅠ 놀랐습니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "준호 얼굴에 멍 들어서 왔는데 애들이 때렸대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "애가 나는 없어지는 게 나을 것 같대요... 어떡해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "아무 답 없으면 바로 신고 접수합니다 ㅠ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "지훈이 얼굴에 멍이 들어서 왔어요 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "계속 무시하시면 제가 교실로 찾아가요 진짜로",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "요즘 하린이 옷이 계속 같은거 입고 와요 ㅜㅜ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "정우 생일파티에 아무도 안 불러서 울었어요 ㅠ 따돌림 같아요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "박지훈 선생님 이 문제 안 고치면 민원 들어갑니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "하은이가 셔틀비 매번 뺏겨요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "우리 승현이 말투가 너무 어두워요 죽고 싶다는 얘기도 했고요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "진짜 경찰서 갈까요 말까요 마지막 기회예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "교장실 찾아가서 민원 넣겠습니다 😡",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "우리 서연이 또 놀리면 가만 안 있는다 진짜",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "우리 아이가 죽고 싶다고 말했는데 너무 걱정돼요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "선생님 아이가 점심 먹다가 목에 걸려서 응급실 다녀왔어요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "담임 바꿔달라고 교실 찾아갈 수도 있어요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "ㅇㅋ 그럼 내일 교실로 감 😤",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "아이 얼굴에 멍자국 있던데 선생님도 보셨나요?",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "한번만 더 막말하면 가만 안 있을 줄 아세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "한번만 더 그러면 고소합니다 진짜로요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "놀이터 그네 고리가 깨져있던데 아이들 다칠까봐 걱정이에요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "단톡에서 욕 먹고 따돌림당해서 힘들어해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "채원이 체중이 너무 줄어든 것 같아서 걱정입니다",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "급식실 가스 냄새 난다고 아이가 두통 호소해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "지우가 아침을 3일째 굶고 오는데 확인 부탁드려요ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "이대로 방관하시면 저도 가만 있지 않을 겁니다",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "자꾸 죽고싶다 그러는데 그냥 투정인가요? 불안해요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "도윤이가 밤마다 혼자 있다고 하는데 괜찮을까요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "집에서 욕하고 폭행이 있는 것 같아요 확인부탁",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "준서가 수업 끝나고 안 와서 아직도 못 찾았어요 ㅠ",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "재윤이가 자꾸 무서워한다고 해서 연락드려요 😢",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학대"
+  },
+  {
+   "text": "가만 안 둬요 진짜 민원 넣을 거야",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "아들이 살아있는 게 싫다고 하는데 학교에서도 그런 모습 있나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "애 울리면 가만 안 있을거야 선생님",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_조건부"
+  },
+  {
+   "text": "이번엔 그냥 안 넘어갑니다 교실 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "아이가 수돗물 먹고 토했다는데 어떻게 해야하나요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_안전"
+  },
+  {
+   "text": "담임 선생님이 이렇게 나오시면 교실로 바로 갈 거예요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  },
+  {
+   "text": "학부모 단톡방에 다 공유하기 전에 답하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "소송 걸리기 싫으시면 빨리 연락하세요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_법적"
+  },
+  {
+   "text": "요즘 애가 자해를 하는 것 같아서 연락드려요 확인 부탁드려요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_자해"
+  },
+  {
+   "text": "지아 카톡 단체방에서 다 같이 욕하고 왕따 시킨대요",
+   "rough": false,
+   "category": "urgent",
+   "type": "긴급_학폭"
+  },
+  {
+   "text": "선생님 얼굴 보고 얘기해야 될 것 같아요 교실 갈게요",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_대면"
+  }
+ ]
+}

@@ -1,0 +1,119 @@
+{
+ "_note": "교사 모델이 생성을 거절한 두 유형(신체 위해 암시 · 신상 공개 위협)을 직접 쓴 문장. 평가셋과 비슷한 것은 뺐다.",
+ "items": [
+  {
+   "text": "요즘 세상 무서운 거 아시죠? 몸조심하세요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "선생님 다치시는 일 없었으면 좋겠네요, 진심으로요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "한 번만 더 그러면 저도 손이 먼저 나갈 것 같아요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "길에서 마주치면 그냥은 안 넘어갑니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "주차장에서 뵐 수도 있겠네요 ㅎㅎ",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "우리 애 울린 만큼 똑같이 갚아 드릴게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "선생님도 맞아 봐야 정신 차리시죠.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "제가 성격이 좀 욱하는 편이라 무슨 일 날지 몰라요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "언제 한번 따로 손 좀 봐 드려야겠네요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "조용히 넘어갈 때 잘하세요, 다음엔 진짜 몸으로 보여 드려요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신체"
+  },
+  {
+   "text": "선생님 얼굴 사진 찍어 둔 거 있어요, 올리면 끝나요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "지역 커뮤니티에 실명으로 글 쓸게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "유튜브에 이 일 다 올려서 선생님 얼굴 알리겠습니다.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "선생님 전화번호 학부모들한테 다 돌릴 거예요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "블라인드 처리 없이 학교 이름이랑 같이 퍼뜨릴게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "녹음한 거 편집해서 단톡방마다 뿌릴게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "지역 신문사에 제보해서 이름 나가게 할게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "선생님 SNS 계정 찾았어요, 거기 댓글로 다 알릴게요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  },
+  {
+   "text": "학부모 밴드에 선생님 이야기 하나하나 다 공개할 거예요.",
+   "rough": true,
+   "category": "threat",
+   "type": "위협_신상"
+  }
+ ]
+}

@@ -25,17 +25,18 @@ for lid in ("parent2", "parent3", "parent5", "parent6", "student1", "student2", 
 # 교사: 메시지함에 긴급 · 일반 · 거친 표현(가림) · 위협이 모두 있다
 todo = c.get("/api/teacher/inbox?filter=todo", headers=teacher).json()
 assert len(todo["urgent"]) >= 2 and len(todo["items"]) >= 4 and todo["masked_since_last_visit"] >= 1
-assert any(i["masked_count"] > 0 for i in todo["items"])
+# 11.05 시연 장면: 방금 온 새 메시지(쿠션 요약 · 평범한 요청 · 긴급). 가림 여부는 판단기가 정해서, 키워드만 쓰는 이 검사에선 안 본다
+assert sum(1 for i in todo["items"] + todo["urgent"] if i.get("teacher_state") == "new") >= 3, todo
 school = c.get("/api/teacher/inbox?filter=school", headers=teacher).json()
-assert school["counts"]["school"] >= 2 and school["items"] == []  # 학교로 넘어간 새 건: 건수만
+assert school["counts"]["school"] >= 1 and school["items"] == []  # 학교로 넘어간 새 건: 건수만
 att = c.get("/api/teacher/attendance", headers=teacher).json()
 assert att["counts"]["late"] >= 1 and att["counts"]["early"] >= 1
 trips = c.get("/api/teacher/field-trips", headers=teacher).json()["items"]
 assert {t["status"] for t in trips} >= {"pending", "approved", "rejected"}
 
-# 관리자: 새 위협 2건 이상, 처리 완료 1건 이상(대응 기록 있음), 가입 대기 2명
+# 관리자: 새 위협 1건 이상, 처리 완료 1건 이상(대응 기록 있음), 가입 대기 2명
 cases = c.get("/api/admin/cases?status=new", headers=admin).json()
-assert cases["counts"]["new"] >= 2 and cases["counts"]["handled"] >= 1
+assert cases["counts"]["new"] >= 1 and cases["counts"]["handled"] >= 1
 done = c.get("/api/admin/cases?status=handled", headers=admin).json()["cases"][0]
 assert c.get(f"/api/admin/cases/{done['id']}", headers=admin).json()["actions"]
 assert len(c.get("/api/admin/members", headers=admin).json()["pending"]) == 2

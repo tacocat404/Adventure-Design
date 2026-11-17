@@ -1,5 +1,5 @@
 // A0 선생님 목록 · A1~A5 학부모 작성 · 경고 시트
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api, usePoll, useUnread, TYPES, when } from '../api.js'
 import { Btn, Composer, Cushi, Dot, Header, Ic, Marked, Sheet, TabBar, Title } from '../components/ui.jsx'
 import { Apply, AttendanceForm, Feed, FieldTripForm, Home } from './School.jsx'
@@ -96,7 +96,36 @@ function Teachers({ me, onOpen }) {
   )
 }
 
-const PRECHECK_MS = 5000
+// 보내기 전 검사 중 쿠션이의 생각 과정 (서버가 실제로 하는 순서: 판단 → 요청 찾기 → API 다듬기).
+// ponytail: 서버가 단계를 알려 주지 않아 시간으로 넘긴다. 거친 표현이 없으면 1초 안에 끝나 첫 줄만 보인다
+const THINK = [
+  [0, '메시지를 읽고 있어요'],
+  [900, '거친 표현이 섞였는지 살펴보는 중'],
+  [2400, '선생님께 꼭 전할 요청을 찾는 중'],
+  [4200, '마음은 그대로, 말은 부드럽게 다듬는 중'],
+  [9000, '거의 다 됐어요, 조금만 기다려 주세요'],
+]
+function Thinking() {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    const ts = THINK.slice(1).map(([ms], i) => setTimeout(() => setN(i + 1), ms))
+    return () => ts.forEach(clearTimeout)
+  }, [])
+  return (
+    <div className="think" role="status" aria-live="polite">
+      <Cushi face="read" size={34} label="생각 중인 쿠션이" />
+      <ol>
+        {THINK.slice(0, n + 1).map(([, t], i) => (
+          <li key={i} className={i === n ? 'now' : 'done'}>
+            <span className="tk">{i === n ? <i /> : '✓'}</span>{t}{i === n && <span className="dots"><b>.</b><b>.</b><b>.</b></span>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+const PRECHECK_MS = 17000 // 서버 다듬기 제한 15초 + 여유. 거친 표현이 없으면 1초 안에 끝난다
 
 function Conversation({ cls, onBack }) {
   const [items, setItems] = useState(null)
@@ -139,7 +168,7 @@ function Conversation({ cls, onBack }) {
             </div>)}
       </div>
       <Composer placeholder="메시지" value={text} onChange={setText} onSend={check} busy={!!stage}>
-        {stage === 'checking' && <div className="row cap"><Cushi face="read" size={30} />확인 중</div>}
+        {stage === 'checking' && <Thinking />}
         {editing && <><div className="quote"><Marked text={editing.text} spans={editing.spans} /></div></>}
         {err && <p className="err" role="alert">{err}</p>}
         <div className="picks">
@@ -163,10 +192,12 @@ function Conversation({ cls, onBack }) {
           {warn.keeps.length > 0 && (
             <div className="tags">{warn.keeps.map((k) => <span key={k} className="tag tg-mint">✓ {k}</span>)}</div>
           )}
-          {warn.suggestions.length > 0 && <Btn onClick={() => send(warn.suggestions[choice], true)}>바꾼 문장으로 보내기</Btn>}
-          <div className="two">
-            <Btn kind="white" onClick={() => { setEditing(warn); setWarn(null) }}>직접 고치기</Btn>
-            <button className="btn b-ghost" onClick={() => send(warn.text, false)}>그대로 보내기</button>
+          <div className="sheetfoot">
+            {warn.suggestions.length > 0 && <Btn onClick={() => send(warn.suggestions[choice], true)}>바꾼 문장으로 보내기</Btn>}
+            <div className="two">
+              <Btn kind="white" onClick={() => { setEditing(warn); setWarn(null) }}>직접 고치기</Btn>
+              <button className="btn b-ghost" onClick={() => send(warn.text, false)}>그대로 보내기</button>
+            </div>
           </div>
         </Sheet>
       )}
