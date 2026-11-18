@@ -1,4 +1,4 @@
-// API 부르기 · 공통 글자 — docs/06_API/API명세_쿠션톡_261102.html
+// API 부르기 · 공통 글자 — docs/4_시스템설계/API명세.html
 import { useEffect, useState } from 'react'
 
 const store = {
