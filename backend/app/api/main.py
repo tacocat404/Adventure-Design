@@ -1,4 +1,4 @@
-"""쿠션톡 API — docs/06_API/API명세_쿠션톡_261102.html 03절.
+"""쿠션톡 API — docs/4_시스템설계/API명세.html 03절.
 
 실행 (backend 폴더에서): .venv/Scripts/python -m uvicorn app.api.main:app --reload
 처음 실행하면 cushion.db를 만들고 예시 계정 · 반 · 메시지를 넣는다 (비밀번호 pass1234).
