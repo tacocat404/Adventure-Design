@@ -225,21 +225,54 @@ function Join({ onIn, onBack }) {
   )
 }
 
-// 개발 · 시연용: 시드 계정(비밀번호 pass1234)으로 바로 들어간다
+// 관리자: 방패
+const AdminIcon = () => (
+  <Svg><path d="M12 3l7 3v5.5c0 4.2-2.9 7.9-7 9.5-4.1-1.6-7-5.3-7-9.5V6z" /><path d="M9 12l2.2 2.2L15.5 10" /></Svg>
+)
+
+// 개발 · 시연용: 역할 버튼 한 번으로 시드 계정(비밀번호 pass1234)에 들어간다. 직접 입력은 접어 둔다.
+const QUICK = [['parent', 'parent1', '학부모', ParentIcon, true], ['staff', 'teacher1', '교사', TeacherIcon], ['student', 'admin1', '관리자', AdminIcon]]
+
 function TestLogin({ onIn, onBack }) {
   const [f, setF] = useState({ login_id: '', password: 'pass1234' })
+  const [busyId, setBusyId] = useState(null)
+  const [msg, setMsg] = useState(null)
+  const [resetting, setResetting] = useState(false)
   const [submit, busy, err] = useSubmit(async () => onIn(await api('/auth/login', { method: 'POST', body: f })))
+  const quick = async (id) => {
+    setBusyId(id); setMsg(null)
+    try { onIn(await api('/auth/login', { method: 'POST', body: { login_id: id, password: 'pass1234' } })) } catch (e) { setMsg(e.message); setBusyId(null) }
+  }
+  const reset = async () => {
+    if (!window.confirm('시연하면서 생긴 데이터를 지우고 처음 장면으로 되돌릴까요? 계정 · 학교 · 반은 그대로 남아요.')) return
+    setMsg(null); setResetting(true)
+    try { await api('/demo/reset', { method: 'POST' }); setMsg('시연 데이터를 되돌렸어요') } catch (e) { setMsg(e.message) } finally { setResetting(false) }
+  }
   return (
-    <form className="app" onSubmit={submit}>
-      <Header title="테스트 계정" sub="개발용 · teacher1 · parent1 · admin1 · student1" onBack={onBack} />
+    <div className="app">
+      <Header title="테스트 계정" sub="개발용 · 역할을 누르면 바로 들어가요" onBack={onBack} />
       <div className="page tight">
-        <label className="lbl" htmlFor="lid">아이디</label>
-        <input id="lid" className="field" autoComplete="username" value={f.login_id} onChange={(e) => setF({ ...f, login_id: e.target.value })} />
-        <label className="lbl" htmlFor="pw">비밀번호</label>
-        <input id="pw" className="field" type="password" autoComplete="current-password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
-        {err && <p className="err" role="alert">{err.message}</p>}
-        <Btn disabled={busy || !f.login_id || !f.password}>들어가기</Btn>
+        <div className="tiles">
+          {QUICK.map(([cls, id, label, Icon, wide]) => (
+            <button key={id} className={`tile ${cls}${wide ? ' wide' : ''}`} disabled={busyId !== null} onClick={() => quick(id)}>
+              <span className="ic"><Icon /></span>{label}
+            </button>
+          ))}
+        </div>
+        {msg && <p className="err" role="alert">{msg}</p>}
+        <details style={{ marginTop: 8 }}>
+          <summary className="cap center" style={{ cursor: 'pointer' }}>다른 계정으로 들어가기 (학생 등)</summary>
+          <form onSubmit={submit} style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+            <label className="lbl" htmlFor="lid">아이디</label>
+            <input id="lid" className="field" autoComplete="username" value={f.login_id} onChange={(e) => setF({ ...f, login_id: e.target.value })} />
+            <label className="lbl" htmlFor="pw">비밀번호</label>
+            <input id="pw" className="field" type="password" autoComplete="current-password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
+            {err && <p className="err" role="alert">{err.message}</p>}
+            <Btn disabled={busy || !f.login_id || !f.password}>들어가기</Btn>
+          </form>
+        </details>
+        <button className="cap center" style={{ textDecoration: 'underline', marginTop: 16 }} disabled={resetting} onClick={reset}>{resetting ? '되돌리는 중… (10초쯤 걸려요)' : '데모 리셋'}</button>
       </div>
-    </form>
+    </div>
   )
 }

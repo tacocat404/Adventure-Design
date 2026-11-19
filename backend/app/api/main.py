@@ -433,6 +433,17 @@ def config():
     return {"demo_login": demo_on(), "providers": list(PROFILES), "ready": ready()}
 
 
+@app.post("/api/demo/reset")
+def demo_reset():
+    """시연 뒤 데모 리셋 — 시연 중 만든 메시지 · 사건 · 알림만 지우고 장면 데이터를 다시 넣는다. 계정 · 학교 · 반은 그대로.
+    개발 · 시연 모드(CUSHION_DEMO_LOGIN=on)에서만 열린다. backend/demo_reset.py 와 같은 일을 한다 (이쪽은 백업 없음)."""
+    if not demo_on():
+        raise ApiError("NOT_FOUND", 404)
+    from app.api import demo_data  # 불러오면 처음 한 번 채우기는 알아서 돈다
+    demo_data.seed_present(force=True)
+    return {"ok": True}
+
+
 @app.post("/api/auth/social")
 def social(b: Social):
     uid_, name = social_profile(b.provider, b.token)
